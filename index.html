@@ -2,31 +2,274 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Teste Supabase</title>
+    <title>My Life Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .login-box { text-align: center; margin-top: 100px; }
+        button { padding: 10px 20px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #8e44ad; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .status-ativo { color: green; font-weight: bold; }
+        .status-expirado { color: red; font-weight: bold; }
+        .status-proximo { color: orange; font-weight: bold; }
+        .renovar-btn { background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+        .renovar-btn:hover { background: #218838; }
+        .loading { opacity: 0.5; pointer-events: none; }
+    </style>
 </head>
 <body>
-    <h1>Teste de Conexão</h1>
-    <button onclick="testar()">Testar</button>
-    <pre id="resultado"></pre>
+    <div id="login" class="login-box">
+        <h2>🔐 Admin - My Life</h2>
+        <button onclick="loginGithub()">Entrar com GitHub</button>
+        <p id="status"></p>
+    </div>
+
+    <div id="admin" style="display:none">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+            <h2>📊 Painel de Assinaturas</h2>
+            <button onclick="logout()">Sair</button>
+        </div>
+        
+        <div id="stats" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:20px 0">
+            <div style="background:#f0f0f0; padding:15px; border-radius:5px; text-align:center">
+                <strong>Total</strong>
+                <div id="total" style="font-size:24px">0</div>
+            </div>
+            <div style="background:#d4edda; padding:15px; border-radius:5px; text-align:center">
+                <strong>Ativos</strong>
+                <div id="ativos" style="font-size:24px">0</div>
+            </div>
+            <div style="background:#fff3cd; padding:15px; border-radius:5px; text-align:center">
+                <strong>Próximos 7d</strong>
+                <div id="proximos" style="font-size:24px">0</div>
+            </div>
+            <div style="background:#f8d7da; padding:15px; border-radius:5px; text-align:center">
+                <strong>Expirados</strong>
+                <div id="expirados" style="font-size:24px">0</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Expiração</th>
+                    <th>Status</th>
+                    <th>Dias</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela"></tbody>
+        </table>
+    </div>
 
     <script>
+        // CONFIGURAÇÃO ÚNICA - sem declaração duplicada
         const supabase = window.supabase.createClient(
             'https://rirvrrlgjetsgwhqqfvq.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds'
         );
 
-        async function testar() {
-            document.getElementById('resultado').innerText = 'Testando...';
-            
-            // Teste 1: Verificar conexão básica
-            const { data, error } = await supabase.from('assinaturas').select('count');
-            
-            if (error) {
-                document.getElementById('resultado').innerText = 'ERRO: ' + error.message;
-            } else {
-                document.getElementById('resultado').innerText = 'SUCESSO! Conexão OK';
+        // Função para buscar email do usuário
+        async function getUserEmail(userId) {
+            try {
+                const { data, error } = await supabase.rpc('get_user_email', {
+                    user_id: userId
+                });
+                
+                if (error) {
+                    console.error('Erro ao buscar email:', error);
+                    return 'Email não disponível';
+                }
+                
+                return data || 'Email não encontrado';
+            } catch (error) {
+                console.error('Erro na função getUserEmail:', error);
+                return 'Erro ao carregar';
             }
+        }
+
+        // Função para renovar assinatura
+        async function renovarAssinatura(id, dias = 30) {
+            if (!confirm('Deseja renovar esta assinatura por 30 dias?')) return;
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'Renovando...';
+            
+            try {
+                const { data, error } = await supabase.rpc('renovar_assinatura', {
+                    p_assinatura_id: id,
+                    p_dias: dias
+                });
+                
+                if (error) throw error;
+                
+                alert('Assinatura renovada com sucesso!');
+                carregarDados(); // Recarrega os dados
+            } catch (error) {
+                alert('Erro ao renovar: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = 'Renovar';
+            }
+        }
+
+        // Função para formatar data
+        function formatarData(dataString) {
+            return new Date(dataString).toLocaleDateString('pt-BR');
+        }
+
+        // Função para calcular dias restantes
+        function calcularDiasRestantes(dataExpiracao) {
+            const hoje = new Date();
+            const expiracao = new Date(dataExpiracao);
+            const diffTime = expiracao - hoje;
+            const diffDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDias;
+        }
+
+        // Função para determinar status
+        function getStatus(diasRestantes) {
+            if (diasRestantes < 0) return { texto: 'Expirado', classe: 'status-expirado' };
+            if (diasRestantes <= 7) return { texto: 'Próximo ao vencimento', classe: 'status-proximo' };
+            return { texto: 'Ativo', classe: 'status-ativo' };
+        }
+
+        // Função para carregar dados completos
+        async function carregarDados() {
+            const tabela = document.getElementById('tabela');
+            tabela.innerHTML = '<tr><td colspan="5" style="text-align:center">Carregando...</td></tr>';
+            
+            try {
+                // Buscar assinaturas
+                const { data: assinaturas, error } = await supabase
+                    .from('assinaturas')
+                    .select('*')
+                    .order('data_expiracao', { ascending: true });
+                
+                if (error) throw error;
+                
+                if (!assinaturas || assinaturas.length === 0) {
+                    tabela.innerHTML = '<tr><td colspan="5" style="text-align:center">Nenhuma assinatura encontrada</td></tr>';
+                    atualizarEstatisticas([]);
+                    return;
+                }
+
+                // Estatísticas
+                let totalAtivos = 0;
+                let totalProximos = 0;
+                let totalExpirados = 0;
+
+                // Para cada assinatura, buscar o email
+                for (const assinatura of assinaturas) {
+                    const email = await getUserEmail(assinatura.user_id);
+                    assinatura.email_usuario = email;
+                    
+                    // Calcular estatísticas
+                    const diasRestantes = calcularDiasRestantes(assinatura.data_expiracao);
+                    if (diasRestantes < 0) totalExpirados++;
+                    else if (diasRestantes <= 7) totalProximos++;
+                    else totalAtivos++;
+                }
+
+                // Atualizar estatísticas
+                atualizarEstatisticas({
+                    total: assinaturas.length,
+                    ativos: totalAtivos,
+                    proximos: totalProximos,
+                    expirados: totalExpirados
+                });
+
+                // Renderizar tabela
+                tabela.innerHTML = assinaturas.map(ass => {
+                    const diasRestantes = calcularDiasRestantes(ass.data_expiracao);
+                    const status = getStatus(diasRestantes);
+                    
+                    return `
+                        <tr>
+                            <td>${ass.email_usuario}</td>
+                            <td>${formatarData(ass.data_expiracao)}</td>
+                            <td class="${status.classe}">${status.texto}</td>
+                            <td>${diasRestantes} dias</td>
+                            <td>
+                                ${diasRestantes <= 7 ? 
+                                    `<button class="renovar-btn" onclick="renovarAssinatura('${ass.id}')">Renovar</button>` 
+                                    : '-'}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                tabela.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red">Erro ao carregar: ${error.message}</td></tr>`;
+            }
+        }
+
+        // Função para atualizar estatísticas
+        function atualizarEstatisticas(stats) {
+            document.getElementById('total').textContent = stats.total || 0;
+            document.getElementById('ativos').textContent = stats.ativos || 0;
+            document.getElementById('proximos').textContent = stats.proximos || 0;
+            document.getElementById('expirados').textContent = stats.expirados || 0;
+        }
+
+        async function loginGithub() {
+            document.getElementById('status').innerText = 'Redirecionando para GitHub...';
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'github',
+                options: { 
+                    redirectTo: window.location.href.split('#')[0].split('?')[0]
+                }
+            });
+            if (error) {
+                document.getElementById('status').innerText = 'Erro: ' + error.message;
+                console.error('Erro login:', error);
+            }
+        }
+
+        async function verificarSessao() {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    console.error('Erro ao verificar sessão:', error);
+                    return;
+                }
+
+                if (session) {
+                    document.getElementById('login').style.display = 'none';
+                    document.getElementById('admin').style.display = 'block';
+                    await carregarDados();
+                } else {
+                    // Verificar se tem hash na URL (callback do OAuth)
+                    if (window.location.hash) {
+                        const { data, error } = await supabase.auth.getSession();
+                        if (data.session) {
+                            document.getElementById('login').style.display = 'none';
+                            document.getElementById('admin').style.display = 'block';
+                            await carregarDados();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar sessão:', error);
+            }
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = window.location.pathname;
+        }
+
+        // Iniciar
+        document.addEventListener('DOMContentLoaded', verificarSessao);
+
+        // Verificar se veio de callback do OAuth
+        if (window.location.hash || window.location.search) {
+            verificarSessao();
         }
     </script>
 </body>
