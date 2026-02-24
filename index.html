@@ -2,78 +2,31 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>My Life Admin</title>
+    <title>Teste Supabase</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: Arial; padding: 20px; text-align: center; }
-        button { padding: 10px 20px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        pre { text-align: left; background: #f0f0f0; padding: 10px; border-radius: 5px; margin-top: 20px; }
-    </style>
 </head>
 <body>
-    <div id="login">
-        <h2>🔐 Login Admin - My Life</h2>
-        <button onclick="loginGithub()">Entrar com GitHub</button>
-        <p id="status"></p>
-    </div>
-
-    <div id="admin" style="display:none">
-        <h2>✅ Painel Admin</h2>
-        <button onclick="logout()">Sair</button>
-        <h3>Dados das Assinaturas:</h3>
-        <pre id="dados">Carregando...</pre>
-    </div>
+    <h1>Teste de Conexão</h1>
+    <button onclick="testar()">Testar</button>
+    <pre id="resultado"></pre>
 
     <script>
-        // Configuração ÚNICA do Supabase
         const supabase = window.supabase.createClient(
             'https://rirvrrlgjetsgwhqqfvq.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds'
         );
 
-        // Função de login
-        async function loginGithub() {
-            document.getElementById('status').innerText = 'Redirecionando...';
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'github',
-                options: { redirectTo: window.location.href }
-            });
-            if (error) document.getElementById('status').innerText = 'Erro: ' + error.message;
-        }
-
-        // Verificar se já está logado
-        async function verificarLogin() {
-            const { data: { session } } = await supabase.auth.getSession();
+        async function testar() {
+            document.getElementById('resultado').innerText = 'Testando...';
             
-            if (session) {
-                document.getElementById('login').style.display = 'none';
-                document.getElementById('admin').style.display = 'block';
-                
-                // Buscar assinaturas
-                const { data, error } = await supabase
-                    .from('assinaturas')
-                    .select('*');
-                
-                if (error) {
-                    document.getElementById('dados').innerText = 'Erro: ' + error.message;
-                } else {
-                    document.getElementById('dados').innerText = JSON.stringify(data, null, 2);
-                }
+            // Teste 1: Verificar conexão básica
+            const { data, error } = await supabase.from('assinaturas').select('count');
+            
+            if (error) {
+                document.getElementById('resultado').innerText = 'ERRO: ' + error.message;
+            } else {
+                document.getElementById('resultado').innerText = 'SUCESSO! Conexão OK';
             }
-        }
-
-        // Logout
-        async function logout() {
-            await supabase.auth.signOut();
-            window.location.reload();
-        }
-
-        // Executar ao carregar a página
-        verificarLogin();
-
-        // Verificar se voltou do GitHub (callback)
-        if (window.location.search || window.location.hash) {
-            verificarLogin();
         }
     </script>
 </body>
