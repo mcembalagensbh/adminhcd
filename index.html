@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Life - Admin</title>
+    <title>My Life - Admin de Assinaturas</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ESTILOS - copie do código anterior */
+        /* Mantenha todo o CSS que você já tem - é igual */
         * {
             margin: 0;
             padding: 0;
@@ -468,7 +468,7 @@
         <i class="fas fa-crown" style="font-size: 48px; color: var(--primary); margin-bottom: 20px;"></i>
         <h2 style="margin-bottom: 20px;">Painel Admin - My Life</h2>
         <p style="margin-bottom: 20px; color: var(--gray);">Faça login com seu GitHub para acessar</p>
-        <button class="github-btn" onclick="loginComGithub()">
+        <button class="github-btn" id="githubLoginBtn">
             <i class="fab fa-github"></i>
             Entrar com GitHub
         </button>
@@ -524,15 +524,18 @@
         <div class="filters">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Buscar por email..." onkeyup="filtrarTabela()">
+                <input type="text" id="searchInput" placeholder="Buscar por email...">
             </div>
-            <select class="filter-select" id="statusFilter" onchange="filtrarTabela()">
+            <select class="filter-select" id="statusFilter">
                 <option value="todos">Todos os status</option>
                 <option value="ativo">Ativos</option>
                 <option value="expirado">Expirados</option>
                 <option value="proximos">Próximos (7 dias)</option>
             </select>
-            <button class="btn btn-primary" onclick="carregarAssinantes()">
+            <button class="btn btn-primary" id="filtrarBtn">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+            <button class="btn btn-success" id="atualizarBtn">
                 <i class="fas fa-sync-alt"></i> Atualizar
             </button>
         </div>
@@ -578,43 +581,59 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // Configuração do Supabase (apenas uma vez!)
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // Variáveis globais
         let assinantes = [];
         let logs = [];
         let currentPage = 1;
         const itemsPerPage = 10;
 
+        // Função de login
         async function loginComGithub() {
-            document.getElementById('loginStatus').innerHTML = 'Redirecionando para GitHub...';
+            const statusEl = document.getElementById('loginStatus');
+            statusEl.innerHTML = 'Redirecionando para GitHub...';
             
-            const { data, error } = await supabase.auth.signInWithOAuth({
-                provider: 'github',
-                options: {
-                    redirectTo: window.location.href
+            try {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: 'github',
+                    options: {
+                        redirectTo: window.location.href
+                    }
+                });
+
+                if (error) {
+                    statusEl.innerHTML = 'Erro: ' + error.message;
+                    console.error('Erro login:', error);
                 }
-            });
-
-            if (error) {
-                document.getElementById('loginStatus').innerHTML = 'Erro: ' + error.message;
+            } catch (err) {
+                statusEl.innerHTML = 'Erro inesperado';
+                console.error('Erro:', err);
             }
         }
 
+        // Verificar sessão
         async function verificarSessao() {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            
-            if (session) {
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('adminContainer').style.display = 'block';
-                document.getElementById('userEmail').textContent = session.user.email;
-                await carregarAssinantes();
-                await carregarLogs();
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (session) {
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('adminContainer').style.display = 'block';
+                    document.getElementById('userEmail').textContent = session.user.email;
+                    await carregarAssinantes();
+                    await carregarLogs();
+                }
+            } catch (err) {
+                console.error('Erro ao verificar sessão:', err);
             }
         }
 
+        // Carregar assinantes
         async function carregarAssinantes() {
             try {
                 const { data: assinaturas, error } = await supabase
@@ -624,21 +643,10 @@
 
                 if (error) throw error;
 
-                // Buscar emails dos usuários
-                const userIds = assinaturas?.map(a => a.user_id) || [];
-                let userMap = {};
-
-                if (userIds.length > 0) {
-                    for (const userId of userIds) {
-                        const { data: email } = await supabase
-                            .rpc('get_user_email', { user_uuid: userId });
-                        if (email) userMap[userId] = email;
-                    }
-                }
-
+                // Processar assinantes
                 assinantes = (assinaturas || []).map(a => ({
                     ...a,
-                    email: userMap[a.user_id] || 'Email não encontrado',
+                    email: a.user_id.substring(0, 8) + '...', // Temporário
                     dias_restantes: Math.ceil((new Date(a.data_expiracao) - new Date()) / (1000 * 60 * 60 * 24))
                 }));
 
@@ -646,7 +654,7 @@
                 filtrarTabela();
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao carregar assinantes: ' + error.message, 'error');
+                showToast('Erro ao carregar assinantes', 'error');
             }
         }
 
@@ -892,15 +900,32 @@
             window.location.reload();
         }
 
-        document.getElementById('modalOverlay').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) fecharModal();
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login button
+            document.getElementById('githubLoginBtn').addEventListener('click', loginComGithub);
+            
+            // Filter buttons
+            document.getElementById('filtrarBtn').addEventListener('click', filtrarTabela);
+            document.getElementById('atualizarBtn').addEventListener('click', carregarAssinantes);
+            
+            // Search input
+            document.getElementById('searchInput').addEventListener('keyup', filtrarTabela);
+            
+            // Status filter
+            document.getElementById('statusFilter').addEventListener('change', filtrarTabela);
+            
+            // Modal close on overlay click
+            document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) fecharModal();
+            });
         });
 
         // Verificar sessão ao carregar
         verificarSessao();
 
         // Verificar parâmetros da URL (para callback do OAuth)
-        if (window.location.hash || window.location.search.includes('access_token')) {
+        if (window.location.hash || window.location.search.includes('access_token') || window.location.search.includes('code')) {
             verificarSessao();
         }
     </script>
