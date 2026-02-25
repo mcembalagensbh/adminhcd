@@ -507,7 +507,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Estilos para o relatório financeiro */
         .report-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -803,8 +802,10 @@
             anual: { valor: 189.90, dias: 365 }
         };
 
-        // Criar cliente Supabase
+        // Criar cliente Supabase - CLIENTE ANÔNIMO (para operações normais)
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Criar cliente ADMIN com Service Role (para operações que exigem acesso total)
         const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
         
         let usuariosData = [];
@@ -836,7 +837,7 @@
             return diffDays;
         }
 
-        // Carregar estatísticas
+        // Carregar estatísticas (usa RPC que já deve ter permissão)
         async function carregarEstatisticas() {
             try {
                 const { data, error } = await supabaseClient
@@ -882,7 +883,7 @@
             }
         }
 
-        // Carregar usuários
+        // Carregar usuários (usa RPC que já deve ter permissão)
         async function carregarUsuarios() {
             try {
                 const { data, error } = await supabaseClient
@@ -1021,7 +1022,7 @@
             document.getElementById('modalAdicionarDias').style.display = 'flex';
         }
 
-        // Confirmar adição de dias
+        // Confirmar adição de dias (usa supabaseAdmin)
         async function confirmarAdicionarDias() {
             const dias = parseInt(document.getElementById('diasQuantidade').value);
             const status = document.getElementById('diasStatus').value;
@@ -1043,7 +1044,7 @@
 
                 if (error) throw error;
 
-                // Registrar log manual
+                // Registrar log manual (usa supabaseAdmin)
                 await supabaseAdmin
                     .from('log_assinaturas')
                     .insert({
@@ -1065,7 +1066,7 @@
             }
         }
 
-        // Mudar status do usuário
+        // Mudar status do usuário (usa supabaseAdmin)
         async function mudarStatus(userId, novoStatus) {
             if (!confirm(`Tem certeza que deseja mudar o status para ${novoStatus}?`)) {
                 return;
@@ -1080,7 +1081,7 @@
 
                 if (error) throw error;
 
-                // Registrar log manual
+                // Registrar log manual (usa supabaseAdmin)
                 await supabaseAdmin
                     .from('log_assinaturas')
                     .insert({
@@ -1099,7 +1100,7 @@
             }
         }
 
-        // Ver logs do usuário
+        // Ver logs do usuário (usa supabaseAdmin)
         async function verLogsUsuario(userId) {
             try {
                 const { data, error } = await supabaseAdmin
@@ -1146,7 +1147,7 @@
             }
         }
 
-        // Carregar logs gerais
+        // Carregar logs gerais (usa supabaseAdmin)
         async function carregarLogsGerais() {
             try {
                 const { data, error } = await supabaseAdmin
@@ -1201,16 +1202,17 @@
             await carregarRelatorioFinanceiro();
         }
 
-        // Carregar dados do relatório financeiro
+        // Carregar dados do relatório financeiro (AGORA USA supabaseAdmin)
         async function carregarRelatorioFinanceiro() {
             try {
-                // Buscar todas as assinaturas com logs de pagamento
+                // Buscar todas as assinaturas usando supabaseAdmin (ignora RLS)
                 const { data: assinaturas, error: assError } = await supabaseAdmin
                     .from('assinaturas')
                     .select('*');
 
                 if (assError) throw assError;
 
+                // Buscar logs de pagamento usando supabaseAdmin (ignora RLS)
                 const { data: logs, error: logError } = await supabaseAdmin
                     .from('log_assinaturas')
                     .select('*')
@@ -1226,7 +1228,7 @@
                 let pagamentosAnual = 0;
                 const pagamentosPorMes = {};
 
-                logs.forEach(log => {
+                (logs || []).forEach(log => {
                     const data = new Date(log.data_verificacao);
                     const mesAno = `${data.getMonth() + 1}/${data.getFullYear()}`;
                     
@@ -1252,17 +1254,20 @@
                 const mediaMensal = meses > 0 ? totalGeral / meses : 0;
 
                 // Calcular assinaturas ativas
-                const ativosMensal = assinaturas.filter(a => {
+                const hoje = new Date();
+                hoje.setHours(0, 0, 0, 0);
+                
+                const ativosMensal = (assinaturas || []).filter(a => {
                     if (!a.data_expiracao) return false;
                     const expiracao = new Date(a.data_expiracao);
-                    const hoje = new Date();
+                    expiracao.setHours(0, 0, 0, 0);
                     return expiracao >= hoje && a.plano === 'mensal';
                 }).length;
 
-                const ativosAnual = assinaturas.filter(a => {
+                const ativosAnual = (assinaturas || []).filter(a => {
                     if (!a.data_expiracao) return false;
                     const expiracao = new Date(a.data_expiracao);
-                    const hoje = new Date();
+                    expiracao.setHours(0, 0, 0, 0);
                     return expiracao >= hoje && a.plano === 'anual';
                 }).length;
 
@@ -1275,7 +1280,7 @@
                                 <i class="fas fa-dollar-sign"></i> Total Arrecadado (Geral)
                             </div>
                             <div class="report-value">R$ ${totalGeral.toFixed(2)}</div>
-                            <div class="report-sub">Baseado em ${logs.length} pagamentos</div>
+                            <div class="report-sub">Baseado em ${logs?.length || 0} pagamentos</div>
                         </div>
                         
                         <div class="report-card">
@@ -1370,7 +1375,7 @@
                 console.error('Erro ao carregar relatório:', error);
                 document.getElementById('relatorioContent').innerHTML = `
                     <p style="text-align: center; color: var(--danger); padding: 20px;">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros: ${error.message}
                     </p>
                 `;
             }
