@@ -158,11 +158,14 @@
     </div>
 
     <script>
+        // Configuração do Supabase
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Criar cliente Supabase (com nome único para evitar conflito)
+        const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Função de login - DEFINIDA ANTES de ser usada
         async function fazerLogin() {
             const senha = document.getElementById('senhaInput').value;
             
@@ -171,26 +174,29 @@
                 return;
             }
 
+            // Mostrar loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('errorMessage').style.display = 'none';
 
             try {
                 // Verificar a senha no banco
-                const { data, error } = await supabase
+                const { data, error } = await supabaseAdmin
                     .rpc('verificar_senha_admin', { p_senha: senha });
 
                 if (error) throw error;
 
-                if (data) {
+                if (data === true) {
                     // Senha correta - salvar no sessionStorage
                     sessionStorage.setItem('admin_autenticado', 'true');
+                    
+                    // Redirecionar para o painel
                     window.location.href = 'admin.html';
                 } else {
                     mostrarErro('Senha incorreta');
                 }
             } catch (error) {
-                console.error('Erro:', error);
-                mostrarErro('Erro ao verificar senha');
+                console.error('Erro detalhado:', error);
+                mostrarErro('Erro ao verificar senha: ' + error.message);
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -200,6 +206,14 @@
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = msg;
             errorDiv.style.display = 'block';
+        }
+
+        // Verificar se já está logado (opcional - redirecionar se já estiver)
+        window.onload = function() {
+            const autenticado = sessionStorage.getItem('admin_autenticado');
+            if (autenticado === 'true') {
+                window.location.href = 'admin.html';
+            }
         }
     </script>
 </body>
