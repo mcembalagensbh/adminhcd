@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Life - Painel Admin</title>
     <style>
-        /* (mesmo CSS que eu enviei antes, mantém igual) */
         * {
             margin: 0;
             padding: 0;
@@ -134,6 +133,7 @@
             padding: 10px;
             border-radius: 12px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
         }
 
         .tab-btn {
@@ -426,6 +426,7 @@
         .log-action.expirado_auto { color: var(--danger); }
         .log-action.proximo_expiracao { color: var(--warning); }
         .log-action.admin_manual { color: var(--success); }
+        .log-action.status_alterado { color: var(--warning); }
 
         .log-details {
             color: var(--dark);
@@ -470,6 +471,16 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        pre {
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -501,12 +512,16 @@
             <button class="tab-btn" onclick="mudarAba('ajuda')">
                 <i class="fas fa-question-circle"></i> Ajuda
             </button>
+            <button class="tab-btn" onclick="mudarAba('config')">
+                <i class="fas fa-cog"></i> Configurações
+            </button>
         </div>
 
         <div class="search-bar" id="searchBar">
             <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por email ou ID..." onkeyup="filtrarUsuarios()">
         </div>
 
+        <!-- Aba Usuários -->
         <div id="usuariosTab" class="tab-content">
             <div class="table-container">
                 <table id="tabelaUsuarios">
@@ -531,12 +546,14 @@
             </div>
         </div>
 
+        <!-- Aba Logs -->
         <div id="logsTab" class="tab-content" style="display: none;">
             <div class="logs-container" id="logsContainer">
                 <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando logs...</div>
             </div>
         </div>
 
+        <!-- Aba Ajuda -->
         <div id="ajudaTab" class="tab-content" style="display: none;">
             <div style="background: white; padding: 30px; border-radius: 12px;">
                 <h2 style="color: var(--primary-dark); margin-bottom: 20px;">
@@ -568,8 +585,56 @@
                 </div>
             </div>
         </div>
+
+        <!-- Aba Configurações -->
+        <div id="configTab" class="tab-content" style="display: none;">
+            <div style="background: white; padding: 30px; border-radius: 12px;">
+                <h2 style="color: var(--primary-dark); margin-bottom: 20px;">
+                    <i class="fas fa-cog"></i> Configurações do Admin
+                </h2>
+                
+                <div style="max-width: 400px; margin: 0 auto;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">
+                        <i class="fas fa-lock"></i> Alterar Senha
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label>Senha Atual</label>
+                        <input type="password" id="senhaAtual" class="form-control" placeholder="Digite a senha atual">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        <input type="password" id="senhaNova" class="form-control" placeholder="Mínimo 4 caracteres">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Confirmar Nova Senha</label>
+                        <input type="password" id="senhaConfirmar" class="form-control" placeholder="Digite novamente">
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="alterarSenhaAdmin()" style="width: 100%;">
+                        <i class="fas fa-save"></i> Alterar Senha
+                    </button>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <h4 style="color: var(--warning); margin-bottom: 10px;">
+                            <i class="fas fa-exclamation-triangle"></i> Importante
+                        </h4>
+                        <p style="font-size: 0.9em; color: var(--gray);">
+                            Se você perder a senha, precisará acessar o Supabase SQL Editor e executar:
+                        </p>
+                        <pre>
+UPDATE admin_config 
+SET valor = 'nova_senha_aqui' 
+WHERE chave = 'admin_senha';</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Modal para adicionar dias -->
     <div class="modal-overlay" id="modalAdicionarDias">
         <div class="modal-content">
             <div class="modal-header">
@@ -602,6 +667,7 @@
         </div>
     </div>
 
+    <!-- Modal para ver logs do usuário -->
     <div class="modal-overlay" id="modalLogsUsuario">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
@@ -617,19 +683,19 @@
         </div>
     </div>
 
+    <!-- Toast de notificação -->
     <div id="toast" class="toast"></div>
 
     <script>
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
 
-        // Criar cliente Supabase
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let usuariosData = [];
         let usuarioSelecionado = null;
 
-        // Verificar se está autenticado como admin
+        // Verificar autenticação
         function verificarAutenticacao() {
             const autenticado = sessionStorage.getItem('admin_autenticado');
             if (!autenticado) {
@@ -843,7 +909,6 @@
                 showToast(data.mensagem, 'success');
                 fecharModal('modalAdicionarDias');
                 
-                // Recarregar dados
                 await carregarUsuarios();
                 await carregarEstatisticas();
                 
@@ -874,7 +939,7 @@
                 
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao mudar status', 'error');
+                showToast('Erro ao mudar status: ' + (error.message || 'erro desconhecido'), 'error');
             }
         }
 
@@ -899,12 +964,13 @@
                         else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
                         else if (log.acao === 'proximo_expiracao') actionClass += ' proximo_expiracao';
                         else if (log.acao === 'admin_manual') actionClass += ' admin_manual';
+                        else if (log.acao === 'status_alterado') actionClass += ' status_alterado';
 
                         html += `
                             <div class="log-item">
                                 <div class="log-date">${dataLog}</div>
                                 <div class="${actionClass}">${log.acao}</div>
-                                <div class="log-details">${log.detalhes}</div>
+                                <div class="log-details">${log.detalhes || ''}</div>
                             </div>
                         `;
                     });
@@ -946,6 +1012,7 @@
                     else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
                     else if (log.acao === 'proximo_expiracao') actionClass += ' proximo_expiracao';
                     else if (log.acao === 'admin_manual') actionClass += ' admin_manual';
+                    else if (log.acao === 'status_alterado') actionClass += ' status_alterado';
 
                     html += `
                         <div class="log-item">
@@ -968,6 +1035,52 @@
             }
         }
 
+        // Alterar senha do admin
+        async function alterarSenhaAdmin() {
+            const senhaAtual = document.getElementById('senhaAtual').value;
+            const senhaNova = document.getElementById('senhaNova').value;
+            const senhaConfirmar = document.getElementById('senhaConfirmar').value;
+
+            if (!senhaAtual || !senhaNova || !senhaConfirmar) {
+                showToast('Preencha todos os campos', 'warning');
+                return;
+            }
+
+            if (senhaNova.length < 4) {
+                showToast('A nova senha deve ter pelo menos 4 caracteres', 'warning');
+                return;
+            }
+
+            if (senhaNova !== senhaConfirmar) {
+                showToast('As senhas não coincidem', 'warning');
+                return;
+            }
+
+            try {
+                showToast('Alterando senha...', 'info');
+                
+                const { data, error } = await supabaseClient
+                    .rpc('admin_alterar_senha', {
+                        senha_atual: senhaAtual,
+                        senha_nova: senhaNova
+                    });
+
+                if (error) throw error;
+
+                if (data.sucesso) {
+                    showToast(data.mensagem, 'success');
+                    document.getElementById('senhaAtual').value = '';
+                    document.getElementById('senhaNova').value = '';
+                    document.getElementById('senhaConfirmar').value = '';
+                } else {
+                    showToast(data.mensagem, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao alterar senha', 'error');
+            }
+        }
+
         // Mudar aba
         function mudarAba(aba) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -985,6 +1098,10 @@
             } else if (aba === 'ajuda') {
                 document.querySelector('[onclick="mudarAba(\'ajuda\')"]').classList.add('active');
                 document.getElementById('ajudaTab').style.display = 'block';
+                document.getElementById('searchBar').style.display = 'none';
+            } else if (aba === 'config') {
+                document.querySelector('[onclick="mudarAba(\'config\')"]').classList.add('active');
+                document.getElementById('configTab').style.display = 'block';
                 document.getElementById('searchBar').style.display = 'none';
             }
         }
@@ -1008,10 +1125,8 @@
 
         // Inicialização
         async function init() {
-            // Verificar autenticação primeiro
             if (!verificarAutenticacao()) return;
 
-            // Mostrar loading
             showToast('Carregando dados...', 'info');
 
             try {
@@ -1025,7 +1140,6 @@
                 showToast('Erro ao carregar dados', 'error');
             }
 
-            // Logout
             document.getElementById('btnLogout').addEventListener('click', async () => {
                 sessionStorage.removeItem('admin_autenticado');
                 window.location.href = 'admin_login.html';
@@ -1039,7 +1153,6 @@
             }
         };
 
-        // Iniciar quando a página carregar
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
