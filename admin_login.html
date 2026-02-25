@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Life - Admin Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header i {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .login-header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .login-header p {
+            color: #95a5a6;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            color: #667eea;
+        }
+
+        .loading i {
+            font-size: 20px;
+            margin-right: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #95a5a6;
+            font-size: 12px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <i class="fas fa-crown"></i>
+            <h1>Painel Administrativo</h1>
+            <p>My Life - Gestão de Assinaturas</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="form-group">
+            <label><i class="fas fa-lock"></i> Senha de Administrador</label>
+            <input type="password" id="senhaInput" placeholder="Digite a senha" onkeypress="if(event.key==='Enter') fazerLogin()">
+        </div>
+
+        <button class="btn-login" onclick="fazerLogin()">
+            <i class="fas fa-sign-in-alt"></i> Acessar Painel
+        </button>
+
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner fa-spin"></i> Verificando...
+        </div>
+
+        <div class="footer">
+            <i class="fas fa-shield-alt"></i> Acesso restrito
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function fazerLogin() {
+            const senha = document.getElementById('senhaInput').value;
+            
+            if (!senha) {
+                mostrarErro('Digite a senha');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+
+            try {
+                // Verificar a senha no banco
+                const { data, error } = await supabase
+                    .rpc('verificar_senha_admin', { p_senha: senha });
+
+                if (error) throw error;
+
+                if (data) {
+                    // Senha correta - salvar no sessionStorage
+                    sessionStorage.setItem('admin_autenticado', 'true');
+                    window.location.href = 'admin.html';
+                } else {
+                    mostrarErro('Senha incorreta');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarErro('Erro ao verificar senha');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function mostrarErro(msg) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
