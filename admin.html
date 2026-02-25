@@ -21,6 +21,8 @@
             --dark: #2c3e50;
             --gray: #95a5a6;
             --light: #ecf0f1;
+            --pagarme: #6f42c1;
+            --anual: #28a745;
         }
 
         body {
@@ -31,7 +33,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -193,7 +195,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 1200px;
         }
 
         th {
@@ -265,57 +267,63 @@
 
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 5px;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.85em;
+            font-size: 0.8em;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             transition: all 0.3s;
+            color: white;
         }
 
         .btn-sm {
-            padding: 5px 10px;
-            font-size: 0.8em;
+            padding: 5px 8px;
+            font-size: 0.75em;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
         }
 
         .btn-success {
             background: var(--success);
-            color: white;
         }
 
         .btn-danger {
             background: var(--danger);
-            color: white;
         }
 
         .btn-warning {
             background: var(--warning);
-            color: white;
+            color: var(--dark);
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
+        .btn-pagarme {
+            background: var(--pagarme);
+        }
+
+        .btn-anual {
+            background: var(--anual);
         }
 
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .modal-overlay {
@@ -427,6 +435,8 @@
         .log-action.proximo_expiracao { color: var(--warning); }
         .log-action.admin_manual { color: var(--success); }
         .log-action.status_alterado { color: var(--warning); }
+        .log-action.assinatura_criada_pagarme { color: var(--pagarme); }
+        .log-action.assinatura_renovada_pagarme { color: var(--anual); }
 
         .log-details {
             color: var(--dark);
@@ -460,6 +470,7 @@
         .toast.success { background: var(--success); }
         .toast.error { background: var(--danger); }
         .toast.warning { background: var(--warning); }
+        .toast.info { background: var(--primary); }
 
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
@@ -480,6 +491,20 @@
             font-size: 0.8em;
             overflow-x: auto;
             margin-top: 10px;
+        }
+
+        .link-copiado {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--success);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 3000;
+            display: none;
+            text-align: center;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -567,6 +592,8 @@
                     <p>Para cada usuário, você tem as seguintes opções:</p>
                     <ul style="margin-left: 30px; margin-top: 10px;">
                         <li><strong>➕ Adicionar Dias</strong> - Adiciona dias à assinatura atual</li>
+                        <li><strong>💳 R$17,90</strong> - Gera link de pagamento mensal (Pagar.me)</li>
+                        <li><strong>📅 R$189,90</strong> - Gera link de pagamento anual (Pagar.me)</li>
                         <li><strong>👁️ Ver Logs</strong> - Mostra histórico de ações do usuário</li>
                         <li><strong>✅ Ativar/❌ Desativar</strong> - Muda o status manualmente</li>
                     </ul>
@@ -683,6 +710,32 @@ WHERE chave = 'admin_senha';</pre>
         </div>
     </div>
 
+    <!-- Modal para mostrar link gerado -->
+    <div class="modal-overlay" id="modalLinkGerado">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-link"></i> Link de Pagamento Gerado</h2>
+                <button class="close-modal" onclick="fecharModal('modalLinkGerado')">&times;</button>
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-check-circle" style="font-size: 48px; color: var(--success); margin-bottom: 15px;"></i>
+                <p style="margin-bottom: 15px;">Link gerado com sucesso!</p>
+                <div style="background: var(--light); padding: 15px; border-radius: 8px; margin-bottom: 15px; word-break: break-all;">
+                    <small id="linkGeradoUrl"></small>
+                </div>
+                <button class="btn btn-success" onclick="copiarLink()" style="width: 100%;">
+                    <i class="fas fa-copy"></i> Copiar Link
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalLinkGerado')">Fechar</button>
+                <button class="btn btn-primary" style="flex:2" onclick="window.open(document.getElementById('linkGeradoUrl').textContent, '_blank')">
+                    <i class="fas fa-external-link-alt"></i> Abrir Link
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast de notificação -->
     <div id="toast" class="toast"></div>
 
@@ -694,6 +747,7 @@ WHERE chave = 'admin_senha';</pre>
         
         let usuariosData = [];
         let usuarioSelecionado = null;
+        let linkAtual = '';
 
         // Verificar autenticação
         function verificarAutenticacao() {
@@ -790,9 +844,9 @@ WHERE chave = 'admin_senha';</pre>
 
             let html = '';
             usuarios.forEach(user => {
-                const dias = user.dias_restantes;
+                const dias = user.dias_restantes || 0;
                 let statusClass = 'status-sem_assinatura';
-                let statusText = user.status;
+                let statusText = user.status || 'sem assinatura';
 
                 if (user.status === 'ativo') {
                     if (dias <= 0) {
@@ -807,6 +861,8 @@ WHERE chave = 'admin_senha';</pre>
                     }
                 } else if (user.status === 'expirado') {
                     statusClass = 'status-expirado';
+                } else if (user.status === 'cancelado') {
+                    statusClass = 'status-sem_assinatura';
                 }
 
                 let diasClass = '';
@@ -836,16 +892,22 @@ WHERE chave = 'admin_senha';</pre>
                         <td><small>${ultimoLogin}</small></td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-sm btn-success" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')" title="Adicionar dias">
+                                <button class="btn btn-success btn-sm" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')" title="Adicionar dias manualmente">
                                     <i class="fas fa-plus"></i>
                                 </button>
-                                <button class="btn btn-sm btn-primary" onclick="verLogsUsuario('${user.user_id}')" title="Ver logs">
+                                <button class="btn btn-pagarme btn-sm" onclick="gerarLinkPagamento('${user.user_id}', 'mensal', this)" title="Gerar link de pagamento mensal - R$ 17,90">
+                                    <i class="fas fa-credit-card"></i> R$17,90
+                                </button>
+                                <button class="btn btn-anual btn-sm" onclick="gerarLinkPagamento('${user.user_id}', 'anual', this)" title="Gerar link de pagamento anual - R$ 189,90">
+                                    <i class="fas fa-calendar-alt"></i> R$189,90
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="verLogsUsuario('${user.user_id}')" title="Ver logs do usuário">
                                     <i class="fas fa-history"></i>
                                 </button>
-                                <button class="btn btn-sm btn-warning" onclick="mudarStatus('${user.user_id}', 'ativo')" title="Ativar">
+                                <button class="btn btn-warning btn-sm" onclick="mudarStatus('${user.user_id}', 'ativo')" title="Ativar assinatura">
                                     <i class="fas fa-check-circle"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" onclick="mudarStatus('${user.user_id}', 'expirado')" title="Desativar">
+                                <button class="btn btn-danger btn-sm" onclick="mudarStatus('${user.user_id}', 'expirado')" title="Desativar assinatura">
                                     <i class="fas fa-times-circle"></i>
                                 </button>
                             </div>
@@ -868,7 +930,7 @@ WHERE chave = 'admin_senha';</pre>
 
             const filtrados = usuariosData.filter(user => 
                 user.email.toLowerCase().includes(termo) || 
-                user.user_id.toLowerCase().includes(termo)
+                (user.user_id && user.user_id.toLowerCase().includes(termo))
             );
 
             renderizarTabelaUsuarios(filtrados);
@@ -918,6 +980,75 @@ WHERE chave = 'admin_senha';</pre>
             }
         }
 
+        // NOVA FUNÇÃO: Gerar link de pagamento Pagar.me
+        async function gerarLinkPagamento(userId, plano, botao) {
+            try {
+                // Salvar texto original do botão
+                const textoOriginal = botao.innerHTML;
+                botao.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+                botao.disabled = true;
+                
+                showToast('Gerando link de pagamento...', 'info');
+                
+                // Pegar token do usuário logado
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (!session) {
+                    showToast('Sessão expirada. Faça login novamente.', 'error');
+                    window.location.href = 'admin_login.html';
+                    return;
+                }
+                
+                // Chamar a Edge Function
+                const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/gerar-link-pagamento', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        plano: plano
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erro ao gerar link');
+                }
+                
+                // Salvar link para copiar depois
+                linkAtual = data.url;
+                
+                // Mostrar modal com o link
+                document.getElementById('linkGeradoUrl').textContent = data.url;
+                document.getElementById('modalLinkGerado').style.display = 'flex';
+                
+                // Registrar no console
+                console.log('Link gerado:', data.url);
+                
+                showToast('✅ Link gerado com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Erro ao gerar link:', error);
+                showToast('Erro: ' + (error.message || 'Erro desconhecido'), 'error');
+            } finally {
+                // Restaurar botão
+                botao.innerHTML = plano === 'mensal' ? '<i class="fas fa-credit-card"></i> R$17,90' : '<i class="fas fa-calendar-alt"></i> R$189,90';
+                botao.disabled = false;
+            }
+        }
+
+        // Função para copiar link
+        function copiarLink() {
+            navigator.clipboard.writeText(linkAtual).then(() => {
+                showToast('Link copiado para a área de transferência!', 'success');
+            }).catch(() => {
+                showToast('Erro ao copiar link', 'error');
+            });
+        }
+
         // Mudar status do usuário
         async function mudarStatus(userId, novoStatus) {
             if (!confirm(`Tem certeza que deseja mudar o status para ${novoStatus}?`)) {
@@ -965,6 +1096,8 @@ WHERE chave = 'admin_senha';</pre>
                         else if (log.acao === 'proximo_expiracao') actionClass += ' proximo_expiracao';
                         else if (log.acao === 'admin_manual') actionClass += ' admin_manual';
                         else if (log.acao === 'status_alterado') actionClass += ' status_alterado';
+                        else if (log.acao === 'assinatura_criada_pagarme') actionClass += ' assinatura_criada_pagarme';
+                        else if (log.acao === 'assinatura_renovada_pagarme') actionClass += ' assinatura_renovada_pagarme';
 
                         html += `
                             <div class="log-item">
@@ -1013,6 +1146,8 @@ WHERE chave = 'admin_senha';</pre>
                     else if (log.acao === 'proximo_expiracao') actionClass += ' proximo_expiracao';
                     else if (log.acao === 'admin_manual') actionClass += ' admin_manual';
                     else if (log.acao === 'status_alterado') actionClass += ' status_alterado';
+                    else if (log.acao === 'assinatura_criada_pagarme') actionClass += ' assinatura_criada_pagarme';
+                    else if (log.acao === 'assinatura_renovada_pagarme') actionClass += ' assinatura_renovada_pagarme';
 
                     html += `
                         <div class="log-item">
