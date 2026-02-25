@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Life - Painel Admin</title>
     <style>
+        /* (mesmo CSS que eu enviei antes, mantém igual) */
         * {
             margin: 0;
             padding: 0;
@@ -36,7 +37,6 @@
             padding: 20px;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
@@ -79,7 +79,6 @@
             color: var(--primary-dark);
         }
 
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -127,12 +126,6 @@
             color: var(--dark);
         }
 
-        .stat-info .small {
-            font-size: 0.8em;
-            color: var(--gray);
-        }
-
-        /* Tabs */
         .tabs {
             display: flex;
             gap: 10px;
@@ -167,7 +160,6 @@
             color: white;
         }
 
-        /* Search */
         .search-bar {
             background: white;
             padding: 20px;
@@ -190,7 +182,6 @@
             border-color: var(--primary);
         }
 
-        /* Table */
         .table-container {
             background: white;
             border-radius: 12px;
@@ -327,7 +318,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -403,7 +393,6 @@
             margin-top: 20px;
         }
 
-        /* Logs */
         .logs-container {
             background: white;
             border-radius: 12px;
@@ -443,7 +432,6 @@
             flex: 1;
         }
 
-        /* Loading */
         .loading {
             text-align: center;
             padding: 50px;
@@ -482,18 +470,12 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
-        @media (max-width: 768px) {
-            .container { padding: 10px; }
-            .stats-grid { grid-template-columns: 1fr; }
-        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>
                 <i class="fas fa-crown"></i>
@@ -505,12 +487,10 @@
             </button>
         </div>
 
-        <!-- Stats Cards -->
         <div class="stats-grid" id="statsContainer">
             <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando estatísticas...</div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="mudarAba('usuarios')">
                 <i class="fas fa-users"></i> Usuários
@@ -523,12 +503,10 @@
             </button>
         </div>
 
-        <!-- Search Bar (visível apenas na aba usuários) -->
         <div class="search-bar" id="searchBar">
             <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por email ou ID..." onkeyup="filtrarUsuarios()">
         </div>
 
-        <!-- Tabela de Usuários -->
         <div id="usuariosTab" class="tab-content">
             <div class="table-container">
                 <table id="tabelaUsuarios">
@@ -553,14 +531,12 @@
             </div>
         </div>
 
-        <!-- Logs Tab -->
         <div id="logsTab" class="tab-content" style="display: none;">
             <div class="logs-container" id="logsContainer">
                 <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando logs...</div>
             </div>
         </div>
 
-        <!-- Ajuda Tab -->
         <div id="ajudaTab" class="tab-content" style="display: none;">
             <div style="background: white; padding: 30px; border-radius: 12px;">
                 <h2 style="color: var(--primary-dark); margin-bottom: 20px;">
@@ -573,7 +549,7 @@
                     </h3>
                     <p>Para cada usuário, você tem as seguintes opções:</p>
                     <ul style="margin-left: 30px; margin-top: 10px;">
-                        <li><strong>➕ Adicionar Dias</strong> - Adiciona dias à assinatura atual (renova)</li>
+                        <li><strong>➕ Adicionar Dias</strong> - Adiciona dias à assinatura atual</li>
                         <li><strong>👁️ Ver Logs</strong> - Mostra histórico de ações do usuário</li>
                         <li><strong>✅ Ativar/❌ Desativar</strong> - Muda o status manualmente</li>
                     </ul>
@@ -590,23 +566,10 @@
                         <div><span class="status-badge status-sem_assinatura">Sem assinatura</span> - Nunca assinou</div>
                     </div>
                 </div>
-
-                <div style="margin-bottom: 25px;">
-                    <h3 style="color: var(--primary); margin-bottom: 10px;">
-                        <i class="fas fa-bell"></i> Sistema Automático
-                    </h3>
-                    <p>Um job automático roda todo dia à meia-noite para:</p>
-                    <ul style="margin-left: 30px; margin-top: 10px;">
-                        <li>Marcar assinaturas expiradas como "expirado"</li>
-                        <li>Registrar quem vai expirar em 7 dias</li>
-                        <li>Limpar logs antigos (mais de 30 dias)</li>
-                    </ul>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para adicionar dias -->
     <div class="modal-overlay" id="modalAdicionarDias">
         <div class="modal-content">
             <div class="modal-header">
@@ -639,7 +602,6 @@
         </div>
     </div>
 
-    <!-- Modal para ver logs do usuário -->
     <div class="modal-overlay" id="modalLogsUsuario">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
@@ -655,52 +617,32 @@
         </div>
     </div>
 
-    <!-- Toast de notificação -->
     <div id="toast" class="toast"></div>
 
     <script>
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let usuarioAtual = null;
+        // Criar cliente Supabase
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         let usuariosData = [];
+        let usuarioSelecionado = null;
 
-        // Verificar se está logado e é admin
-        async function verificarAdmin() {
-            try {
-                const { data: { user }, error } = await supabase.auth.getUser();
-                
-                if (error || !user) {
-                    window.location.href = 'login.html';
-                    return false;
-                }
-
-                usuarioAtual = user;
-                
-                // Verificar se é admin (vamos fazer uma função RPC)
-                const { data: isAdmin, error: adminError } = await supabase
-                    .rpc('test_is_admin', { user_uuid: user.id });
-                
-                if (adminError || !isAdmin) {
-                    showToast('Acesso negado. Você não é administrador.', 'error');
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 2000);
-                    return false;
-                }
-
-                return true;
-            } catch (error) {
-                console.error('Erro ao verificar admin:', error);
+        // Verificar se está autenticado como admin
+        function verificarAutenticacao() {
+            const autenticado = sessionStorage.getItem('admin_autenticado');
+            if (!autenticado) {
+                window.location.href = 'admin_login.html';
                 return false;
             }
+            return true;
         }
 
         // Carregar estatísticas
         async function carregarEstatisticas() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .rpc('admin_estatisticas');
                 
                 if (error) throw error;
@@ -746,7 +688,7 @@
         // Carregar usuários
         async function carregarUsuarios() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .rpc('admin_listar_usuarios');
                 
                 if (error) throw error;
@@ -867,8 +809,6 @@
         }
 
         // Abrir modal para adicionar dias
-        let usuarioSelecionado = null;
-
         function abrirModalAdicionarDias(userId, email) {
             usuarioSelecionado = userId;
             document.getElementById('modalUsuarioInfo').innerHTML = `
@@ -891,7 +831,7 @@
             try {
                 showToast('Processando...', 'info');
                 
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .rpc('admin_atualizar_assinatura', {
                         p_user_id: usuarioSelecionado,
                         p_dias: dias,
@@ -920,7 +860,7 @@
             }
 
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .rpc('admin_mudar_status', {
                         p_user_id: userId,
                         p_status: novoStatus
@@ -941,7 +881,7 @@
         // Ver logs do usuário
         async function verLogsUsuario(userId) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .rpc('admin_log_usuario', { p_user_id: userId });
 
                 if (error) throw error;
@@ -983,7 +923,7 @@
         // Carregar logs gerais
         async function carregarLogsGerais() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('log_assinaturas')
                     .select('*')
                     .order('data_verificacao', { ascending: false })
@@ -1068,18 +1008,27 @@
 
         // Inicialização
         async function init() {
-            const isAdmin = await verificarAdmin();
-            if (!isAdmin) return;
+            // Verificar autenticação primeiro
+            if (!verificarAutenticacao()) return;
 
-            await Promise.all([
-                carregarEstatisticas(),
-                carregarUsuarios()
-            ]);
+            // Mostrar loading
+            showToast('Carregando dados...', 'info');
+
+            try {
+                await Promise.all([
+                    carregarEstatisticas(),
+                    carregarUsuarios()
+                ]);
+                showToast('Dados carregados!', 'success');
+            } catch (error) {
+                console.error('Erro na inicialização:', error);
+                showToast('Erro ao carregar dados', 'error');
+            }
 
             // Logout
             document.getElementById('btnLogout').addEventListener('click', async () => {
-                await supabase.auth.signOut();
-                window.location.href = 'login.html';
+                sessionStorage.removeItem('admin_autenticado');
+                window.location.href = 'admin_login.html';
             });
         }
 
@@ -1090,7 +1039,8 @@
             }
         };
 
-        init();
+        // Iniciar quando a página carregar
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
