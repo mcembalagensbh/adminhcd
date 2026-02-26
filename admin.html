@@ -659,7 +659,7 @@
             margin-left: 10px;
         }
 
-        /* NOVO: Estilo para o modal de redefinição de senha */
+        /* Estilo para o modal de redefinição de senha */
         .reset-modal {
             position: fixed;
             top: 0;
@@ -729,7 +729,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!-- NOVO: Modal de Redefinição de Senha -->
+    <!-- Modal de Redefinição de Senha -->
     <div class="reset-modal" id="resetPasswordModal">
         <div class="reset-modal-content">
             <div class="reset-header">
@@ -971,15 +971,14 @@
         const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
         
         let usuariosData = [];
-        let usuariosFiltrados = [];
         let usuarioSelecionado = null;
         let filtroAtivo = 'todos';
 
         // ============================================
-        // NOVO: Funções para recuperação de senha
+        // FUNÇÕES DE RECUPERAÇÃO DE SENHA
         // ============================================
 
-        // Verificar se veio de um link de recuperação
+        // Verificar se veio de um link de recuperação (RETORNA true/false)
         async function verificarLinkRecuperacao() {
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
             const accessToken = hashParams.get('access_token');
@@ -988,10 +987,12 @@
             
             console.log('Verificando link:', { type, hasToken: !!accessToken });
             
+            // Se tiver token e for recovery
             if (accessToken && (type === 'recovery' || type === 'signup')) {
                 try {
                     showToast('Verificando link de recuperação...', 'info');
                     
+                    // Configura a sessão com o token
                     const { error } = await supabaseClient.auth.setSession({
                         access_token: accessToken,
                         refresh_token: refreshToken
@@ -999,19 +1000,28 @@
                     
                     if (error) throw error;
                     
+                    // MOSTRA o modal de redefinição (NÃO redireciona)
                     document.querySelector('.container').classList.add('blur');
                     document.getElementById('resetPasswordModal').style.display = 'flex';
+                    
                     showToast('Link válido! Digite sua nova senha.', 'success');
+                    
+                    return true; // É link de recuperação
                     
                 } catch (error) {
                     console.error('Erro ao processar link:', error);
                     showToast('Link inválido ou expirado. Solicite um novo.', 'error');
                     
+                    // Em caso de erro, redireciona para o login
                     setTimeout(() => {
                         window.location.href = 'admin_login.html';
                     }, 2000);
+                    
+                    return true; // Mesmo com erro, consideramos que é recovery para não prosseguir
                 }
             }
+            
+            return false; // Não é link de recuperação
         }
 
         // Confirmar redefinição de senha
@@ -1058,6 +1068,7 @@
                 
                 showToast('Senha atualizada! Faça login novamente.', 'success');
                 
+                // Redireciona para o login após 3 segundos
                 setTimeout(() => {
                     sessionStorage.removeItem('admin_autenticado');
                     window.location.href = 'admin_login.html';
@@ -1079,12 +1090,13 @@
             document.getElementById('resetConfirmPassword').value = '';
             document.getElementById('resetMessage').style.display = 'none';
             
+            // Redireciona para o login
             sessionStorage.removeItem('admin_autenticado');
             window.location.href = 'admin_login.html';
         }
 
         // ============================================
-        // Funções originais (mantidas exatamente iguais)
+        // FUNÇÕES ORIGINAIS (mantidas iguais)
         // ============================================
 
         // Verificar autenticação
@@ -1157,7 +1169,6 @@
 
                 usuarios?.forEach(user => {
                     const dias = calcularDiasRestantes(user.data_expiracao);
-                    const status = determinarStatus(user);
                     
                     if (user.status === 'ativo') {
                         if (dias > 7) {
@@ -1797,26 +1808,30 @@
             }, 3000);
         }
 
-        // NOVO: Modifiquei a função init para incluir a verificação do link
+        // FUNÇÃO INIT CORRIGIDA - ordem correta!
         async function init() {
-            // Primeiro verifica se é um link de recuperação
-            await verificarLinkRecuperacao();
+            // 1º: Verificar se é link de recuperação (ANTES da autenticação)
+            const isRecoveryLink = await verificarLinkRecuperacao();
             
-            if (!verificarAutenticacao()) return;
+            // 2º: Só verifica autenticação se NÃO for link de recuperação
+            if (!isRecoveryLink) {
+                if (!verificarAutenticacao()) return;
 
-            showToast('Carregando dados...', 'info');
+                showToast('Carregando dados...', 'info');
 
-            try {
-                await Promise.all([
-                    carregarEstatisticas(),
-                    carregarUsuarios()
-                ]);
-                showToast('Dados carregados!', 'success');
-            } catch (error) {
-                console.error('Erro na inicialização:', error);
-                showToast('Erro ao carregar dados', 'error');
+                try {
+                    await Promise.all([
+                        carregarEstatisticas(),
+                        carregarUsuarios()
+                    ]);
+                    showToast('Dados carregados!', 'success');
+                } catch (error) {
+                    console.error('Erro na inicialização:', error);
+                    showToast('Erro ao carregar dados', 'error');
+                }
             }
 
+            // Evento do botão logout (sempre adicionar)
             document.getElementById('btnLogout').addEventListener('click', async () => {
                 sessionStorage.removeItem('admin_autenticado');
                 window.location.href = 'admin_login.html';
@@ -1828,7 +1843,6 @@
             if (event.target.classList.contains('modal-overlay')) {
                 event.target.style.display = 'none';
             }
-            // NOVO: Fechar modal de reset se clicar fora
             if (event.target.classList.contains('reset-modal')) {
                 cancelarRedefinicaoSenha();
             }
