@@ -469,7 +469,7 @@
             try {
                 // ⚠️ CORREÇÃO: Alterar o redirectTo para a página de admin
                 const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
-                   redirectTo: 'https://mcembalagensbh.github.io/admin/admin.html'
+                   redirectTo: 'https://mcembalagensbh.github.io/adminhcd/admin.html'
                 });
 
                 if (error) throw error;
