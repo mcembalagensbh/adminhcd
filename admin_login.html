@@ -173,66 +173,44 @@
 
         .modal-content h3 {
             color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 22px;
-        }
-
-        .modal-content p {
-            color: #666;
             margin-bottom: 20px;
-            font-size: 14px;
+            font-size: 22px;
+            text-align: center;
         }
 
         .modal-buttons {
             display: flex;
             gap: 10px;
+            justify-content: center;
         }
 
         .modal-buttons button {
-            flex: 1;
-            padding: 12px;
+            padding: 12px 24px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
             background: #667eea;
             color: white;
         }
 
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
+        .contact-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .modal-message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 14px;
-            display: none;
+        .contact-info p {
+            margin: 5px 0;
+            color: #2c3e50;
         }
 
-        .modal-message.success {
-            background: #d4edda;
-            color: #155724;
-            display: block;
-        }
-
-        .modal-message.error {
-            background: #f8d7da;
-            color: #721c24;
-            display: block;
-        }
-
-        .modal-message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            display: block;
+        .contact-info i {
+            color: #667eea;
+            margin-right: 8px;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -255,7 +233,9 @@
         </div>
 
         <div class="forgot-password">
-            <a onclick="mostrarModalRecuperacao()"><i class="fas fa-key"></i> Esqueci minha senha</a>
+            <a href="#" onclick="mostrarModalRecuperacao(); return false;">
+                <i class="fas fa-key"></i> Esqueci minha senha
+            </a>
         </div>
 
         <button class="btn-login" onclick="fazerLogin()" id="loginBtn">
@@ -275,14 +255,15 @@
     <div class="modal-overlay" id="modalRecuperacao">
         <div class="modal-content">
             <h3><i class="fas fa-key"></i> Recuperar senha</h3>
-            <p>Para recuperar a senha de administrador, entre em contato com o suporte.</p>
             
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <p><strong>📧 suporte@mylife.app.br</strong></p>
+            <div class="contact-info">
+                <p><i class="fas fa-envelope"></i> <strong>suporte@mylife.app.br</strong></p>
+                <p><i class="fas fa-phone"></i> (31) 99999-9999</p>
+                <p style="margin-top: 15px; font-size: 14px;">Entre em contato para redefinir sua senha de administrador.</p>
             </div>
             
             <div class="modal-buttons">
-                <button class="btn-primary" onclick="fecharModalRecuperacao()">
+                <button onclick="fecharModalRecuperacao()">
                     <i class="fas fa-check"></i> OK
                 </button>
             </div>
@@ -290,11 +271,14 @@
     </div>
 
     <script>
+        // Configuração do Supabase
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
 
+        // Criar cliente Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Função de login
         async function fazerLogin() {
             const senha = document.getElementById('senhaInput').value;
             
@@ -303,6 +287,7 @@
                 return;
             }
 
+            // Mostrar loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('successMessage').style.display = 'none';
@@ -321,10 +306,12 @@
                 console.log('Resultado:', data);
 
                 if (data === true) {
+                    // Senha correta
                     sessionStorage.setItem('admin_autenticado', 'true');
                     
                     mostrarSucesso('Login realizado! Redirecionando...');
                     
+                    // Redirecionar para o painel
                     setTimeout(() => {
                         window.location.href = 'admin.html';
                     }, 1000);
@@ -334,10 +321,10 @@
             } catch (error) {
                 console.error('Erro detalhado:', error);
                 
-                if (error.message.includes('function "verificar_senha_admin" does not exist')) {
-                    mostrarErro('Erro: Função de verificação não existe no banco. Execute o SQL primeiro.');
+                if (error.message && error.message.includes('function "verificar_senha_admin" does not exist')) {
+                    mostrarErro('Erro: Função de verificação não existe. Execute o SQL no Supabase primeiro.');
                 } else {
-                    mostrarErro('Erro ao verificar senha: ' + error.message);
+                    mostrarErro('Erro ao verificar senha: ' + (error.message || 'Erro desconhecido'));
                 }
             } finally {
                 document.getElementById('loading').style.display = 'none';
@@ -356,6 +343,7 @@
             successDiv.style.display = 'block';
         }
 
+        // Funções do Modal
         function mostrarModalRecuperacao() {
             document.getElementById('modalRecuperacao').style.display = 'flex';
         }
@@ -369,6 +357,14 @@
             const autenticado = sessionStorage.getItem('admin_autenticado');
             if (autenticado === 'true') {
                 window.location.href = 'admin.html';
+            }
+        }
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalRecuperacao');
+            if (event.target === modal) {
+                fecharModalRecuperacao();
             }
         }
 
