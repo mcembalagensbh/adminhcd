@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>My Life - Admin Mobile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Life - Painel Admin (Multi-View)</title>
     <style>
+        /* ===== ESTILOS GLOBAIS ===== */
         * {
             margin: 0;
             padding: 0;
@@ -30,155 +31,591 @@
             background: #f5f7fa;
             color: var(--dark);
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
+            transition: all 0.3s;
         }
 
-        /* Container responsivo */
         .container {
-            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 12px;
+            padding: 20px;
         }
 
-        /* Header mobile */
+        /* ===== HEADER COM BOTÕES DE VISUALIZAÇÃO ===== */
         .header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 15px;
+            padding: 20px;
             border-radius: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .header h1 {
-            font-size: 1.4em;
+            font-size: 1.8em;
             display: flex;
             align-items: center;
-            gap: 8px;
-            word-break: break-word;
+            gap: 10px;
         }
 
         .header h1 i {
-            font-size: 1.3em;
+            font-size: 1.5em;
         }
 
         .header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-header {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-header:hover {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        .btn-header.active-view {
+            background: white;
+            color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        /* ===== VIEWS ===== */
+        .pc-view, .mobile-view {
+            display: none;
+        }
+
+        .pc-view.active, .mobile-view.active {
+            display: block;
+        }
+
+        /* ===== ESTILOS PC VIEW (ORIGINAL) ===== */
+        .pc-view .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .pc-view .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .pc-view .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .pc-view .stat-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        }
+
+        .pc-view .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .pc-view .stat-icon.free {
+            background: var(--free);
+        }
+
+        .pc-view .stat-info h3 {
+            font-size: 0.9em;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .pc-view .stat-info .number {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .pc-view .clear-filter {
+            background: var(--light);
+            color: var(--dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        .pc-view .clear-filter:hover {
+            background: var(--gray);
+            color: white;
+        }
+
+        .pc-view .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .pc-view .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pc-view .tab-btn:hover {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .pc-view .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .pc-view .search-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .pc-view .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .pc-view .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .pc-view .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .pc-view table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .pc-view th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .pc-view td {
+            padding: 15px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .pc-view tr:hover {
+            background: #f8f9fa;
+        }
+
+        .pc-view .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .pc-view .status-ativo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .pc-view .status-expirado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .pc-view .status-sem_assinatura {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .pc-view .status-pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .pc-view .status-gratis {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .pc-view .days-badge {
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .pc-view .days-urgent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .pc-view .days-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .pc-view .days-good {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .pc-view .action-buttons {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
         }
 
-        .btn-header, .logout-btn {
-            flex: 1;
-            min-width: 120px;
-            background: rgba(255,255,255,0.2);
-            border: 2px solid white;
-            color: white;
-            padding: 12px 12px;
-            border-radius: 8px;
+        .pc-view .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.9em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.3s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn-header:active, .logout-btn:active {
-            background: white;
-            color: var(--primary-dark);
-            transform: scale(0.98);
-        }
-
-        /* Stats grid responsivo */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 15px 10px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-            cursor: pointer;
-            border: 2px solid transparent;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .stat-card:active {
-            transform: scale(0.98);
-            background: #f8f9fa;
-        }
-
-        .stat-card.active {
-            border-color: var(--primary);
-            background: linear-gradient(135deg, #f8f9fa, #ffffff);
-        }
-
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-        }
-
-        .stat-icon.free {
-            background: var(--free);
-        }
-
-        .stat-info h3 {
-            font-size: 0.75em;
-            color: var(--gray);
-            margin-bottom: 3px;
-            white-space: nowrap;
-        }
-
-        .stat-info .number {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        /* Filtros */
-        #filtersBar {
-            flex-direction: column;
-            align-items: flex-start !important;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .filter-indicator {
-            background: var(--primary);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
+            font-size: 0.85em;
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            transition: all 0.3s;
         }
 
-        .clear-filter {
+        .pc-view .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+
+        .pc-view .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .pc-view .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .pc-view .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .pc-view .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .pc-view .btn-info {
+            background: var(--free);
+            color: white;
+        }
+
+        .pc-view .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .pc-view .btn-purple {
+            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+            color: white;
+        }
+
+        .pc-view .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .pc-view .email-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pc-view .plan-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            background: var(--purple);
+            color: white;
+        }
+
+        .pc-view .plan-badge.mensal {
+            background: var(--primary);
+        }
+
+        .pc-view .plan-badge.anual {
+            background: var(--purple-dark);
+        }
+
+        .pc-view .plan-badge.gratis {
+            background: var(--free);
+        }
+
+        .pc-view .filter-indicator {
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        /* ===== ESTILOS MOBILE VIEW ===== */
+        .mobile-view .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .mobile-view .stat-card {
+            background: white;
+            padding: 12px 8px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .mobile-view .stat-card.active {
+            border-color: var(--primary);
+        }
+
+        .mobile-view .stat-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin: 0 auto 8px;
+        }
+
+        .mobile-view .stat-icon.free {
+            background: var(--free);
+        }
+
+        .mobile-view .stat-info h3 {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+
+        .mobile-view .stat-info .number {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .mobile-view .tabs {
+            display: flex;
+            gap: 5px;
+            background: white;
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mobile-view .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .mobile-view .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .mobile-view .search-bar {
+            margin-bottom: 15px;
+        }
+
+        .mobile-view .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .mobile-view .user-card {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .mobile-view .user-card.ativo { border-left-color: var(--success); }
+        .mobile-view .user-card.expirado { border-left-color: var(--danger); }
+        .mobile-view .user-card.pendente { border-left-color: var(--warning); }
+        .mobile-view .user-card.gratis { border-left-color: var(--free); }
+
+        .mobile-view .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .mobile-view .user-email {
+            font-weight: 600;
+            font-size: 0.85rem;
+            word-break: break-word;
+        }
+
+        .mobile-view .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .mobile-view .user-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            background: var(--light);
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+        }
+
+        .mobile-view .user-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .mobile-view .action-btn {
+            padding: 8px 5px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .mobile-view .action-btn i { font-size: 1rem; }
+        .mobile-view .action-btn.add { background: var(--success); }
+        .mobile-view .action-btn.logs { background: var(--primary); }
+        .mobile-view .action-btn.activate { background: var(--warning); }
+        .mobile-view .action-btn.deactivate { background: var(--danger); }
+
+        .mobile-view .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .mobile-view .clear-filter {
             background: var(--light);
             color: var(--dark);
             padding: 8px 16px;
@@ -189,248 +626,46 @@
             gap: 5px;
             cursor: pointer;
             border: none;
-            -webkit-tap-highlight-color: transparent;
+            margin-bottom: 10px;
         }
 
-        .clear-filter:active {
-            background: var(--gray);
+        .mobile-view .filter-indicator {
+            background: var(--primary);
             color: white;
-        }
-
-        /* Tabs mobile */
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 16px;
-            background: white;
-            padding: 8px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .tabs::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tab-btn {
-            padding: 10px 16px;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85em;
-            color: var(--gray);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .tab-btn:active {
-            background: var(--light);
-        }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        /* Search bar */
-        .search-bar {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid var(--light);
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            -webkit-appearance: none;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Cards de usuários para mobile */
-        .users-cards {
-            display: none;
-        }
-
-        .user-card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-left: 4px solid transparent;
-        }
-
-        .user-card.ativo { border-left-color: var(--success); }
-        .user-card.expirado { border-left-color: var(--danger); }
-        .user-card.pendente { border-left-color: var(--warning); }
-        .user-card.gratis { border-left-color: var(--free); }
-
-        .user-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .user-email {
-            font-weight: 600;
-            color: var(--dark);
-            word-break: break-all;
-            font-size: 0.95em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .user-status {
-            font-size: 0.75em;
-            padding: 4px 8px;
+            padding: 5px 10px;
             border-radius: 20px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .user-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-            background: var(--light);
-            padding: 12px;
-            border-radius: 8px;
-        }
-
-        .user-detail-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .detail-label {
-            font-size: 0.7em;
-            color: var(--gray);
-            margin-bottom: 2px;
-        }
-
-        .detail-value {
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-
-        .user-actions {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .action-btn {
-            padding: 10px 5px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.75em;
-            display: flex;
-            flex-direction: column;
+            font-size: 0.8em;
+            display: inline-flex;
             align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            transition: all 0.2s;
-        }
-
-        .action-btn i {
-            font-size: 1.1em;
-        }
-
-        .action-btn:active {
-            transform: scale(0.95);
-        }
-
-        .action-btn.add { background: var(--success); color: white; }
-        .action-btn.logs { background: var(--primary); color: white; }
-        .action-btn.activate { background: var(--warning); color: white; }
-        .action-btn.deactivate { background: var(--danger); color: white; }
-
-        /* Tabela desktop (escondida no mobile) */
-        .table-container {
-            display: none;
-        }
-
-        /* Logs mobile */
-        .logs-container {
-            background: white;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .log-item {
-            padding: 12px 10px;
-            border-bottom: 1px solid var(--light);
-            display: flex;
-            flex-direction: column;
             gap: 5px;
         }
 
-        .log-item:last-child {
-            border-bottom: none;
+        /* ===== COMPONENTES COMPARTILHADOS ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
 
-        .log-date {
-            color: var(--gray);
-            font-size: 0.8em;
-        }
-
-        .log-action {
-            font-weight: 600;
-            font-size: 0.9em;
-        }
-
-        .log-action.trial_auto { color: var(--primary); }
-        .log-action.expirado_auto { color: var(--danger); }
-        .log-action.proximo_expiracao { color: var(--warning); }
-        .log-action.admin_manual { color: var(--success); }
-        .log-action.pagamento { color: var(--purple); }
-
-        .log-details {
-            color: var(--dark);
-            font-size: 0.85em;
-        }
-
-        /* Modal mobile */
         .modal-content {
             background: white;
-            padding: 20px;
-            border-radius: 16px;
-            width: 95%;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
             max-width: 500px;
-            max-height: 85vh;
+            max-height: 80vh;
             overflow-y: auto;
-            margin: 10px;
         }
 
         .modal-content.large {
-            width: 95%;
+            max-width: 800px;
         }
 
         .modal-header {
@@ -441,141 +676,94 @@
         }
 
         .modal-header h2 {
-            font-size: 1.2em;
             color: var(--primary-dark);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .close-modal {
             background: none;
             border: none;
-            font-size: 28px;
+            font-size: 24px;
             cursor: pointer;
             color: var(--gray);
-            padding: 0 10px;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             font-weight: 600;
-            font-size: 0.9em;
             color: var(--dark);
         }
 
         .form-control {
             width: 100%;
-            padding: 14px;
+            padding: 10px;
             border: 2px solid var(--light);
-            border-radius: 10px;
-            font-size: 16px;
-            -webkit-appearance: none;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
         }
 
         .modal-footer {
             display: flex;
             gap: 10px;
             margin-top: 20px;
-            flex-direction: column;
         }
 
-        .modal-footer .btn {
-            width: 100%;
-            padding: 14px;
-            justify-content: center;
-        }
-
-        /* Botões */
-        .btn {
-            padding: 12px 16px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95em;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-
-        /* Relatório mobile */
-        .report-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .report-card {
-            background: linear-gradient(135deg, #f8f9fa, #ffffff);
-            padding: 16px;
+        .logs-container {
+            background: white;
             border-radius: 12px;
-            border: 1px solid var(--light);
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .report-card.total {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-        }
-
-        .report-label {
-            font-size: 0.8em;
-            color: var(--gray);
-            margin-bottom: 5px;
+        .log-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--light);
             display: flex;
-            align-items: center;
-            gap: 5px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .report-card.total .report-label {
-            color: rgba(255,255,255,0.8);
+        .log-item:last-child {
+            border-bottom: none;
         }
 
-        .report-value {
-            font-size: 1.6em;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .report-card.total .report-value {
-            color: white;
-        }
-
-        .report-sub {
-            font-size: 0.75em;
+        .log-date {
+            min-width: 160px;
             color: var(--gray);
-            margin-top: 5px;
+            font-size: 0.9em;
         }
 
-        /* Loading */
+        .log-action {
+            min-width: 120px;
+            font-weight: 600;
+        }
+
+        .log-action.trial_auto { color: var(--primary); }
+        .log-action.expirado_auto { color: var(--danger); }
+        .log-action.proximo_expiracao { color: var(--warning); }
+        .log-action.admin_manual { color: var(--success); }
+        .log-action.pagamento { color: var(--purple); }
+
+        .log-details {
+            color: var(--dark);
+            flex: 1;
+        }
+
         .loading {
             text-align: center;
-            padding: 30px;
+            padding: 50px;
             color: var(--gray);
         }
 
@@ -584,89 +772,112 @@
             margin-bottom: 10px;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 20px;
-            left: 20px;
             right: 20px;
             background: var(--dark);
             color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
+            padding: 15px 25px;
+            border-radius: 8px;
             z-index: 2000;
             display: none;
-            animation: slideUp 0.3s;
-            text-align: center;
-            font-weight: 500;
+            animation: slideIn 0.3s;
         }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Media query para desktop */
-        @media (min-width: 768px) {
-            .users-cards {
-                display: none;
-            }
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
 
-            .table-container {
-                display: block;
-            }
+        .report-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--light);
+        }
 
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            }
+        .report-card.total {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
 
-            .header {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
+        .report-card.total .report-value {
+            color: white;
+            font-size: 2.5em;
+        }
 
-            .header h1 {
-                font-size: 1.8em;
-            }
+        .report-label {
+            font-size: 0.9em;
+            color: var(--gray);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-            .header-right {
-                flex-wrap: nowrap;
-            }
+        .report-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--dark);
+        }
 
-            .btn-header, .logout-btn {
-                flex: 0 1 auto;
-                padding: 10px 20px;
-            }
+        .report-sub {
+            font-size: 0.8em;
+            color: var(--gray);
+            margin-top: 5px;
+        }
 
-            #filtersBar {
-                flex-direction: row;
-                align-items: center !important;
+        /* Ajustes mobile para modais */
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+                margin: 10px;
             }
-
+            
             .modal-footer {
-                flex-direction: row;
+                flex-direction: column;
             }
-
+            
+            .modal-footer .btn {
+                width: 100%;
+            }
+            
+            .log-item {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .log-date {
+                min-width: auto;
+            }
+            
             .report-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
-
+            
+            .report-card.total {
+                grid-column: span 1;
+            }
+            
             .toast {
-                left: auto;
+                left: 20px;
                 right: 20px;
-                min-width: 300px;
-            }
-        }
-
-        /* Ajustes para tablets */
-        @media (min-width: 768px) and (max-width: 1023px) {
-            .container {
-                padding: 15px;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
+                bottom: 20px;
+                text-align: center;
             }
         }
     </style>
@@ -678,9 +889,17 @@
         <div class="header">
             <h1>
                 <i class="fas fa-crown"></i>
-                My Life Mobile
+                My Life - Admin
             </h1>
             <div class="header-right">
+                <button class="btn-header" id="btnPCView" onclick="switchToPC()">
+                    <i class="fas fa-desktop"></i>
+                    PC
+                </button>
+                <button class="btn-header" id="btnMobileView" onclick="switchToMobile()">
+                    <i class="fas fa-mobile-alt"></i>
+                    Mobile
+                </button>
                 <button class="btn-header" onclick="abrirRelatorioFinanceiro()">
                     <i class="fas fa-chart-line"></i>
                     Relatório
@@ -692,106 +911,131 @@
             </div>
         </div>
 
+        <!-- ESTATÍSTICAS (compartilhado) -->
         <div class="stats-grid" id="statsContainer">
-            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando estatísticas...</div>
         </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="mudarAba('usuarios')">
-                <i class="fas fa-users"></i> Usuários
-            </button>
-            <button class="tab-btn" onclick="mudarAba('logs')">
-                <i class="fas fa-history"></i> Logs
-            </button>
-            <button class="tab-btn" onclick="mudarAba('ajuda')">
-                <i class="fas fa-question-circle"></i> Ajuda
-            </button>
-        </div>
-
-        <div id="filtersBar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div id="activeFilter"></div>
-            <button class="clear-filter" onclick="limparFiltro()" id="clearFilterBtn" style="display: none;">
-                <i class="fas fa-times"></i> Limpar filtro
-            </button>
-        </div>
-
-        <div class="search-bar" id="searchBar">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar email ou ID..." onkeyup="filtrarUsuarios()">
-        </div>
-
-        <div id="usuariosTab" class="tab-content">
-            <!-- Cards para mobile -->
-            <div id="usuariosCards" class="users-cards">
-                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando usuários...</div>
+        <!-- VIEW PC -->
+        <div id="pcView" class="pc-view active">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="mudarAbaPC('usuarios')">
+                    <i class="fas fa-users"></i> Usuários
+                </button>
+                <button class="tab-btn" onclick="mudarAbaPC('logs')">
+                    <i class="fas fa-history"></i> Logs
+                </button>
+                <button class="tab-btn" onclick="mudarAbaPC('ajuda')">
+                    <i class="fas fa-question-circle"></i> Ajuda
+                </button>
             </div>
 
-            <!-- Tabela para desktop -->
-            <div class="table-container">
-                <table id="tabelaUsuarios">
-                    <thead>
-                        <tr>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Expiração</th>
-                            <th>Dias</th>
-                            <th>Plano</th>
-                            <th>Último Login</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usuariosBody">
-                        <tr>
-                            <td colspan="7" class="loading">
-                                <i class="fas fa-spinner fa-spin"></i> Carregando...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div id="filtersBarPC" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div id="activeFilterPC"></div>
+                <button class="clear-filter" onclick="limparFiltroPC()" id="clearFilterBtnPC" style="display: none;">
+                    <i class="fas fa-times"></i> Limpar filtro
+                </button>
             </div>
-        </div>
 
-        <div id="logsTab" class="tab-content" style="display: none;">
-            <div class="logs-container" id="logsContainer">
-                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando logs...</div>
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInputPC" placeholder="🔍 Buscar por email ou ID..." onkeyup="filtrarUsuariosPC()">
             </div>
-        </div>
 
-        <div id="ajudaTab" class="tab-content" style="display: none;">
-            <div style="background: white; padding: 20px; border-radius: 12px;">
-                <h2 style="color: var(--primary-dark); margin-bottom: 15px; font-size: 1.2em;">
-                    <i class="fas fa-question-circle"></i> Manual Mobile
-                </h2>
-                
-                <div style="margin-bottom: 20px;">
-                    <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1em;">
-                        <i class="fas fa-user-cog"></i> Ações Rápidas
-                    </h3>
-                    <ul style="margin-left: 20px; font-size: 0.9em;">
-                        <li><strong>➕ Add</strong> - Adicionar dias</li>
-                        <li><strong>📋 Logs</strong> - Ver histórico</li>
-                        <li><strong>✅ Ativar</strong> - Ativar usuário</li>
-                        <li><strong>❌ Desativar</strong> - Desativar</li>
-                    </ul>
+            <div id="usuariosTabPC" class="tab-content">
+                <div class="table-container">
+                    <table id="tabelaUsuariosPC">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Expiração</th>
+                                <th>Dias Restantes</th>
+                                <th>Plano</th>
+                                <th>Último Login</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usuariosBodyPC">
+                            <tr>
+                                <td colspan="7" class="loading">
+                                    <i class="fas fa-spinner fa-spin"></i> Carregando usuários...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                <div>
-                    <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1em;">
-                        <i class="fas fa-filter"></i> Filtros Rápidos
-                    </h3>
-                    <p style="font-size: 0.9em;">Toque nos cards de estatísticas para filtrar usuários por status.</p>
+            <div id="logsTabPC" class="tab-content" style="display: none;">
+                <div class="logs-container" id="logsContainerPC">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando logs...</div>
+                </div>
+            </div>
+
+            <div id="ajudaTabPC" class="tab-content" style="display: none;">
+                <div style="background: white; padding: 30px; border-radius: 12px;">
+                    <h2 style="color: var(--primary-dark); margin-bottom: 20px;">
+                        <i class="fas fa-question-circle"></i> Manual do Administrador
+                    </h2>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: var(--primary); margin-bottom: 10px;">
+                            <i class="fas fa-user-cog"></i> Gerenciar Assinaturas
+                        </h3>
+                        <p>Para cada usuário, você tem as seguintes opções:</p>
+                        <ul style="margin-left: 30px; margin-top: 10px;">
+                            <li><strong>➕ Adicionar Dias</strong> - Adiciona dias à assinatura atual</li>
+                            <li><strong>👁️ Ver Logs</strong> - Mostra histórico de ações do usuário</li>
+                            <li><strong>✅ Ativar/❌ Desativar</strong> - Muda o status manualmente</li>
+                            <li><strong>🔍 Filtros</strong> - Clique nos cards de estatísticas para filtrar</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW MOBILE -->
+        <div id="mobileView" class="mobile-view">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="mudarAbaMobile('usuarios')">
+                    <i class="fas fa-users"></i> Usuários
+                </button>
+                <button class="tab-btn" onclick="mudarAbaMobile('logs')">
+                    <i class="fas fa-history"></i> Logs
+                </button>
+            </div>
+
+            <div id="filtersBarMobile" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div id="activeFilterMobile"></div>
+                <button class="clear-filter" onclick="limparFiltroMobile()" id="clearFilterBtnMobile" style="display: none;">
+                    <i class="fas fa-times"></i> Limpar filtro
+                </button>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInputMobile" placeholder="🔍 Buscar email ou ID..." onkeyup="filtrarUsuariosMobile()">
+            </div>
+
+            <div id="usuariosTabMobile">
+                <div id="usuariosCardsMobile"></div>
+            </div>
+
+            <div id="logsTabMobile" style="display: none;">
+                <div class="logs-container" id="logsContainerMobile">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando logs...</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Adicionar Dias -->
+    <!-- MODAIS (compartilhados) -->
     <div class="modal-overlay" id="modalAdicionarDias">
         <div class="modal-content">
             <div class="modal-header">
                 <h2><i class="fas fa-calendar-plus"></i> Adicionar Dias</h2>
                 <button class="close-modal" onclick="fecharModal('modalAdicionarDias')">&times;</button>
             </div>
-            <div id="modalUsuarioInfo" style="background: var(--light); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; word-break: break-word;">
+            <div id="modalUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
                 Carregando...
             </div>
             <div class="form-group">
@@ -807,24 +1051,23 @@
                 </select>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" onclick="confirmarAdicionarDias()">
+                <button class="btn btn-primary" style="flex:2" onclick="confirmarAdicionarDias()">
                     <i class="fas fa-check"></i> Confirmar
                 </button>
-                <button class="btn btn-outline" onclick="fecharModal('modalAdicionarDias')">
+                <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalAdicionarDias')">
                     Cancelar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Logs do Usuário -->
     <div class="modal-overlay" id="modalLogsUsuario">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
-                <h2><i class="fas fa-history"></i> Histórico</h2>
+                <h2><i class="fas fa-history"></i> Histórico do Usuário</h2>
                 <button class="close-modal" onclick="fecharModal('modalLogsUsuario')">&times;</button>
             </div>
-            <div id="logsUsuarioContent" style="max-height: 60vh; overflow-y: auto;">
+            <div id="logsUsuarioContent" style="max-height: 400px; overflow-y: auto;">
                 Carregando...
             </div>
             <div class="modal-footer">
@@ -833,15 +1076,14 @@
         </div>
     </div>
 
-    <!-- Modal Relatório Financeiro -->
     <div class="modal-overlay" id="modalRelatorioFinanceiro">
         <div class="modal-content large">
             <div class="modal-header">
-                <h2><i class="fas fa-chart-line"></i> Relatório</h2>
+                <h2><i class="fas fa-chart-line"></i> Relatório Financeiro</h2>
                 <button class="close-modal" onclick="fecharModal('modalRelatorioFinanceiro')">&times;</button>
             </div>
             <div class="modal-body" id="relatorioContent">
-                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando dados financeiros...</div>
             </div>
         </div>
     </div>
@@ -855,10 +1097,13 @@
 
         const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
         
+        // Dados compartilhados
         let usuariosData = [];
         let usuarioSelecionado = null;
-        let filtroAtivo = 'todos';
+        let filtroAtivoPC = 'todos';
+        let filtroAtivoMobile = 'todos';
 
+        // ===== FUNÇÕES COMPARTILHADAS =====
         function verificarAutenticacao() {
             const autenticado = sessionStorage.getItem('admin_autenticado');
             if (!autenticado) {
@@ -888,7 +1133,7 @@
                 if (dias <= 0) {
                     return { class: 'status-expirado', text: 'Expirado' };
                 } else if (dias <= 7) {
-                    return { class: 'status-pendente', text: `Próximo (${dias}d)` };
+                    return { class: 'status-pendente', text: 'Próximo (' + dias + 'd)' };
                 } else {
                     if (!user.plano || user.plano === 'não definido') {
                         return { class: 'status-gratis', text: 'Grátis' };
@@ -912,6 +1157,45 @@
             }
         }
 
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // ===== SWITCH VIEW =====
+        function switchToPC() {
+            document.getElementById('pcView').classList.add('active');
+            document.getElementById('mobileView').classList.remove('active');
+            document.getElementById('btnPCView').classList.add('active-view');
+            document.getElementById('btnMobileView').classList.remove('active-view');
+            
+            // Recarregar dados se necessário
+            carregarEstatisticas();
+            carregarUsuarios();
+        }
+
+        function switchToMobile() {
+            document.getElementById('mobileView').classList.add('active');
+            document.getElementById('pcView').classList.remove('active');
+            document.getElementById('btnMobileView').classList.add('active-view');
+            document.getElementById('btnPCView').classList.remove('active-view');
+            
+            // Recarregar dados se necessário
+            carregarEstatisticas();
+            carregarUsuarios();
+        }
+
+        // ===== CARREGAR DADOS (compartilhado) =====
         async function carregarEstatisticas() {
             try {
                 const { data: usuarios, error } = await supabaseAdmin
@@ -950,35 +1234,35 @@
                 const container = document.getElementById('statsContainer');
                 
                 container.innerHTML = `
-                    <div class="stat-card ${filtroAtivo === 'todos' ? 'active' : ''}" onclick="aplicarFiltro('todos')">
+                    <div class="stat-card" onclick="aplicarFiltroGlobal('todos')">
                         <div class="stat-icon"><i class="fas fa-users"></i></div>
                         <div class="stat-info">
-                            <h3>Total</h3>
+                            <h3>Total Usuários</h3>
                             <div class="number">${stats.total}</div>
                         </div>
                     </div>
-                    <div class="stat-card ${filtroAtivo === 'ativos' ? 'active' : ''}" onclick="aplicarFiltro('ativos')">
+                    <div class="stat-card" onclick="aplicarFiltroGlobal('ativos')">
                         <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                         <div class="stat-info">
                             <h3>Ativos</h3>
                             <div class="number">${stats.ativos}</div>
                         </div>
                     </div>
-                    <div class="stat-card ${filtroAtivo === 'gratis' ? 'active' : ''}" onclick="aplicarFiltro('gratis')">
+                    <div class="stat-card" onclick="aplicarFiltroGlobal('gratis')">
                         <div class="stat-icon free"><i class="fas fa-gift"></i></div>
                         <div class="stat-info">
                             <h3>Grátis</h3>
                             <div class="number">${stats.gratis}</div>
                         </div>
                     </div>
-                    <div class="stat-card ${filtroAtivo === 'expiram7dias' ? 'active' : ''}" onclick="aplicarFiltro('expiram7dias')">
+                    <div class="stat-card" onclick="aplicarFiltroGlobal('expiram7dias')">
                         <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
                         <div class="stat-info">
                             <h3>Expirando</h3>
                             <div class="number">${stats.expiram7dias}</div>
                         </div>
                     </div>
-                    <div class="stat-card ${filtroAtivo === 'expirados' ? 'active' : ''}" onclick="aplicarFiltro('expirados')">
+                    <div class="stat-card" onclick="aplicarFiltroGlobal('expirados')">
                         <div class="stat-icon"><i class="fas fa-calendar-times"></i></div>
                         <div class="stat-info">
                             <h3>Expirados</h3>
@@ -1004,33 +1288,33 @@
                     status_info: determinarStatus(user)
                 }));
                 
-                aplicarFiltro(filtroAtivo);
+                // Atualizar ambas as views
+                aplicarFiltroPC(filtroAtivoPC);
+                aplicarFiltroMobile(filtroAtivoMobile);
             } catch (error) {
                 console.error('Erro ao carregar usuários:', error);
-                document.getElementById('usuariosBody').innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: var(--danger); padding: 30px;">
-                            <i class="fas fa-exclamation-triangle"></i> Erro ao carregar
-                        </td>
-                    </tr>
-                `;
-                document.getElementById('usuariosCards').innerHTML = `
-                    <div style="text-align: center; color: var(--danger); padding: 30px;">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar
-                    </div>
-                `;
             }
         }
 
-        function aplicarFiltro(tipo) {
-            filtroAtivo = tipo;
+        // ===== FUNÇÕES PC VIEW =====
+        function aplicarFiltroGlobal(tipo) {
+            // Aplica o filtro na view atual
+            if (document.getElementById('pcView').classList.contains('active')) {
+                aplicarFiltroPC(tipo);
+            } else {
+                aplicarFiltroMobile(tipo);
+            }
+        }
+
+        function aplicarFiltroPC(tipo) {
+            filtroAtivoPC = tipo;
             
-            document.querySelectorAll('.stat-card').forEach(card => {
+            document.querySelectorAll('#pcView .stat-card').forEach(card => {
                 card.classList.remove('active');
             });
             
-            const clearBtn = document.getElementById('clearFilterBtn');
-            const activeFilter = document.getElementById('activeFilter');
+            const clearBtn = document.getElementById('clearFilterBtnPC');
+            const activeFilter = document.getElementById('activeFilterPC');
             
             if (tipo !== 'todos') {
                 clearBtn.style.display = 'inline-flex';
@@ -1038,32 +1322,32 @@
                 switch(tipo) {
                     case 'ativos': nomeFiltro = 'Ativos'; break;
                     case 'gratis': nomeFiltro = 'Grátis'; break;
-                    case 'expiram7dias': nomeFiltro = 'Expirando'; break;
+                    case 'expiram7dias': nomeFiltro = 'Expirando em 7 dias'; break;
                     case 'expirados': nomeFiltro = 'Expirados'; break;
                 }
-                activeFilter.innerHTML = `<span class="filter-indicator"><i class="fas fa-filter"></i> ${nomeFiltro}</span>`;
+                activeFilter.innerHTML = `<span class="filter-indicator"><i class="fas fa-filter"></i> Filtrando: ${nomeFiltro}</span>`;
             } else {
                 clearBtn.style.display = 'none';
                 activeFilter.innerHTML = '';
             }
             
-            filtrarUsuarios();
+            filtrarUsuariosPC();
         }
 
-        function limparFiltro() {
-            aplicarFiltro('todos');
+        function limparFiltroPC() {
+            aplicarFiltroPC('todos');
         }
 
-        function filtrarUsuarios() {
-            const termo = document.getElementById('searchInput').value.toLowerCase();
+        function filtrarUsuariosPC() {
+            const termo = document.getElementById('searchInputPC').value.toLowerCase();
             
             let filtrados = usuariosData;
             
-            if (filtroAtivo !== 'todos') {
+            if (filtroAtivoPC !== 'todos') {
                 filtrados = filtrados.filter(user => {
                     const dias = user.dias_restantes;
                     
-                    switch(filtroAtivo) {
+                    switch(filtroAtivoPC) {
                         case 'ativos':
                             return user.status === 'ativo' && dias > 7 && user.plano && user.plano !== 'não definido';
                         case 'gratis':
@@ -1085,15 +1369,209 @@
                 );
             }
             
-            renderizarCardsUsuarios(filtrados);
-            renderizarTabelaUsuarios(filtrados);
+            renderizarTabelaPC(filtrados);
         }
 
-        function renderizarCardsUsuarios(usuarios) {
-            const cardsContainer = document.getElementById('usuariosCards');
+        function renderizarTabelaPC(usuarios) {
+            const tbody = document.getElementById('usuariosBodyPC');
             
             if (usuarios.length === 0) {
-                cardsContainer.innerHTML = `
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 30px;">
+                            <i class="fas fa-search"></i> Nenhum usuário encontrado
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            usuarios.forEach(user => {
+                const dias = user.dias_restantes;
+                const statusInfo = user.status_info;
+                
+                let diasClass = '';
+                if (dias <= 0) diasClass = 'days-urgent';
+                else if (dias <= 7) diasClass = 'days-warning';
+                else diasClass = 'days-good';
+
+                const dataExpiracao = user.data_expiracao ? 
+                    new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
+                
+                const ultimoLogin = user.ultimo_login ? 
+                    new Date(user.ultimo_login).toLocaleString('pt-BR') : 'Nunca';
+
+                const plano = user.plano || 'não definido';
+                let planoClass = 'plan-badge';
+                if (plano === 'mensal') planoClass += ' mensal';
+                else if (plano === 'anual') planoClass += ' anual';
+                else planoClass += ' gratis';
+
+                html += `
+                    <tr>
+                        <td class="email-cell" title="${user.email}">
+                            <i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>
+                            ${user.email}
+                        </td>
+                        <td>
+                            <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
+                        </td>
+                        <td>${dataExpiracao}</td>
+                        <td>
+                            <span class="days-badge ${diasClass}">${dias} dias</span>
+                        </td>
+                        <td>
+                            <span class="${planoClass}">${plano}</span>
+                        </td>
+                        <td><small>${ultimoLogin}</small></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-success" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')" title="Adicionar dias">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="btn btn-sm btn-primary" onclick="verLogsUsuario('${user.user_id}')" title="Ver logs">
+                                    <i class="fas fa-history"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="mudarStatus('${user.user_id}', 'ativo')" title="Ativar">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="mudarStatus('${user.user_id}', 'expirado')" title="Desativar">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function mudarAbaPC(aba) {
+            document.querySelectorAll('#pcView .tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#pcView .tab-content').forEach(content => content.style.display = 'none');
+            
+            if (aba === 'usuarios') {
+                document.querySelector('#pcView [onclick="mudarAbaPC(\'usuarios\')"]').classList.add('active');
+                document.getElementById('usuariosTabPC').style.display = 'block';
+            } else if (aba === 'logs') {
+                document.querySelector('#pcView [onclick="mudarAbaPC(\'logs\')"]').classList.add('active');
+                document.getElementById('logsTabPC').style.display = 'block';
+                carregarLogsGeraisPC();
+            } else if (aba === 'ajuda') {
+                document.querySelector('#pcView [onclick="mudarAbaPC(\'ajuda\')"]').classList.add('active');
+                document.getElementById('ajudaTabPC').style.display = 'block';
+            }
+        }
+
+        async function carregarLogsGeraisPC() {
+            try {
+                const { data, error } = await supabaseAdmin
+                    .from('log_assinaturas')
+                    .select('*')
+                    .order('data_verificacao', { ascending: false })
+                    .limit(100);
+
+                if (error) throw error;
+
+                const container = document.getElementById('logsContainerPC');
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
+                    return;
+                }
+
+                let html = '';
+                data.forEach(log => {
+                    const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR');
+                    html += `
+                        <div class="log-item">
+                            <div class="log-date">${dataLog}</div>
+                            <div class="log-action ${log.acao}">${log.acao}</div>
+                            <div class="log-details">${log.detalhes || ''}</div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        // ===== FUNÇÕES MOBILE VIEW =====
+        function aplicarFiltroMobile(tipo) {
+            filtroAtivoMobile = tipo;
+            
+            document.querySelectorAll('#mobileView .stat-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const clearBtn = document.getElementById('clearFilterBtnMobile');
+            const activeFilter = document.getElementById('activeFilterMobile');
+            
+            if (tipo !== 'todos') {
+                clearBtn.style.display = 'inline-flex';
+                let nomeFiltro = '';
+                switch(tipo) {
+                    case 'ativos': nomeFiltro = 'Ativos'; break;
+                    case 'gratis': nomeFiltro = 'Grátis'; break;
+                    case 'expiram7dias': nomeFiltro = 'Expirando'; break;
+                    case 'expirados': nomeFiltro = 'Expirados'; break;
+                }
+                activeFilter.innerHTML = `<span class="filter-indicator"><i class="fas fa-filter"></i> ${nomeFiltro}</span>`;
+            } else {
+                clearBtn.style.display = 'none';
+                activeFilter.innerHTML = '';
+            }
+            
+            filtrarUsuariosMobile();
+        }
+
+        function limparFiltroMobile() {
+            aplicarFiltroMobile('todos');
+        }
+
+        function filtrarUsuariosMobile() {
+            const termo = document.getElementById('searchInputMobile').value.toLowerCase();
+            
+            let filtrados = usuariosData;
+            
+            if (filtroAtivoMobile !== 'todos') {
+                filtrados = filtrados.filter(user => {
+                    const dias = user.dias_restantes;
+                    
+                    switch(filtroAtivoMobile) {
+                        case 'ativos':
+                            return user.status === 'ativo' && dias > 7 && user.plano && user.plano !== 'não definido';
+                        case 'gratis':
+                            return user.status === 'ativo' && dias > 7 && (!user.plano || user.plano === 'não definido');
+                        case 'expiram7dias':
+                            return user.status === 'ativo' && dias > 0 && dias <= 7;
+                        case 'expirados':
+                            return user.status === 'expirado' || (user.status === 'ativo' && dias <= 0);
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            if (termo) {
+                filtrados = filtrados.filter(user => 
+                    user.email.toLowerCase().includes(termo) || 
+                    user.user_id.toLowerCase().includes(termo)
+                );
+            }
+            
+            renderizarCardsMobile(filtrados);
+        }
+
+        function renderizarCardsMobile(usuarios) {
+            const container = document.getElementById('usuariosCardsMobile');
+            
+            if (usuarios.length === 0) {
+                container.innerHTML = `
                     <div style="text-align: center; padding: 30px; background: white; border-radius: 12px;">
                         <i class="fas fa-search" style="font-size: 2em; color: var(--gray); margin-bottom: 10px;"></i>
                         <p>Nenhum usuário encontrado</p>
@@ -1104,7 +1582,7 @@
 
             let html = '';
             usuarios.forEach(user => {
-                const statusInfo = user.status_info || determinarStatus(user);
+                const statusInfo = user.status_info;
                 const dias = user.dias_restantes;
                 
                 let cardClass = 'user-card';
@@ -1121,30 +1599,30 @@
 
                 html += `
                     <div class="${cardClass}">
-                        <div class="user-card-header">
+                        <div class="user-header">
                             <span class="user-email">
                                 <i class="fas fa-envelope" style="color: var(--gray);"></i>
                                 ${user.email.length > 25 ? user.email.substring(0, 25) + '...' : user.email}
                             </span>
-                            <span class="user-status ${getStatusClass(statusInfo.text)}">${statusInfo.text}</span>
+                            <span class="status-badge ${getStatusClass(statusInfo.text)}">${statusInfo.text}</span>
                         </div>
                         
-                        <div class="user-details">
-                            <div class="user-detail-item">
-                                <span class="detail-label">Expiração</span>
-                                <span class="detail-value">${dataExpiracao}</span>
+                        <div class="user-info">
+                            <div>
+                                <small>Expira</small><br>
+                                <strong>${dataExpiracao}</strong>
                             </div>
-                            <div class="user-detail-item">
-                                <span class="detail-label">Dias</span>
-                                <span class="detail-value ${dias <= 0 ? 'days-urgent' : dias <= 7 ? 'days-warning' : ''}">${dias}</span>
+                            <div>
+                                <small>Dias</small><br>
+                                <strong class="${dias <= 0 ? 'days-urgent' : dias <= 7 ? 'days-warning' : ''}">${dias}</strong>
                             </div>
-                            <div class="user-detail-item">
-                                <span class="detail-label">Plano</span>
-                                <span class="detail-value">${user.plano || 'não definido'}</span>
+                            <div>
+                                <small>Plano</small><br>
+                                <strong>${user.plano || 'não'}</strong>
                             </div>
-                            <div class="user-detail-item">
-                                <span class="detail-label">Último login</span>
-                                <span class="detail-value">${ultimoLogin}</span>
+                            <div>
+                                <small>Login</small><br>
+                                <strong>${ultimoLogin}</strong>
                             </div>
                         </div>
 
@@ -1170,62 +1648,58 @@
                 `;
             });
 
-            cardsContainer.innerHTML = html;
+            container.innerHTML = html;
         }
 
-        function renderizarTabelaUsuarios(usuarios) {
-            const tbody = document.getElementById('usuariosBody');
+        function mudarAbaMobile(aba) {
+            document.querySelectorAll('#mobileView .tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('usuariosTabMobile').style.display = aba === 'usuarios' ? 'block' : 'none';
+            document.getElementById('logsTabMobile').style.display = aba === 'logs' ? 'block' : 'none';
             
-            if (usuarios.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align: center; padding: 30px;">
-                            <i class="fas fa-search"></i> Nenhum usuário encontrado
-                        </td>
-                    </tr>
-                `;
-                return;
+            if (aba === 'usuarios') {
+                document.querySelector('#mobileView [onclick="mudarAbaMobile(\'usuarios\')"]').classList.add('active');
+            } else {
+                document.querySelector('#mobileView [onclick="mudarAbaMobile(\'logs\')"]').classList.add('active');
+                carregarLogsGeraisMobile();
             }
-
-            let html = '';
-            usuarios.forEach(user => {
-                const statusInfo = user.status_info || determinarStatus(user);
-                const dias = user.dias_restantes;
-                
-                let diasClass = '';
-                if (dias <= 0) diasClass = 'days-urgent';
-                else if (dias <= 7) diasClass = 'days-warning';
-                else diasClass = 'days-good';
-
-                const dataExpiracao = user.data_expiracao ? 
-                    new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
-                
-                const ultimoLogin = user.ultimo_login ? 
-                    new Date(user.ultimo_login).toLocaleString('pt-BR') : 'Nunca';
-
-                html += `
-                    <tr>
-                        <td title="${user.email}"><i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>${user.email}</td>
-                        <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
-                        <td>${dataExpiracao}</td>
-                        <td><span class="days-badge ${diasClass}">${dias} dias</span></td>
-                        <td>${user.plano || 'não definido'}</td>
-                        <td><small>${ultimoLogin}</small></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-success" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')"><i class="fas fa-plus"></i></button>
-                                <button class="btn btn-sm btn-primary" onclick="verLogsUsuario('${user.user_id}')"><i class="fas fa-history"></i></button>
-                                <button class="btn btn-sm btn-warning" onclick="mudarStatus('${user.user_id}', 'ativo')"><i class="fas fa-check-circle"></i></button>
-                                <button class="btn btn-sm btn-danger" onclick="mudarStatus('${user.user_id}', 'expirado')"><i class="fas fa-times-circle"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = html;
         }
 
+        async function carregarLogsGeraisMobile() {
+            try {
+                const { data, error } = await supabaseAdmin
+                    .from('log_assinaturas')
+                    .select('*')
+                    .order('data_verificacao', { ascending: false })
+                    .limit(50);
+
+                if (error) throw error;
+
+                const container = document.getElementById('logsContainerMobile');
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
+                    return;
+                }
+
+                let html = '';
+                data.forEach(log => {
+                    const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR');
+                    html += `
+                        <div class="log-item">
+                            <div class="log-date">${dataLog}</div>
+                            <div class="log-action ${log.acao}">${log.acao}</div>
+                            <div class="log-details">${log.detalhes || ''}</div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        // ===== AÇÕES COMPARTILHADAS =====
         function abrirModalAdicionarDias(userId, email) {
             usuarioSelecionado = userId;
             document.getElementById('modalUsuarioInfo').innerHTML = `
@@ -1344,47 +1818,6 @@
             }
         }
 
-        async function carregarLogsGerais() {
-            try {
-                const { data, error } = await supabaseAdmin
-                    .from('log_assinaturas')
-                    .select('*')
-                    .order('data_verificacao', { ascending: false })
-                    .limit(50);
-
-                if (error) throw error;
-
-                const container = document.getElementById('logsContainer');
-                
-                if (!data || data.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
-                    return;
-                }
-
-                let html = '';
-                data.forEach(log => {
-                    const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR');
-                    html += `
-                        <div class="log-item">
-                            <div class="log-date">${dataLog}</div>
-                            <div class="log-action ${log.acao}">${log.acao}</div>
-                            <div class="log-details">${log.detalhes || ''}</div>
-                        </div>
-                    `;
-                });
-
-                container.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Erro:', error);
-                document.getElementById('logsContainer').innerHTML = `
-                    <p style="text-align: center; color: var(--danger); padding: 20px;">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar logs
-                    </p>
-                `;
-            }
-        }
-
         async function abrirRelatorioFinanceiro() {
             document.getElementById('modalRelatorioFinanceiro').style.display = 'flex';
             await carregarRelatorioFinanceiro();
@@ -1401,8 +1834,8 @@
                 if (error) throw error;
 
                 const PLANOS = {
-                    mensal: { valor: 17.90, dias: 30 },
-                    anual: { valor: 189.90, dias: 365 }
+                    mensal: { valor: 17.90 },
+                    anual: { valor: 189.90 }
                 };
 
                 let totalMensal = 0;
@@ -1437,106 +1870,63 @@
                 content.innerHTML = `
                     <div class="report-grid">
                         <div class="report-card total">
-                            <div class="report-label"><i class="fas fa-dollar-sign"></i> Total</div>
+                            <div class="report-label">
+                                <i class="fas fa-dollar-sign"></i> Total Arrecadado
+                            </div>
                             <div class="report-value">R$ ${totalGeral.toFixed(2)}</div>
                             <div class="report-sub">${logs?.length || 0} pagamentos</div>
                         </div>
                         
                         <div class="report-card">
-                            <div class="report-label"><i class="fas fa-calendar-alt"></i> Média</div>
+                            <div class="report-label">
+                                <i class="fas fa-calendar-alt"></i> Média Mensal
+                            </div>
                             <div class="report-value">R$ ${mediaMensal.toFixed(2)}</div>
                             <div class="report-sub">${meses} meses</div>
                         </div>
-                    </div>
-
-                    <div style="margin-top: 20px;">
-                        <h3 style="color: var(--primary-dark); margin-bottom: 12px; font-size: 1.1em;">Detalhamento</h3>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
-                                <h4 style="color: var(--primary); font-size: 0.9em; margin-bottom: 8px;">Mensal</h4>
-                                <div style="font-weight: 700;">R$ ${totalMensal.toFixed(2)}</div>
-                                <div style="font-size: 0.8em; color: var(--gray);">${pagamentosMensal} pagamentos</div>
+                        <div class="report-card">
+                            <div class="report-label">
+                                <i class="fas fa-chart-pie"></i> Detalhamento
                             </div>
-                            
-                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
-                                <h4 style="color: var(--purple-dark); font-size: 0.9em; margin-bottom: 8px;">Anual</h4>
-                                <div style="font-weight: 700;">R$ ${totalAnual.toFixed(2)}</div>
-                                <div style="font-size: 0.8em; color: var(--gray);">${pagamentosAnual} pagamentos</div>
+                            <div style="margin-top: 10px;">
+                                <div><strong>Mensal:</strong> R$ ${totalMensal.toFixed(2)} (${pagamentosMensal})</div>
+                                <div><strong>Anual:</strong> R$ ${totalAnual.toFixed(2)} (${pagamentosAnual})</div>
                             </div>
                         </div>
                     </div>
                 `;
 
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('Erro ao carregar relatório:', error);
                 document.getElementById('relatorioContent').innerHTML = `
                     <p style="text-align: center; color: var(--danger); padding: 20px;">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados
                     </p>
                 `;
             }
         }
 
-        function mudarAba(aba) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
-            
-            if (aba === 'usuarios') {
-                document.querySelector('[onclick="mudarAba(\'usuarios\')"]').classList.add('active');
-                document.getElementById('usuariosTab').style.display = 'block';
-                document.getElementById('searchBar').style.display = 'block';
-                document.getElementById('filtersBar').style.display = 'flex';
-                
-                // Mostrar cards no mobile, tabela no desktop
-                if (window.innerWidth < 768) {
-                    document.getElementById('usuariosCards').style.display = 'block';
-                }
-            } else if (aba === 'logs') {
-                document.querySelector('[onclick="mudarAba(\'logs\')"]').classList.add('active');
-                document.getElementById('logsTab').style.display = 'block';
-                document.getElementById('searchBar').style.display = 'none';
-                document.getElementById('filtersBar').style.display = 'none';
-                document.getElementById('usuariosCards').style.display = 'none';
-                carregarLogsGerais();
-            } else if (aba === 'ajuda') {
-                document.querySelector('[onclick="mudarAba(\'ajuda\')"]').classList.add('active');
-                document.getElementById('ajudaTab').style.display = 'block';
-                document.getElementById('searchBar').style.display = 'none';
-                document.getElementById('filtersBar').style.display = 'none';
-                document.getElementById('usuariosCards').style.display = 'none';
-            }
-        }
-
-        function fecharModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast ${type}`;
-            toast.style.display = 'block';
-            
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
-        }
-
+        // ===== INICIALIZAÇÃO =====
         async function init() {
             if (!verificarAutenticacao()) return;
 
-            showToast('Carregando...', 'info');
+            showToast('Carregando dados...', 'info');
 
             try {
                 await Promise.all([
                     carregarEstatisticas(),
                     carregarUsuarios()
                 ]);
-                showToast('Pronto!', 'success');
+                
+                // Inicializar abas
+                mudarAbaPC('usuarios');
+                mudarAbaMobile('usuarios');
+                
+                showToast('Dados carregados!', 'success');
             } catch (error) {
-                console.error('Erro:', error);
-                showToast('Erro ao carregar', 'error');
+                console.error('Erro na inicialização:', error);
+                showToast('Erro ao carregar dados', 'error');
             }
 
             document.getElementById('btnLogout').addEventListener('click', async () => {
@@ -1544,25 +1934,19 @@
                 window.location.href = 'admin_login.html';
             });
 
-            // Ajustar visibilidade baseado no tamanho da tela
-            function ajustarParaTela() {
-                if (window.innerWidth < 768) {
-                    document.getElementById('usuariosCards').style.display = 'block';
-                } else {
-                    document.getElementById('usuariosCards').style.display = 'none';
-                }
-            }
-
-            window.addEventListener('resize', ajustarParaTela);
-            ajustarParaTela();
+            // Event listeners para busca
+            document.getElementById('searchInputPC').addEventListener('keyup', filtrarUsuariosPC);
+            document.getElementById('searchInputMobile').addEventListener('keyup', filtrarUsuariosMobile);
         }
 
+        // Fechar modais ao clicar fora
         window.onclick = function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 event.target.style.display = 'none';
             }
         };
 
+        // Iniciar quando a página carregar
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
