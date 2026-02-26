@@ -148,7 +148,7 @@
             cursor: pointer;
         }
 
-        /* Modal de Recuperação */
+        /* Modal simplificado */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -168,31 +168,12 @@
             border-radius: 16px;
             max-width: 400px;
             width: 90%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
         }
 
         .modal-content h3 {
             color: #2c3e50;
             margin-bottom: 20px;
-            font-size: 22px;
-            text-align: center;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .modal-buttons button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            background: #667eea;
-            color: white;
         }
 
         .contact-info {
@@ -200,17 +181,15 @@
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            text-align: center;
         }
 
-        .contact-info p {
-            margin: 5px 0;
-            color: #2c3e50;
-        }
-
-        .contact-info i {
-            color: #667eea;
-            margin-right: 8px;
+        .modal-buttons button {
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -229,7 +208,7 @@
 
         <div class="form-group">
             <label><i class="fas fa-lock"></i> Senha</label>
-            <input type="password" id="senhaInput" placeholder="Digite a senha" autofocus>
+            <input type="password" id="senhaInput" placeholder="Digite a senha">
         </div>
 
         <div class="forgot-password">
@@ -238,7 +217,7 @@
             </a>
         </div>
 
-        <button class="btn-login" onclick="fazerLogin()" id="loginBtn">
+        <button class="btn-login" onclick="fazerLogin()">
             <i class="fas fa-sign-in-alt"></i> Acessar Painel
         </button>
 
@@ -251,34 +230,32 @@
         </div>
     </div>
 
-    <!-- Modal de Recuperação de Senha -->
+    <!-- Modal de Recuperação -->
     <div class="modal-overlay" id="modalRecuperacao">
         <div class="modal-content">
             <h3><i class="fas fa-key"></i> Recuperar senha</h3>
-            
             <div class="contact-info">
                 <p><i class="fas fa-envelope"></i> <strong>suporte@mylife.app.br</strong></p>
                 <p><i class="fas fa-phone"></i> (31) 99999-9999</p>
-                <p style="margin-top: 15px; font-size: 14px;">Entre em contato para redefinir sua senha de administrador.</p>
+                <p style="margin-top: 15px;">Entre em contato para redefinir sua senha</p>
             </div>
-            
             <div class="modal-buttons">
-                <button onclick="fecharModalRecuperacao()">
-                    <i class="fas fa-check"></i> OK
-                </button>
+                <button onclick="fecharModalRecuperacao()">OK</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuração do Supabase
+        // ============================================
+        // CÓDIGO COMPLETO DO LOGIN
+        // ============================================
+        
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
 
-        // Criar cliente Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Função de login
+        // FUNÇÃO DE LOGIN (estava faltando!)
         async function fazerLogin() {
             const senha = document.getElementById('senhaInput').value;
             
@@ -287,31 +264,27 @@
                 return;
             }
 
-            // Mostrar loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
 
             try {
-                console.log('Verificando senha...');
+                console.log('🔍 Verificando senha...');
                 
                 const { data, error } = await supabase
                     .rpc('verificar_senha_admin', { p_senha: senha });
 
                 if (error) {
-                    console.error('Erro RPC:', error);
+                    console.error('❌ Erro RPC:', error);
                     throw error;
                 }
 
-                console.log('Resultado:', data);
+                console.log('✅ Resultado:', data);
 
                 if (data === true) {
-                    // Senha correta
                     sessionStorage.setItem('admin_autenticado', 'true');
                     
                     mostrarSucesso('Login realizado! Redirecionando...');
                     
-                    // Redirecionar para o painel
                     setTimeout(() => {
                         window.location.href = 'admin.html';
                     }, 1000);
@@ -319,12 +292,12 @@
                     mostrarErro('Senha incorreta');
                 }
             } catch (error) {
-                console.error('Erro detalhado:', error);
+                console.error('❌ Erro:', error);
                 
-                if (error.message && error.message.includes('function "verificar_senha_admin" does not exist')) {
-                    mostrarErro('Erro: Função de verificação não existe. Execute o SQL no Supabase primeiro.');
+                if (error.message?.includes('function "verificar_senha_admin" does not exist')) {
+                    mostrarErro('Função SQL não existe! Execute o SQL primeiro.');
                 } else {
-                    mostrarErro('Erro ao verificar senha: ' + (error.message || 'Erro desconhecido'));
+                    mostrarErro('Erro: ' + (error.message || 'Erro desconhecido'));
                 }
             } finally {
                 document.getElementById('loading').style.display = 'none';
@@ -332,18 +305,16 @@
         }
 
         function mostrarErro(msg) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
+            document.getElementById('errorMessage').textContent = msg;
+            document.getElementById('errorMessage').style.display = 'block';
         }
 
         function mostrarSucesso(msg) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = msg;
-            successDiv.style.display = 'block';
+            document.getElementById('successMessage').textContent = msg;
+            document.getElementById('successMessage').style.display = 'block';
         }
 
-        // Funções do Modal
+        // Funções do modal
         function mostrarModalRecuperacao() {
             document.getElementById('modalRecuperacao').style.display = 'flex';
         }
@@ -352,19 +323,10 @@
             document.getElementById('modalRecuperacao').style.display = 'none';
         }
 
-        // Verificar se já está logado
+        // Verificar login existente
         window.onload = function() {
-            const autenticado = sessionStorage.getItem('admin_autenticado');
-            if (autenticado === 'true') {
+            if (sessionStorage.getItem('admin_autenticado') === 'true') {
                 window.location.href = 'admin.html';
-            }
-        }
-
-        // Fechar modal ao clicar fora
-        window.onclick = function(event) {
-            const modal = document.getElementById('modalRecuperacao');
-            if (event.target === modal) {
-                fecharModalRecuperacao();
             }
         }
 
@@ -374,6 +336,13 @@
                 fazerLogin();
             }
         });
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('modalRecuperacao')) {
+                fecharModalRecuperacao();
+            }
+        };
     </script>
 </body>
 </html>
