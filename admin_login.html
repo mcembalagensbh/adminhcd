@@ -467,9 +467,9 @@
             modalMessage.style.display = 'none';
 
             try {
-                // Enviar e-mail de recuperação usando o Supabase Auth
+                // ⚠️ CORREÇÃO: Alterar o redirectTo para a página de admin
                 const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + '/redefinir-senha.html' // Ajuste para o nome do seu arquivo
+                    redirectTo: 'https://mcembalagensbh.github.io/adminhcd/admin.html' // Agora aponta para o admin
                 });
 
                 if (error) throw error;
