@@ -751,7 +751,7 @@
             <div id="resetMessage" class="reset-message"></div>
             
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-primary" style="flex: 2;" onclick="confirmarRedefinicaoSenha()">
+                <button class="btn btn-primary" style="flex: 2;" onclick="confirmarRedefinicaoSenhaAdmin()">
                     <i class="fas fa-save"></i> Salvar nova senha
                 </button>
                 <button class="btn btn-outline" style="flex: 1;" onclick="cancelarRedefinicaoSenha()">
@@ -954,78 +954,72 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
         const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY0MzYzOCwiZXhwIjoyMDg2MjE5NjM4fQ.o8A42E0Zr3HZw0_qb4s-qA95MatoKCvrpFuAqW31Xqc';
 
-        // Links do Mercado Pago
-        const MERCADO_PAGO_LINKS = {
-            mensal: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=9a30d25477b445028fd6374c1b5d51f9',
-            anual: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=59d5d72cfcee476b99776abcbddc4adf'
-        };
-
-        // Valores dos planos
-        const PLANOS = {
-            mensal: { valor: 17.90, dias: 30 },
-            anual: { valor: 189.90, dias: 365 }
-        };
-
-        // Criar cliente Supabase
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
         
         let usuariosData = [];
         let usuarioSelecionado = null;
         let filtroAtivo = 'todos';
 
-        // ============================================
-        // FUNÇÕES DE RECUPERAÇÃO DE SENHA
-        // ============================================
-
-        // Verificar se veio de um link de recuperação (RETORNA true/false)
+        // Verificar se veio de um link de recuperação
         async function verificarLinkRecuperacao() {
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
             const accessToken = hashParams.get('access_token');
             const type = hashParams.get('type');
             const refreshToken = hashParams.get('refresh_token');
             
-            console.log('Verificando link:', { type, hasToken: !!accessToken });
+            console.log('📍 URL atual:', window.location.href);
+            console.log('📍 Access Token:', accessToken ? 'PRESENTE' : 'AUSENTE');
+            console.log('📍 Type:', type);
             
-            // Se tiver token e for recovery
             if (accessToken && (type === 'recovery' || type === 'signup')) {
                 try {
                     showToast('Verificando link de recuperação...', 'info');
                     
-                    // Configura a sessão com o token
-                    const { error } = await supabaseClient.auth.setSession({
+                    const { error } = await supabase.auth.setSession({
                         access_token: accessToken,
                         refresh_token: refreshToken
                     });
                     
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Erro no setSession:', error);
+                        
+                        const { error: signInError } = await supabase.auth.verifyOtp({
+                            token_hash: accessToken,
+                            type: 'recovery'
+                        });
+                        
+                        if (signInError) throw signInError;
+                    }
                     
-                    // MOSTRA o modal de redefinição (NÃO redireciona)
                     document.querySelector('.container').classList.add('blur');
                     document.getElementById('resetPasswordModal').style.display = 'flex';
-                    
                     showToast('Link válido! Digite sua nova senha.', 'success');
                     
-                    return true; // É link de recuperação
+                    return true;
                     
                 } catch (error) {
-                    console.error('Erro ao processar link:', error);
-                    showToast('Link inválido ou expirado. Solicite um novo.', 'error');
+                    console.error('❌ Erro ao processar link:', error);
                     
-                    // Em caso de erro, redireciona para o login
+                    if (error.message.includes('expired')) {
+                        showToast('❌ Link expirado. Solicite um novo.', 'error');
+                    } else {
+                        showToast('❌ Link inválido: ' + error.message, 'error');
+                    }
+                    
                     setTimeout(() => {
                         window.location.href = 'admin_login.html';
-                    }, 2000);
+                    }, 3000);
                     
-                    return true; // Mesmo com erro, consideramos que é recovery para não prosseguir
+                    return true;
                 }
             }
             
-            return false; // Não é link de recuperação
+            return false;
         }
 
-        // Confirmar redefinição de senha
-        async function confirmarRedefinicaoSenha() {
+        // Confirmar redefinição de senha ADMIN
+        async function confirmarRedefinicaoSenhaAdmin() {
             const newPassword = document.getElementById('resetNewPassword').value;
             const confirmPassword = document.getElementById('resetConfirmPassword').value;
             const resetMessage = document.getElementById('resetMessage');
@@ -1054,35 +1048,33 @@
             }
             
             try {
-                showToast('Atualizando senha...', 'info');
+                showToast('Atualizando senha do admin...', 'info');
                 
-                const { error } = await supabaseClient.auth.updateUser({
-                    password: newPassword
-                });
-                
+                // Chamar a função RPC para atualizar senha do admin
+                const { data, error } = await supabaseAdmin
+                    .rpc('admin_atualizar_senha', { p_nova_senha: newPassword });
+
                 if (error) throw error;
                 
                 resetMessage.className = 'reset-message success';
-                resetMessage.innerHTML = '<i class="fas fa-check-circle"></i> Senha atualizada com sucesso!';
+                resetMessage.innerHTML = '<i class="fas fa-check-circle"></i> Senha de admin atualizada com sucesso!';
                 resetMessage.style.display = 'block';
                 
-                showToast('Senha atualizada! Faça login novamente.', 'success');
+                showToast('Senha de admin atualizada! Faça login novamente.', 'success');
                 
-                // Redireciona para o login após 3 segundos
                 setTimeout(() => {
                     sessionStorage.removeItem('admin_autenticado');
                     window.location.href = 'admin_login.html';
                 }, 3000);
                 
             } catch (error) {
-                console.error('Erro ao atualizar senha:', error);
+                console.error('Erro ao atualizar senha do admin:', error);
                 resetMessage.className = 'reset-message error';
                 resetMessage.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erro: ' + error.message;
                 resetMessage.style.display = 'block';
             }
         }
 
-        // Cancelar redefinição
         function cancelarRedefinicaoSenha() {
             document.getElementById('resetPasswordModal').style.display = 'none';
             document.querySelector('.container').classList.remove('blur');
@@ -1090,16 +1082,10 @@
             document.getElementById('resetConfirmPassword').value = '';
             document.getElementById('resetMessage').style.display = 'none';
             
-            // Redireciona para o login
             sessionStorage.removeItem('admin_autenticado');
             window.location.href = 'admin_login.html';
         }
 
-        // ============================================
-        // FUNÇÕES ORIGINAIS (mantidas iguais)
-        // ============================================
-
-        // Verificar autenticação
         function verificarAutenticacao() {
             const autenticado = sessionStorage.getItem('admin_autenticado');
             if (!autenticado) {
@@ -1109,7 +1095,6 @@
             return true;
         }
 
-        // Calcular dias restantes
         function calcularDiasRestantes(dataExpiracao) {
             if (!dataExpiracao) return 0;
             
@@ -1125,7 +1110,6 @@
             return diffDays;
         }
 
-        // Determinar status do usuário
         function determinarStatus(user) {
             const dias = calcularDiasRestantes(user.data_expiracao);
             
@@ -1151,7 +1135,6 @@
             return { class: 'status-sem_assinatura', text: user.status || 'Sem assinatura' };
         }
 
-        // Carregar estatísticas
         async function carregarEstatisticas() {
             try {
                 const { data: usuarios, error } = await supabaseAdmin
@@ -1231,7 +1214,6 @@
             }
         }
 
-        // Carregar usuários
         async function carregarUsuarios() {
             try {
                 const { data, error } = await supabaseAdmin
@@ -1260,7 +1242,6 @@
             }
         }
 
-        // Aplicar filtro
         function aplicarFiltro(tipo) {
             filtroAtivo = tipo;
             
@@ -1289,12 +1270,10 @@
             filtrarUsuarios();
         }
 
-        // Limpar filtro
         function limparFiltro() {
             aplicarFiltro('todos');
         }
 
-        // Filtrar usuários (busca + status)
         function filtrarUsuarios() {
             const termo = document.getElementById('searchInput').value.toLowerCase();
             
@@ -1329,7 +1308,6 @@
             renderizarTabelaUsuarios(filtrados);
         }
 
-        // Renderizar tabela
         function renderizarTabelaUsuarios(usuarios) {
             const tbody = document.getElementById('usuariosBody');
             
@@ -1406,7 +1384,6 @@
             tbody.innerHTML = html;
         }
 
-        // Abrir modal para adicionar dias
         function abrirModalAdicionarDias(userId, email) {
             usuarioSelecionado = userId;
             document.getElementById('modalUsuarioInfo').innerHTML = `
@@ -1416,7 +1393,6 @@
             document.getElementById('modalAdicionarDias').style.display = 'flex';
         }
 
-        // Confirmar adição de dias
         async function confirmarAdicionarDias() {
             const dias = parseInt(document.getElementById('diasQuantidade').value);
             const status = document.getElementById('diasStatus').value;
@@ -1458,7 +1434,6 @@
             }
         }
 
-        // Mudar status do usuário
         async function mudarStatus(userId, novoStatus) {
             if (!confirm(`Tem certeza que deseja mudar o status para ${novoStatus}?`)) {
                 return;
@@ -1491,7 +1466,6 @@
             }
         }
 
-        // Ver logs do usuário
         async function verLogsUsuario(userId) {
             try {
                 const { data, error } = await supabaseAdmin
@@ -1538,7 +1512,6 @@
             }
         }
 
-        // Carregar logs gerais
         async function carregarLogsGerais() {
             try {
                 const { data, error } = await supabaseAdmin
@@ -1587,13 +1560,11 @@
             }
         }
 
-        // Abrir relatório financeiro
         async function abrirRelatorioFinanceiro() {
             document.getElementById('modalRelatorioFinanceiro').style.display = 'flex';
             await carregarRelatorioFinanceiro();
         }
 
-        // Carregar dados do relatório financeiro
         async function carregarRelatorioFinanceiro() {
             try {
                 const { data: assinaturas, error: assError } = await supabaseAdmin
@@ -1609,6 +1580,11 @@
                     .order('data_verificacao', { ascending: false });
 
                 if (logError) throw logError;
+
+                const PLANOS = {
+                    mensal: { valor: 17.90, dias: 30 },
+                    anual: { valor: 189.90, dias: 365 }
+                };
 
                 let totalMensal = 0;
                 let totalAnual = 0;
@@ -1767,7 +1743,6 @@
             }
         }
 
-        // Mudar aba
         function mudarAba(aba) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
@@ -1791,12 +1766,10 @@
             }
         }
 
-        // Fechar modal
         function fecharModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // Show toast
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1808,12 +1781,9 @@
             }, 3000);
         }
 
-        // FUNÇÃO INIT CORRIGIDA - ordem correta!
         async function init() {
-            // 1º: Verificar se é link de recuperação (ANTES da autenticação)
             const isRecoveryLink = await verificarLinkRecuperacao();
             
-            // 2º: Só verifica autenticação se NÃO for link de recuperação
             if (!isRecoveryLink) {
                 if (!verificarAutenticacao()) return;
 
@@ -1831,14 +1801,12 @@
                 }
             }
 
-            // Evento do botão logout (sempre adicionar)
             document.getElementById('btnLogout').addEventListener('click', async () => {
                 sessionStorage.removeItem('admin_autenticado');
                 window.location.href = 'admin_login.html';
             });
         }
 
-        // Fechar modais ao clicar fora
         window.onclick = function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 event.target.style.display = 'none';
@@ -1848,7 +1816,6 @@
             }
         };
 
-        // Iniciar quando a página carregar
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
