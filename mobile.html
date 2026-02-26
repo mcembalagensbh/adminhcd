@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>My Life - Admin Mobile</title>
     <style>
+        /* (seus estilos existentes - mantenha iguais) */
         * {
             margin: 0;
             padding: 0;
@@ -859,13 +860,41 @@
         let usuarioSelecionado = null;
         let filtroAtivo = 'todos';
 
+        // ===== FUNÇÃO DE AUTENTICAÇÃO CORRIGIDA (usa localStorage) =====
         function verificarAutenticacao() {
-            const autenticado = sessionStorage.getItem('admin_autenticado');
+            const autenticado = localStorage.getItem('admin_autenticado');
+            const loginTimestamp = localStorage.getItem('admin_login_timestamp');
+            
+            // Se não estiver autenticado, redireciona
             if (!autenticado) {
                 window.location.href = 'admin_login.html';
                 return false;
             }
+            
+            // Opcional: Verificar se o login não é muito antigo (ex: 30 dias)
+            if (loginTimestamp) {
+                const diasDesdeLogin = (Date.now() - parseInt(loginTimestamp)) / (1000 * 60 * 60 * 24);
+                if (diasDesdeLogin > 30) { // Se passou mais de 30 dias, pede login novamente
+                    localStorage.removeItem('admin_autenticado');
+                    localStorage.removeItem('admin_login_timestamp');
+                    localStorage.removeItem('admin_email');
+                    window.location.href = 'admin_login.html';
+                    return false;
+                }
+            }
+            
             return true;
+        }
+
+        // ===== FUNÇÃO DE LOGOUT CORRIGIDA =====
+        function fazerLogout() {
+            // Limpa TODOS os dados de autenticação do localStorage
+            localStorage.removeItem('admin_autenticado');
+            localStorage.removeItem('admin_login_timestamp');
+            localStorage.removeItem('admin_email');
+            
+            // Redireciona para o login
+            window.location.href = 'admin_login.html';
         }
 
         function calcularDiasRestantes(dataExpiracao) {
@@ -1526,6 +1555,12 @@
         async function init() {
             if (!verificarAutenticacao()) return;
 
+            // Mostra mensagem de boas-vindas (opcional)
+            const adminEmail = localStorage.getItem('admin_email');
+            if (adminEmail) {
+                showToast(`Bem-vindo, ${adminEmail}!`, 'success');
+            }
+
             showToast('Carregando...', 'info');
 
             try {
@@ -1539,10 +1574,8 @@
                 showToast('Erro ao carregar', 'error');
             }
 
-            document.getElementById('btnLogout').addEventListener('click', async () => {
-                sessionStorage.removeItem('admin_autenticado');
-                window.location.href = 'admin_login.html';
-            });
+            // ===== EVENT LISTENER DO LOGOUT CORRIGIDO =====
+            document.getElementById('btnLogout').addEventListener('click', fazerLogout);
 
             // Ajustar visibilidade baseado no tamanho da tela
             function ajustarParaTela() {
