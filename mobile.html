@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>My Life - Admin Mobile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --light: #ecf0f1;
+            --purple: #9b59b6;
+            --purple-dark: #8e44ad;
+            --free: #3498db;
+        }
+
+        body {
+            background: #f5f7fa;
+            color: var(--dark);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Container responsivo */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px;
+        }
+
+        /* Header mobile */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            word-break: break-word;
+        }
+
+        .header h1 i {
+            font-size: 1.3em;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-header, .logout-btn {
+            flex: 1;
+            min-width: 120px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 12px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-header:active, .logout-btn:active {
+            background: white;
+            color: var(--primary-dark);
+            transform: scale(0.98);
+        }
+
+        /* Stats grid responsivo */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .stat-card:active {
+            transform: scale(0.98);
+            background: #f8f9fa;
+        }
+
+        .stat-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .stat-icon.free {
+            background: var(--free);
+        }
+
+        .stat-info h3 {
+            font-size: 0.75em;
+            color: var(--gray);
+            margin-bottom: 3px;
+            white-space: nowrap;
+        }
+
+        .stat-info .number {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* Filtros */
+        #filtersBar {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .filter-indicator {
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .clear-filter {
+            background: var(--light);
+            color: var(--dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            border: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .clear-filter:active {
+            background: var(--gray);
+            color: white;
+        }
+
+        /* Tabs mobile */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 16px;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            color: var(--gray);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tab-btn:active {
+            background: var(--light);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        /* Search bar */
+        .search-bar {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--light);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Cards de usuários para mobile */
+        .users-cards {
+            display: none;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid transparent;
+        }
+
+        .user-card.ativo { border-left-color: var(--success); }
+        .user-card.expirado { border-left-color: var(--danger); }
+        .user-card.pendente { border-left-color: var(--warning); }
+        .user-card.gratis { border-left-color: var(--free); }
+
+        .user-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .user-email {
+            font-weight: 600;
+            color: var(--dark);
+            word-break: break-all;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .user-status {
+            font-size: 0.75em;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .user-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+            background: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .user-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.7em;
+            color: var(--gray);
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .user-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 10px 5px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.75em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: all 0.2s;
+        }
+
+        .action-btn i {
+            font-size: 1.1em;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .action-btn.add { background: var(--success); color: white; }
+        .action-btn.logs { background: var(--primary); color: white; }
+        .action-btn.activate { background: var(--warning); color: white; }
+        .action-btn.deactivate { background: var(--danger); color: white; }
+
+        /* Tabela desktop (escondida no mobile) */
+        .table-container {
+            display: none;
+        }
+
+        /* Logs mobile */
+        .logs-container {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .log-item {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--light);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-date {
+            color: var(--gray);
+            font-size: 0.8em;
+        }
+
+        .log-action {
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .log-action.trial_auto { color: var(--primary); }
+        .log-action.expirado_auto { color: var(--danger); }
+        .log-action.proximo_expiracao { color: var(--warning); }
+        .log-action.admin_manual { color: var(--success); }
+        .log-action.pagamento { color: var(--purple); }
+
+        .log-details {
+            color: var(--dark);
+            font-size: 0.85em;
+        }
+
+        /* Modal mobile */
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: 10px;
+        }
+
+        .modal-content.large {
+            width: 95%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.2em;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 0 10px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--light);
+            border-radius: 10px;
+            font-size: 16px;
+            -webkit-appearance: none;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-direction: column;
+        }
+
+        .modal-footer .btn {
+            width: 100%;
+            padding: 14px;
+            justify-content: center;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        /* Relatório mobile */
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .report-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--light);
+        }
+
+        .report-card.total {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .report-label {
+            font-size: 0.8em;
+            color: var(--gray);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .report-card.total .report-label {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .report-value {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .report-card.total .report-value {
+            color: white;
+        }
+
+        .report-sub {
+            font-size: 0.75em;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray);
+        }
+
+        .loading i {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 2000;
+            display: none;
+            animation: slideUp 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Media query para desktop */
+        @media (min-width: 768px) {
+            .users-cards {
+                display: none;
+            }
+
+            .table-container {
+                display: block;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header-right {
+                flex-wrap: nowrap;
+            }
+
+            .btn-header, .logout-btn {
+                flex: 0 1 auto;
+                padding: 10px 20px;
+            }
+
+            #filtersBar {
+                flex-direction: row;
+                align-items: center !important;
+            }
+
+            .modal-footer {
+                flex-direction: row;
+            }
+
+            .report-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .toast {
+                left: auto;
+                right: 20px;
+                min-width: 300px;
+            }
+        }
+
+        /* Ajustes para tablets */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .container {
+                padding: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-crown"></i>
+                My Life Mobile
+            </h1>
+            <div class="header-right">
+                <button class="btn-header" onclick="abrirRelatorioFinanceiro()">
+                    <i class="fas fa-chart-line"></i>
+                    Relatório
+                </button>
+                <button class="logout-btn" id="btnLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsContainer">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="mudarAba('usuarios')">
+                <i class="fas fa-users"></i> Usuários
+            </button>
+            <button class="tab-btn" onclick="mudarAba('logs')">
+                <i class="fas fa-history"></i> Logs
+            </button>
+            <button class="tab-btn" onclick="mudarAba('ajuda')">
+                <i class="fas fa-question-circle"></i> Ajuda
+            </button>
+        </div>
+
+        <div id="filtersBar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div id="activeFilter"></div>
+            <button class="clear-filter" onclick="limparFiltro()" id="clearFilterBtn" style="display: none;">
+                <i class="fas fa-times"></i> Limpar filtro
+            </button>
+        </div>
+
+        <div class="search-bar" id="searchBar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar email ou ID..." onkeyup="filtrarUsuarios()">
+        </div>
+
+        <div id="usuariosTab" class="tab-content">
+            <!-- Cards para mobile -->
+            <div id="usuariosCards" class="users-cards">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando usuários...</div>
+            </div>
+
+            <!-- Tabela para desktop -->
+            <div class="table-container">
+                <table id="tabelaUsuarios">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Expiração</th>
+                            <th>Dias</th>
+                            <th>Plano</th>
+                            <th>Último Login</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usuariosBody">
+                        <tr>
+                            <td colspan="7" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i> Carregando...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="logsTab" class="tab-content" style="display: none;">
+            <div class="logs-container" id="logsContainer">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando logs...</div>
+            </div>
+        </div>
+
+        <div id="ajudaTab" class="tab-content" style="display: none;">
+            <div style="background: white; padding: 20px; border-radius: 12px;">
+                <h2 style="color: var(--primary-dark); margin-bottom: 15px; font-size: 1.2em;">
+                    <i class="fas fa-question-circle"></i> Manual Mobile
+                </h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1em;">
+                        <i class="fas fa-user-cog"></i> Ações Rápidas
+                    </h3>
+                    <ul style="margin-left: 20px; font-size: 0.9em;">
+                        <li><strong>➕ Add</strong> - Adicionar dias</li>
+                        <li><strong>📋 Logs</strong> - Ver histórico</li>
+                        <li><strong>✅ Ativar</strong> - Ativar usuário</li>
+                        <li><strong>❌ Desativar</strong> - Desativar</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 style="color: var(--primary); margin-bottom: 8px; font-size: 1em;">
+                        <i class="fas fa-filter"></i> Filtros Rápidos
+                    </h3>
+                    <p style="font-size: 0.9em;">Toque nos cards de estatísticas para filtrar usuários por status.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Dias -->
+    <div class="modal-overlay" id="modalAdicionarDias">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-calendar-plus"></i> Adicionar Dias</h2>
+                <button class="close-modal" onclick="fecharModal('modalAdicionarDias')">&times;</button>
+            </div>
+            <div id="modalUsuarioInfo" style="background: var(--light); padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; word-break: break-word;">
+                Carregando...
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-sort-numeric-up"></i> Quantidade de Dias</label>
+                <input type="number" id="diasQuantidade" class="form-control" value="30" min="1" max="365">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-tag"></i> Status</label>
+                <select id="diasStatus" class="form-control">
+                    <option value="ativo">Ativo</option>
+                    <option value="expirado">Expirado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="confirmarAdicionarDias()">
+                    <i class="fas fa-check"></i> Confirmar
+                </button>
+                <button class="btn btn-outline" onclick="fecharModal('modalAdicionarDias')">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Logs do Usuário -->
+    <div class="modal-overlay" id="modalLogsUsuario">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-history"></i> Histórico</h2>
+                <button class="close-modal" onclick="fecharModal('modalLogsUsuario')">&times;</button>
+            </div>
+            <div id="logsUsuarioContent" style="max-height: 60vh; overflow-y: auto;">
+                Carregando...
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="fecharModal('modalLogsUsuario')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Relatório Financeiro -->
+    <div class="modal-overlay" id="modalRelatorioFinanceiro">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-line"></i> Relatório</h2>
+                <button class="close-modal" onclick="fecharModal('modalRelatorioFinanceiro')">&times;</button>
+            </div>
+            <div class="modal-body" id="relatorioContent">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
+        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY0MzYzOCwiZXhwIjoyMDg2MjE5NjM4fQ.o8A42E0Zr3HZw0_qb4s-qA95MatoKCvrpFuAqW31Xqc';
+
+        const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+        
+        let usuariosData = [];
+        let usuarioSelecionado = null;
+        let filtroAtivo = 'todos';
+
+        function verificarAutenticacao() {
+            const autenticado = sessionStorage.getItem('admin_autenticado');
+            if (!autenticado) {
+                window.location.href = 'admin_login.html';
+                return false;
+            }
+            return true;
+        }
+
+        function calcularDiasRestantes(dataExpiracao) {
+            if (!dataExpiracao) return 0;
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const expiracao = new Date(dataExpiracao);
+            expiracao.setHours(0, 0, 0, 0);
+            return Math.ceil((expiracao - hoje) / (1000 * 60 * 60 * 24));
+        }
+
+        function determinarStatus(user) {
+            const dias = calcularDiasRestantes(user.data_expiracao);
+            
+            if (!user.status || user.status === 'sem_assinatura') {
+                return { class: 'status-sem_assinatura', text: 'Sem assinatura' };
+            }
+            
+            if (user.status === 'ativo') {
+                if (dias <= 0) {
+                    return { class: 'status-expirado', text: 'Expirado' };
+                } else if (dias <= 7) {
+                    return { class: 'status-pendente', text: `Próximo (${dias}d)` };
+                } else {
+                    if (!user.plano || user.plano === 'não definido') {
+                        return { class: 'status-gratis', text: 'Grátis' };
+                    }
+                    return { class: 'status-ativo', text: 'Ativo' };
+                }
+            } else if (user.status === 'expirado') {
+                return { class: 'status-expirado', text: 'Expirado' };
+            }
+            
+            return { class: 'status-sem_assinatura', text: user.status || 'Sem assinatura' };
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Ativo': return 'status-ativo';
+                case 'Expirado': return 'status-expirado';
+                case 'Próximo': return 'status-pendente';
+                case 'Grátis': return 'status-gratis';
+                default: return 'status-sem_assinatura';
+            }
+        }
+
+        async function carregarEstatisticas() {
+            try {
+                const { data: usuarios, error } = await supabaseAdmin
+                    .rpc('admin_listar_usuarios');
+                
+                if (error) throw error;
+                
+                const stats = {
+                    total: usuarios?.length || 0,
+                    ativos: 0,
+                    expiram7dias: 0,
+                    expirados: 0,
+                    gratis: 0
+                };
+
+                usuarios?.forEach(user => {
+                    const dias = calcularDiasRestantes(user.data_expiracao);
+                    
+                    if (user.status === 'ativo') {
+                        if (dias > 7) {
+                            if (!user.plano || user.plano === 'não definido') {
+                                stats.gratis++;
+                            } else {
+                                stats.ativos++;
+                            }
+                        } else if (dias > 0 && dias <= 7) {
+                            stats.expiram7dias++;
+                        } else if (dias <= 0) {
+                            stats.expirados++;
+                        }
+                    } else if (user.status === 'expirado') {
+                        stats.expirados++;
+                    }
+                });
+
+                const container = document.getElementById('statsContainer');
+                
+                container.innerHTML = `
+                    <div class="stat-card ${filtroAtivo === 'todos' ? 'active' : ''}" onclick="aplicarFiltro('todos')">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3>Total</h3>
+                            <div class="number">${stats.total}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card ${filtroAtivo === 'ativos' ? 'active' : ''}" onclick="aplicarFiltro('ativos')">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h3>Ativos</h3>
+                            <div class="number">${stats.ativos}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card ${filtroAtivo === 'gratis' ? 'active' : ''}" onclick="aplicarFiltro('gratis')">
+                        <div class="stat-icon free"><i class="fas fa-gift"></i></div>
+                        <div class="stat-info">
+                            <h3>Grátis</h3>
+                            <div class="number">${stats.gratis}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card ${filtroAtivo === 'expiram7dias' ? 'active' : ''}" onclick="aplicarFiltro('expiram7dias')">
+                        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stat-info">
+                            <h3>Expirando</h3>
+                            <div class="number">${stats.expiram7dias}</div>
+                        </div>
+                    </div>
+                    <div class="stat-card ${filtroAtivo === 'expirados' ? 'active' : ''}" onclick="aplicarFiltro('expirados')">
+                        <div class="stat-icon"><i class="fas fa-calendar-times"></i></div>
+                        <div class="stat-info">
+                            <h3>Expirados</h3>
+                            <div class="number">${stats.expirados}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+            }
+        }
+
+        async function carregarUsuarios() {
+            try {
+                const { data, error } = await supabaseAdmin
+                    .rpc('admin_listar_usuarios');
+                
+                if (error) throw error;
+                
+                usuariosData = (data || []).map(user => ({
+                    ...user,
+                    dias_restantes: calcularDiasRestantes(user.data_expiracao),
+                    status_info: determinarStatus(user)
+                }));
+                
+                aplicarFiltro(filtroAtivo);
+            } catch (error) {
+                console.error('Erro ao carregar usuários:', error);
+                document.getElementById('usuariosBody').innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: var(--danger); padding: 30px;">
+                            <i class="fas fa-exclamation-triangle"></i> Erro ao carregar
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('usuariosCards').innerHTML = `
+                    <div style="text-align: center; color: var(--danger); padding: 30px;">
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar
+                    </div>
+                `;
+            }
+        }
+
+        function aplicarFiltro(tipo) {
+            filtroAtivo = tipo;
+            
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const clearBtn = document.getElementById('clearFilterBtn');
+            const activeFilter = document.getElementById('activeFilter');
+            
+            if (tipo !== 'todos') {
+                clearBtn.style.display = 'inline-flex';
+                let nomeFiltro = '';
+                switch(tipo) {
+                    case 'ativos': nomeFiltro = 'Ativos'; break;
+                    case 'gratis': nomeFiltro = 'Grátis'; break;
+                    case 'expiram7dias': nomeFiltro = 'Expirando'; break;
+                    case 'expirados': nomeFiltro = 'Expirados'; break;
+                }
+                activeFilter.innerHTML = `<span class="filter-indicator"><i class="fas fa-filter"></i> ${nomeFiltro}</span>`;
+            } else {
+                clearBtn.style.display = 'none';
+                activeFilter.innerHTML = '';
+            }
+            
+            filtrarUsuarios();
+        }
+
+        function limparFiltro() {
+            aplicarFiltro('todos');
+        }
+
+        function filtrarUsuarios() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtrados = usuariosData;
+            
+            if (filtroAtivo !== 'todos') {
+                filtrados = filtrados.filter(user => {
+                    const dias = user.dias_restantes;
+                    
+                    switch(filtroAtivo) {
+                        case 'ativos':
+                            return user.status === 'ativo' && dias > 7 && user.plano && user.plano !== 'não definido';
+                        case 'gratis':
+                            return user.status === 'ativo' && dias > 7 && (!user.plano || user.plano === 'não definido');
+                        case 'expiram7dias':
+                            return user.status === 'ativo' && dias > 0 && dias <= 7;
+                        case 'expirados':
+                            return user.status === 'expirado' || (user.status === 'ativo' && dias <= 0);
+                        default:
+                            return true;
+                    }
+                });
+            }
+            
+            if (termo) {
+                filtrados = filtrados.filter(user => 
+                    user.email.toLowerCase().includes(termo) || 
+                    user.user_id.toLowerCase().includes(termo)
+                );
+            }
+            
+            renderizarCardsUsuarios(filtrados);
+            renderizarTabelaUsuarios(filtrados);
+        }
+
+        function renderizarCardsUsuarios(usuarios) {
+            const cardsContainer = document.getElementById('usuariosCards');
+            
+            if (usuarios.length === 0) {
+                cardsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 30px; background: white; border-radius: 12px;">
+                        <i class="fas fa-search" style="font-size: 2em; color: var(--gray); margin-bottom: 10px;"></i>
+                        <p>Nenhum usuário encontrado</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            usuarios.forEach(user => {
+                const statusInfo = user.status_info || determinarStatus(user);
+                const dias = user.dias_restantes;
+                
+                let cardClass = 'user-card';
+                if (statusInfo.text.includes('Ativo')) cardClass += ' ativo';
+                else if (statusInfo.text.includes('Expirado')) cardClass += ' expirado';
+                else if (statusInfo.text.includes('Próximo')) cardClass += ' pendente';
+                else if (statusInfo.text.includes('Grátis')) cardClass += ' gratis';
+
+                const dataExpiracao = user.data_expiracao ? 
+                    new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
+                
+                const ultimoLogin = user.ultimo_login ? 
+                    new Date(user.ultimo_login).toLocaleDateString('pt-BR') : 'Nunca';
+
+                html += `
+                    <div class="${cardClass}">
+                        <div class="user-card-header">
+                            <span class="user-email">
+                                <i class="fas fa-envelope" style="color: var(--gray);"></i>
+                                ${user.email.length > 25 ? user.email.substring(0, 25) + '...' : user.email}
+                            </span>
+                            <span class="user-status ${getStatusClass(statusInfo.text)}">${statusInfo.text}</span>
+                        </div>
+                        
+                        <div class="user-details">
+                            <div class="user-detail-item">
+                                <span class="detail-label">Expiração</span>
+                                <span class="detail-value">${dataExpiracao}</span>
+                            </div>
+                            <div class="user-detail-item">
+                                <span class="detail-label">Dias</span>
+                                <span class="detail-value ${dias <= 0 ? 'days-urgent' : dias <= 7 ? 'days-warning' : ''}">${dias}</span>
+                            </div>
+                            <div class="user-detail-item">
+                                <span class="detail-label">Plano</span>
+                                <span class="detail-value">${user.plano || 'não definido'}</span>
+                            </div>
+                            <div class="user-detail-item">
+                                <span class="detail-label">Último login</span>
+                                <span class="detail-value">${ultimoLogin}</span>
+                            </div>
+                        </div>
+
+                        <div class="user-actions">
+                            <button class="action-btn add" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')">
+                                <i class="fas fa-plus"></i>
+                                <span>Add</span>
+                            </button>
+                            <button class="action-btn logs" onclick="verLogsUsuario('${user.user_id}')">
+                                <i class="fas fa-history"></i>
+                                <span>Logs</span>
+                            </button>
+                            <button class="action-btn activate" onclick="mudarStatus('${user.user_id}', 'ativo')">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Ativar</span>
+                            </button>
+                            <button class="action-btn deactivate" onclick="mudarStatus('${user.user_id}', 'expirado')">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Desativar</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            cardsContainer.innerHTML = html;
+        }
+
+        function renderizarTabelaUsuarios(usuarios) {
+            const tbody = document.getElementById('usuariosBody');
+            
+            if (usuarios.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 30px;">
+                            <i class="fas fa-search"></i> Nenhum usuário encontrado
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            usuarios.forEach(user => {
+                const statusInfo = user.status_info || determinarStatus(user);
+                const dias = user.dias_restantes;
+                
+                let diasClass = '';
+                if (dias <= 0) diasClass = 'days-urgent';
+                else if (dias <= 7) diasClass = 'days-warning';
+                else diasClass = 'days-good';
+
+                const dataExpiracao = user.data_expiracao ? 
+                    new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
+                
+                const ultimoLogin = user.ultimo_login ? 
+                    new Date(user.ultimo_login).toLocaleString('pt-BR') : 'Nunca';
+
+                html += `
+                    <tr>
+                        <td title="${user.email}"><i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>${user.email}</td>
+                        <td><span class="status-badge ${statusInfo.class}">${statusInfo.text}</span></td>
+                        <td>${dataExpiracao}</td>
+                        <td><span class="days-badge ${diasClass}">${dias} dias</span></td>
+                        <td>${user.plano || 'não definido'}</td>
+                        <td><small>${ultimoLogin}</small></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-success" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')"><i class="fas fa-plus"></i></button>
+                                <button class="btn btn-sm btn-primary" onclick="verLogsUsuario('${user.user_id}')"><i class="fas fa-history"></i></button>
+                                <button class="btn btn-sm btn-warning" onclick="mudarStatus('${user.user_id}', 'ativo')"><i class="fas fa-check-circle"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="mudarStatus('${user.user_id}', 'expirado')"><i class="fas fa-times-circle"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function abrirModalAdicionarDias(userId, email) {
+            usuarioSelecionado = userId;
+            document.getElementById('modalUsuarioInfo').innerHTML = `
+                <strong>Email:</strong> ${email}<br>
+                <strong>ID:</strong> ${userId.substring(0, 15)}...
+            `;
+            document.getElementById('modalAdicionarDias').style.display = 'flex';
+        }
+
+        async function confirmarAdicionarDias() {
+            const dias = parseInt(document.getElementById('diasQuantidade').value);
+            const status = document.getElementById('diasStatus').value;
+
+            if (!dias || dias < 1) {
+                showToast('Digite uma quantidade válida', 'warning');
+                return;
+            }
+
+            try {
+                showToast('Processando...', 'info');
+                
+                const { data, error } = await supabaseAdmin
+                    .rpc('admin_atualizar_assinatura', {
+                        p_user_id: usuarioSelecionado,
+                        p_dias: dias,
+                        p_status: status
+                    });
+
+                if (error) throw error;
+
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: usuarioSelecionado,
+                        acao: 'admin_manual',
+                        detalhes: `Admin adicionou ${dias} dias, status: ${status}`
+                    });
+
+                showToast('Assinatura atualizada!', 'success');
+                fecharModal('modalAdicionarDias');
+                
+                await carregarUsuarios();
+                await carregarEstatisticas();
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao atualizar', 'error');
+            }
+        }
+
+        async function mudarStatus(userId, novoStatus) {
+            if (!confirm(`Mudar status para ${novoStatus}?`)) return;
+
+            try {
+                const { data, error } = await supabaseAdmin
+                    .rpc('admin_mudar_status', {
+                        p_user_id: userId,
+                        p_status: novoStatus
+                    });
+
+                if (error) throw error;
+
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: userId,
+                        acao: 'admin_manual',
+                        detalhes: `Admin mudou status para ${novoStatus}`
+                    });
+
+                showToast('Status atualizado!', 'success');
+                await carregarUsuarios();
+                await carregarEstatisticas();
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao mudar status', 'error');
+            }
+        }
+
+        async function verLogsUsuario(userId) {
+            try {
+                const { data, error } = await supabaseAdmin
+                    .from('log_assinaturas')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('data_verificacao', { ascending: false })
+                    .limit(30);
+
+                if (error) throw error;
+
+                const content = document.getElementById('logsUsuarioContent');
+                
+                if (!data || data.length === 0) {
+                    content.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
+                } else {
+                    let html = '';
+                    data.forEach(log => {
+                        const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR');
+                        html += `
+                            <div class="log-item">
+                                <div class="log-date">${dataLog}</div>
+                                <div class="log-action ${log.acao}">${log.acao}</div>
+                                <div class="log-details">${log.detalhes || ''}</div>
+                            </div>
+                        `;
+                    });
+                    content.innerHTML = html;
+                }
+
+                document.getElementById('modalLogsUsuario').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao carregar logs', 'error');
+            }
+        }
+
+        async function carregarLogsGerais() {
+            try {
+                const { data, error } = await supabaseAdmin
+                    .from('log_assinaturas')
+                    .select('*')
+                    .order('data_verificacao', { ascending: false })
+                    .limit(50);
+
+                if (error) throw error;
+
+                const container = document.getElementById('logsContainer');
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
+                    return;
+                }
+
+                let html = '';
+                data.forEach(log => {
+                    const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR');
+                    html += `
+                        <div class="log-item">
+                            <div class="log-date">${dataLog}</div>
+                            <div class="log-action ${log.acao}">${log.acao}</div>
+                            <div class="log-details">${log.detalhes || ''}</div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('logsContainer').innerHTML = `
+                    <p style="text-align: center; color: var(--danger); padding: 20px;">
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar logs
+                    </p>
+                `;
+            }
+        }
+
+        async function abrirRelatorioFinanceiro() {
+            document.getElementById('modalRelatorioFinanceiro').style.display = 'flex';
+            await carregarRelatorioFinanceiro();
+        }
+
+        async function carregarRelatorioFinanceiro() {
+            try {
+                const { data: logs, error } = await supabaseAdmin
+                    .from('log_assinaturas')
+                    .select('*')
+                    .eq('acao', 'pagamento')
+                    .order('data_verificacao', { ascending: false });
+
+                if (error) throw error;
+
+                const PLANOS = {
+                    mensal: { valor: 17.90, dias: 30 },
+                    anual: { valor: 189.90, dias: 365 }
+                };
+
+                let totalMensal = 0;
+                let totalAnual = 0;
+                let pagamentosMensal = 0;
+                let pagamentosAnual = 0;
+                const pagamentosPorMes = {};
+
+                (logs || []).forEach(log => {
+                    const data = new Date(log.data_verificacao);
+                    const mesAno = `${data.getMonth() + 1}/${data.getFullYear()}`;
+                    
+                    let valor = 0;
+                    if (log.detalhes?.includes('mensal')) {
+                        valor = PLANOS.mensal.valor;
+                        totalMensal += valor;
+                        pagamentosMensal++;
+                    } else if (log.detalhes?.includes('anual')) {
+                        valor = PLANOS.anual.valor;
+                        totalAnual += valor;
+                        pagamentosAnual++;
+                    }
+
+                    pagamentosPorMes[mesAno] = (pagamentosPorMes[mesAno] || 0) + valor;
+                });
+
+                const totalGeral = totalMensal + totalAnual;
+                const meses = Object.keys(pagamentosPorMes).length;
+                const mediaMensal = meses > 0 ? totalGeral / meses : 0;
+
+                const content = document.getElementById('relatorioContent');
+                content.innerHTML = `
+                    <div class="report-grid">
+                        <div class="report-card total">
+                            <div class="report-label"><i class="fas fa-dollar-sign"></i> Total</div>
+                            <div class="report-value">R$ ${totalGeral.toFixed(2)}</div>
+                            <div class="report-sub">${logs?.length || 0} pagamentos</div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-label"><i class="fas fa-calendar-alt"></i> Média</div>
+                            <div class="report-value">R$ ${mediaMensal.toFixed(2)}</div>
+                            <div class="report-sub">${meses} meses</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h3 style="color: var(--primary-dark); margin-bottom: 12px; font-size: 1.1em;">Detalhamento</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                                <h4 style="color: var(--primary); font-size: 0.9em; margin-bottom: 8px;">Mensal</h4>
+                                <div style="font-weight: 700;">R$ ${totalMensal.toFixed(2)}</div>
+                                <div style="font-size: 0.8em; color: var(--gray);">${pagamentosMensal} pagamentos</div>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                                <h4 style="color: var(--purple-dark); font-size: 0.9em; margin-bottom: 8px;">Anual</h4>
+                                <div style="font-weight: 700;">R$ ${totalAnual.toFixed(2)}</div>
+                                <div style="font-size: 0.8em; color: var(--gray);">${pagamentosAnual} pagamentos</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('relatorioContent').innerHTML = `
+                    <p style="text-align: center; color: var(--danger); padding: 20px;">
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar
+                    </p>
+                `;
+            }
+        }
+
+        function mudarAba(aba) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+            
+            if (aba === 'usuarios') {
+                document.querySelector('[onclick="mudarAba(\'usuarios\')"]').classList.add('active');
+                document.getElementById('usuariosTab').style.display = 'block';
+                document.getElementById('searchBar').style.display = 'block';
+                document.getElementById('filtersBar').style.display = 'flex';
+                
+                // Mostrar cards no mobile, tabela no desktop
+                if (window.innerWidth < 768) {
+                    document.getElementById('usuariosCards').style.display = 'block';
+                }
+            } else if (aba === 'logs') {
+                document.querySelector('[onclick="mudarAba(\'logs\')"]').classList.add('active');
+                document.getElementById('logsTab').style.display = 'block';
+                document.getElementById('searchBar').style.display = 'none';
+                document.getElementById('filtersBar').style.display = 'none';
+                document.getElementById('usuariosCards').style.display = 'none';
+                carregarLogsGerais();
+            } else if (aba === 'ajuda') {
+                document.querySelector('[onclick="mudarAba(\'ajuda\')"]').classList.add('active');
+                document.getElementById('ajudaTab').style.display = 'block';
+                document.getElementById('searchBar').style.display = 'none';
+                document.getElementById('filtersBar').style.display = 'none';
+                document.getElementById('usuariosCards').style.display = 'none';
+            }
+        }
+
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        async function init() {
+            if (!verificarAutenticacao()) return;
+
+            showToast('Carregando...', 'info');
+
+            try {
+                await Promise.all([
+                    carregarEstatisticas(),
+                    carregarUsuarios()
+                ]);
+                showToast('Pronto!', 'success');
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao carregar', 'error');
+            }
+
+            document.getElementById('btnLogout').addEventListener('click', async () => {
+                sessionStorage.removeItem('admin_autenticado');
+                window.location.href = 'admin_login.html';
+            });
+
+            // Ajustar visibilidade baseado no tamanho da tela
+            function ajustarParaTela() {
+                if (window.innerWidth < 768) {
+                    document.getElementById('usuariosCards').style.display = 'block';
+                } else {
+                    document.getElementById('usuariosCards').style.display = 'none';
+                }
+            }
+
+            window.addEventListener('resize', ajustarParaTela);
+            ajustarParaTela();
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.style.display = 'none';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
