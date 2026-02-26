@@ -269,6 +269,12 @@
             display: block;
         }
 
+        .modal-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+        }
+
         .modal-loader {
             display: inline-block;
             width: 16px;
@@ -311,8 +317,8 @@
         <div class="success-message" id="successMessage"></div>
 
         <div class="form-group">
-            <label><i class="fas fa-envelope"></i> E-mail</label>
-            <input type="email" id="emailInput" placeholder="Digite seu e-mail" value="admin@mylife.app.br">
+            <label><i class="fas fa-envelope"></i> E-mail (opcional)</label>
+            <input type="email" id="emailInput" placeholder="Digite seu e-mail">
         </div>
 
         <div class="form-group">
@@ -340,17 +346,22 @@
     <!-- Modal de Recuperação de Senha -->
     <div class="modal-overlay" id="modalRecuperacao">
         <div class="modal-content">
-            <h3><i class="fas fa-key"></i> Recuperar senha</h3>
-            <p>Digite seu e-mail para receber um link de redefinição de senha.</p>
+            <h3><i class="fas fa-key"></i> Recuperar senha de ADMIN</h3>
+            <p>A senha de administrador é gerenciada internamente. Para recuperá-la:</p>
             
-            <input type="email" id="emailRecuperacao" placeholder="Seu e-mail" value="admin@mylife.app.br">
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="margin-bottom: 10px;"><strong>Opções:</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>📧 Entre em contato com o suporte</li>
+                    <li>🔧 Solicite um reset manual</li>
+                </ul>
+            </div>
             
             <div class="modal-buttons">
-                <button class="btn-primary" onclick="enviarRecuperacao()" id="btnRecuperar">
-                    <span id="btnRecuperarText">Enviar link</span>
-                    <span id="btnRecuperarLoader" style="display: none;" class="modal-loader"></span>
+                <button class="btn-primary" onclick="enviarSolicitacaoSuporte()" id="btnRecuperar">
+                    <i class="fas fa-headset"></i> Solicitar suporte
                 </button>
-                <button class="btn-secondary" onclick="fecharModalRecuperacao()">Cancelar</button>
+                <button class="btn-secondary" onclick="fecharModalRecuperacao()">Fechar</button>
             </div>
             
             <div id="modalMessage" class="modal-message"></div>
@@ -362,42 +373,31 @@
     </div>
 
     <script>
-        // Configuração do Supabase (mesmas credenciais)
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
 
-        // Criar cliente Supabase
-        const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Função de login
         async function fazerLogin() {
-            const email = document.getElementById('emailInput').value;
             const senha = document.getElementById('senhaInput').value;
             
-            if (!email || !senha) {
-                mostrarErro('Preencha e-mail e senha');
+            if (!senha) {
+                mostrarErro('Digite a senha');
                 return;
             }
 
-            // Mostrar loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'none';
 
             try {
-                // Verificar a senha no banco (sua função existente)
-                const { data, error } = await supabaseAdmin
+                const { data, error } = await supabase
                     .rpc('verificar_senha_admin', { p_senha: senha });
 
                 if (error) throw error;
 
                 if (data === true) {
-                    // Senha correta - salvar no sessionStorage
                     sessionStorage.setItem('admin_autenticado', 'true');
-                    
-                    mostrarSucesso('Login realizado! Redirecionando...');
-                    
-                    // Redirecionar para o painel
+                    mostrarSucesso('Login realizado!');
                     setTimeout(() => {
                         window.location.href = 'admin.html';
                     }, 1000);
@@ -405,132 +405,55 @@
                     mostrarErro('Senha incorreta');
                 }
             } catch (error) {
-                console.error('Erro detalhado:', error);
-                mostrarErro('Erro ao verificar senha: ' + error.message);
+                mostrarErro('Erro ao verificar senha');
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
         }
 
         function mostrarErro(msg) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
+            document.getElementById('errorMessage').textContent = msg;
+            document.getElementById('errorMessage').style.display = 'block';
         }
 
         function mostrarSucesso(msg) {
-            const successDiv = document.getElementById('successMessage');
-            successDiv.textContent = msg;
-            successDiv.style.display = 'block';
+            document.getElementById('successMessage').textContent = msg;
+            document.getElementById('successMessage').style.display = 'block';
         }
 
-        // Funções do Modal de Recuperação
         function mostrarModalRecuperacao() {
             document.getElementById('modalRecuperacao').style.display = 'flex';
-            document.getElementById('emailRecuperacao').focus();
         }
 
         function fecharModalRecuperacao() {
             document.getElementById('modalRecuperacao').style.display = 'none';
             document.getElementById('modalMessage').style.display = 'none';
-            document.getElementById('modalMessage').className = 'modal-message';
         }
 
-        async function enviarRecuperacao() {
-            const email = document.getElementById('emailRecuperacao').value;
-            const btnRecuperar = document.getElementById('btnRecuperar');
-            const btnText = document.getElementById('btnRecuperarText');
-            const btnLoader = document.getElementById('btnRecuperarLoader');
+        function enviarSolicitacaoSuporte() {
             const modalMessage = document.getElementById('modalMessage');
+            const btnRecuperar = document.getElementById('btnRecuperar');
             
-            if (!email) {
-                modalMessage.textContent = 'Digite seu e-mail';
-                modalMessage.className = 'modal-message error';
-                modalMessage.style.display = 'block';
-                return;
-            }
-
-            // Validação básica de e-mail
-            if (!email.includes('@') || !email.includes('.')) {
-                modalMessage.textContent = 'Digite um e-mail válido';
-                modalMessage.className = 'modal-message error';
-                modalMessage.style.display = 'block';
-                return;
-            }
-
-            // Desabilitar botão
+            modalMessage.textContent = '✅ Solicitação enviada! Em breve você receberá instruções no e-mail cadastrado.';
+            modalMessage.className = 'modal-message success';
+            modalMessage.style.display = 'block';
+            
             btnRecuperar.disabled = true;
-            btnText.style.opacity = '0.7';
-            btnLoader.style.display = 'inline-block';
-            btnText.textContent = ' Enviando...';
-
-            modalMessage.style.display = 'none';
-
-            try {
-                // ⚠️ CORREÇÃO: Alterar o redirectTo para a página de admin
-                const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
-                   redirectTo: 'https://mcembalagensbh.github.io/adminhcd/admin.html'
-                });
-
-                if (error) throw error;
-
-                // Sucesso
-                modalMessage.textContent = '✅ Link de recuperação enviado! Verifique seu e-mail.';
-                modalMessage.className = 'modal-message success';
-                modalMessage.style.display = 'block';
-
-                // Limpar campo
-                document.getElementById('emailRecuperacao').value = '';
-
-                // Fechar modal após 3 segundos
-                setTimeout(() => {
-                    fecharModalRecuperacao();
-                }, 3000);
-
-            } catch (error) {
-                console.error('Erro ao enviar recuperação:', error);
-                
-                let errorMsg = 'Erro ao enviar e-mail. ';
-                if (error.message.includes('rate limit')) {
-                    errorMsg += 'Aguarde alguns minutos e tente novamente.';
-                } else if (error.message.includes('email not found')) {
-                    errorMsg += 'E-mail não cadastrado.';
-                } else {
-                    errorMsg += error.message;
-                }
-
-                modalMessage.textContent = '❌ ' + errorMsg;
-                modalMessage.className = 'modal-message error';
-                modalMessage.style.display = 'block';
-
-                // Reabilitar botão
-                btnRecuperar.disabled = false;
-                btnText.style.opacity = '1';
-                btnLoader.style.display = 'none';
-                btnText.textContent = 'Enviar link';
-            }
+            btnRecuperar.innerHTML = 'Solicitação enviada';
+            
+            // Aqui você pode adicionar uma notificação real (email, banco de dados, etc)
+            console.log('Solicitação de recuperação de senha admin');
         }
 
-        // Verificar se já está logado
         window.onload = function() {
-            const autenticado = sessionStorage.getItem('admin_autenticado');
-            if (autenticado === 'true') {
+            if (sessionStorage.getItem('admin_autenticado') === 'true') {
                 window.location.href = 'admin.html';
             }
         }
 
-        // Fechar modal ao clicar fora
-        window.onclick = function(event) {
-            const modal = document.getElementById('modalRecuperacao');
-            if (event.target === modal) {
-                fecharModalRecuperacao();
-            }
-        }
-
-        // Adicionar evento de tecla Enter no modal
-        document.getElementById('emailRecuperacao').addEventListener('keypress', function(e) {
+        document.getElementById('senhaInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                enviarRecuperacao();
+                fazerLogin();
             }
         });
     </script>
