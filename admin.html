@@ -186,21 +186,16 @@
             color: white;
         }
 
-        .filters-bar {
+        .search-bar {
             background: white;
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
         }
 
         .search-input {
-            flex: 2;
-            min-width: 250px;
+            width: 100%;
             padding: 12px;
             border: 2px solid var(--light);
             border-radius: 8px;
@@ -211,65 +206,6 @@
         .search-input:focus {
             outline: none;
             border-color: var(--primary);
-        }
-
-        .filter-select {
-            padding: 12px;
-            border: 2px solid var(--light);
-            border-radius: 8px;
-            font-size: 14px;
-            background: white;
-            min-width: 150px;
-            cursor: pointer;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .order-buttons {
-            display: flex;
-            gap: 5px;
-            background: var(--light);
-            padding: 4px;
-            border-radius: 8px;
-            flex-wrap: wrap;
-        }
-
-        .order-btn {
-            padding: 8px 12px;
-            border: none;
-            background: transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--gray);
-            transition: all 0.3s;
-            font-size: 0.85em;
-        }
-
-        .order-btn:hover {
-            background: white;
-            color: var(--primary);
-        }
-
-        .order-btn.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .filter-badge {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: var(--light);
-            padding: 8px 12px;
-            border-radius: 8px;
-            color: var(--dark);
         }
 
         .table-container {
@@ -283,7 +219,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1000px;
+            min-width: 800px;
         }
 
         th {
@@ -394,11 +330,6 @@
 
         .btn-warning {
             background: var(--warning);
-            color: white;
-        }
-
-        .btn-info {
-            background: var(--primary);
             color: white;
         }
 
@@ -531,8 +462,6 @@
         .log-action.proximo_expiracao { color: var(--warning); }
         .log-action.admin_manual { color: var(--success); }
         .log-action.pagamento { color: var(--purple); }
-        .log-action.reset_senha { color: var(--warning); }
-        .log-action.delete_usuario { color: var(--danger); }
 
         .log-details {
             color: var(--dark);
@@ -660,16 +589,17 @@
             background: var(--purple-dark);
         }
 
-        .senha-info {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 1.2em;
-            text-align: center;
-            color: var(--primary-dark);
-            border: 2px dashed var(--primary);
+        .date-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .date-filter input {
+            padding: 8px;
+            border: 1px solid var(--light);
+            border-radius: 6px;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -710,43 +640,8 @@
             </button>
         </div>
 
-        <div class="filters-bar" id="filtersBar">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por email ou ID..." onkeyup="aplicarFiltros()">
-            
-            <select class="filter-select" id="statusFilter" onchange="aplicarFiltros()">
-                <option value="todos">📊 Todos os status</option>
-                <option value="ativo">✅ Ativos</option>
-                <option value="inativo">❌ Inativos</option>
-                <option value="pendente">⚠️ Próximos (7 dias)</option>
-                <option value="expirado">⏰ Expirados</option>
-                <option value="sem_assinatura">🚫 Sem assinatura</option>
-            </select>
-
-            <div class="filter-badge">
-                <i class="fas fa-sort"></i>
-                <span>Ordenar:</span>
-            </div>
-            
-            <div class="order-buttons">
-                <button class="order-btn active" onclick="mudarOrdenacao('email', 'asc')" id="orderEmailAsc" title="Email A-Z">
-                    <i class="fas fa-sort-alpha-down"></i>
-                </button>
-                <button class="order-btn" onclick="mudarOrdenacao('email', 'desc')" id="orderEmailDesc" title="Email Z-A">
-                    <i class="fas fa-sort-alpha-up"></i>
-                </button>
-                <button class="order-btn" onclick="mudarOrdenacao('dias', 'asc')" id="orderDiasAsc" title="Menos dias primeiro">
-                    <i class="fas fa-sort-numeric-down"></i> Dias ↑
-                </button>
-                <button class="order-btn" onclick="mudarOrdenacao('dias', 'desc')" id="orderDiasDesc" title="Mais dias primeiro">
-                    <i class="fas fa-sort-numeric-up"></i> Dias ↓
-                </button>
-                <button class="order-btn" onclick="mudarOrdenacao('data_expiracao', 'asc')" id="orderDataAsc" title="Expiração mais antiga">
-                    <i class="fas fa-calendar"></i> Data ↑
-                </button>
-                <button class="order-btn" onclick="mudarOrdenacao('data_expiracao', 'desc')" id="orderDataDesc" title="Expiração mais recente">
-                    <i class="fas fa-calendar"></i> Data ↓
-                </button>
-            </div>
+        <div class="search-bar" id="searchBar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por email ou ID..." onkeyup="filtrarUsuarios()">
         </div>
 
         <div id="usuariosTab" class="tab-content">
@@ -793,10 +688,8 @@
                     <p>Para cada usuário, você tem as seguintes opções:</p>
                     <ul style="margin-left: 30px; margin-top: 10px;">
                         <li><strong>➕ Adicionar Dias</strong> - Adiciona dias à assinatura atual</li>
-                        <li><strong>🔑 Resetar Senha</strong> - Gera nova senha de acesso e senha do saldo</li>
                         <li><strong>👁️ Ver Logs</strong> - Mostra histórico de ações do usuário</li>
                         <li><strong>✅ Ativar/❌ Desativar</strong> - Muda o status manualmente</li>
-                        <li><strong>🗑️ Deletar</strong> - Remove permanentemente o usuário</li>
                     </ul>
                 </div>
 
@@ -814,12 +707,14 @@
 
                 <div style="margin-bottom: 25px;">
                     <h3 style="color: var(--primary); margin-bottom: 10px;">
-                        <i class="fas fa-filter"></i> Filtros e Ordenação
+                        <i class="fas fa-chart-line"></i> Relatório Financeiro
                     </h3>
+                    <p>O botão "Relatório Financeiro" no cabeçalho mostra:</p>
                     <ul style="margin-left: 30px; margin-top: 10px;">
-                        <li><strong>Filtro por status</strong> - Mostra apenas ativos, inativos, etc.</li>
-                        <li><strong>Busca</strong> - Pesquisa por email ou ID</li>
-                        <li><strong>Ordenação</strong> - Clique nos botões para ordenar como preferir</li>
+                        <li><strong>Total arrecadado</strong> - Valor total de todas as assinaturas</li>
+                        <li><strong>Média mensal</strong> - Valor médio por mês</li>
+                        <li><strong>Receita por período</strong> - Filtro por datas</li>
+                        <li><strong>Detalhamento por plano</strong> - Mensal vs Anual</li>
                     </ul>
                 </div>
             </div>
@@ -853,121 +748,6 @@
                     <i class="fas fa-check"></i> Confirmar
                 </button>
                 <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalAdicionarDias')">
-                    Cancelar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Resetar Senha -->
-    <div class="modal-overlay" id="modalResetarSenha">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-key"></i> Resetar Senha</h2>
-                <button class="close-modal" onclick="fecharModal('modalResetarSenha')">&times;</button>
-            </div>
-            <div id="resetUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
-                Carregando...
-            </div>
-            
-            <div style="text-align: center; margin: 20px 0;">
-                <i class="fas fa-exclamation-triangle" style="color: var(--warning); font-size: 2em;"></i>
-                <p style="margin-top: 10px;">Você está prestes a resetar as senhas deste usuário.</p>
-                <p><strong>Serão geradas novas senhas de acesso e do saldo.</strong></p>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-comment"></i> Motivo do reset</label>
-                <input type="text" id="resetMotivo" class="form-control" placeholder="Ex: Usuário esqueceu a senha">
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-warning" style="flex:2" onclick="confirmarResetSenha()">
-                    <i class="fas fa-sync-alt"></i> Resetar Senhas
-                </button>
-                <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalResetarSenha')">
-                    Cancelar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Senhas Resetadas -->
-    <div class="modal-overlay" id="modalSenhasResetadas">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-check-circle" style="color: var(--success);"></i> Senhas Resetadas</h2>
-                <button class="close-modal" onclick="fecharModal('modalSenhasResetadas')">&times;</button>
-            </div>
-            
-            <div style="text-align: center; margin: 20px 0;">
-                <i class="fas fa-key" style="color: var(--success); font-size: 3em;"></i>
-                <p style="margin: 15px 0; font-weight: 600;">Novas senhas geradas para:</p>
-                <div id="senhasResetadasEmail" style="font-size: 1.1em; margin-bottom: 15px;"></div>
-            </div>
-
-            <div class="senha-info" id="senhaAcessoDisplay">
-                Aguarde...
-            </div>
-
-            <div class="senha-info" id="senhaSaldoDisplay" style="margin-top: 10px;">
-                Aguarde...
-            </div>
-
-            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
-                <strong>Importante:</strong> Anote estas senhas. Elas não poderão ser recuperadas novamente!
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-success" style="flex:1" onclick="copiarSenhasResetadas()">
-                    <i class="fas fa-copy"></i> Copiar Senhas
-                </button>
-                <button class="btn btn-primary" style="flex:1" onclick="fecharModal('modalSenhasResetadas')">
-                    <i class="fas fa-check"></i> OK
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Confirmar Delete -->
-    <div class="modal-overlay" id="modalConfirmarDelete">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Confirmar Exclusão</h2>
-                <button class="close-modal" onclick="fecharModal('modalConfirmarDelete')">&times;</button>
-            </div>
-            
-            <div style="text-align: center; margin: 20px 0;">
-                <i class="fas fa-trash-alt" style="color: var(--danger); font-size: 3em;"></i>
-                <p style="margin: 15px 0; font-size: 1.1em;">
-                    Tem certeza que deseja deletar permanentemente o usuário?
-                </p>
-                <div id="deleteUsuarioInfo" style="background: #f8d7da; padding: 15px; border-radius: 8px; color: #721c24;">
-                    Carregando...
-                </div>
-            </div>
-
-            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
-                <strong>Atenção:</strong> Esta ação é permanente e irreversível!
-                <ul style="margin-top: 10px; margin-left: 20px;">
-                    <li>O usuário será removido do sistema</li>
-                    <li>Todos os dados de assinatura serão perdidos</li>
-                    <li>Os logs serão mantidos para auditoria</li>
-                </ul>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-comment"></i> Motivo da exclusão</label>
-                <input type="text" id="deleteMotivo" class="form-control" placeholder="Ex: Usuário solicitou remoção">
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-danger" style="flex:2" onclick="confirmarDeleteUsuario()">
-                    <i class="fas fa-trash"></i> Sim, deletar permanentemente
-                </button>
-                <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalConfirmarDelete')">
                     Cancelar
                 </button>
             </div>
@@ -1008,7 +788,7 @@
     <script>
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
-        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY0MzYzOCwiZXhwIjoyMDg2MjE5NjM4fQ.o8A42E0Zr3HZw0_qb4s-qA95MatoKCvrpFuAqW31Xqc';
+       const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY0MzYzOCwiZXhwIjoyMDg2MjE5NjM4fQ.o8A42E0Zr3HZw0_qb4s-qA95MatoKCvrpFuAqW31Xqc';
 
         // Links do Mercado Pago
         const MERCADO_PAGO_LINKS = {
@@ -1022,22 +802,16 @@
             anual: { valor: 189.90, dias: 365 }
         };
 
-        // Criar cliente Supabase
+        // Criar cliente Supabase - CLIENTE ANÔNIMO (para operações normais)
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Criar cliente ADMIN com Service Role (para operações que exigem acesso total)
         const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
         
         let usuariosData = [];
-        let usuariosFiltrados = [];
         let usuarioSelecionado = null;
-        let senhasResetadasAtuais = null;
-        
-        // Configurações de ordenação
-        let orderConfig = {
-            field: 'email',
-            direction: 'asc'
-        };
 
-        // Verificar autenticação
+        // Verificar se está autenticado como admin
         function verificarAutenticacao() {
             const autenticado = sessionStorage.getItem('admin_autenticado');
             if (!autenticado) {
@@ -1047,7 +821,7 @@
             return true;
         }
 
-        // Calcular dias restantes
+        // Calcular dias restantes corretamente
         function calcularDiasRestantes(dataExpiracao) {
             if (!dataExpiracao) return 0;
             
@@ -1063,21 +837,11 @@
             return diffDays;
         }
 
-        // Gerar senha aleatória
-        function gerarSenhaAleatoria(tamanho = 8) {
-            const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%';
-            let senha = '';
-            for (let i = 0; i < tamanho; i++) {
-                senha += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-            }
-            return senha;
-        }
-
-        // Carregar estatísticas (usando a nova função)
+        // Carregar estatísticas (usa RPC que já deve ter permissão)
         async function carregarEstatisticas() {
             try {
                 const { data, error } = await supabaseClient
-                    .rpc('mylife_admin_estatisticas');
+                    .rpc('admin_estatisticas');
                 
                 if (error) throw error;
                 
@@ -1119,23 +883,16 @@
             }
         }
 
-        // Carregar usuários (usando a nova função)
+        // Carregar usuários (usa RPC que já deve ter permissão)
         async function carregarUsuarios() {
             try {
                 const { data, error } = await supabaseClient
-                    .rpc('mylife_admin_listar_usuarios');
+                    .rpc('admin_listar_usuarios');
                 
                 if (error) throw error;
                 
                 usuariosData = data || [];
-                
-                // Calcular dias para cada usuário
-                usuariosData = usuariosData.map(user => ({
-                    ...user,
-                    dias_restantes: calcularDiasRestantes(user.data_expiracao)
-                }));
-                
-                aplicarFiltros();
+                renderizarTabelaUsuarios(usuariosData);
             } catch (error) {
                 console.error('Erro ao carregar usuários:', error);
                 document.getElementById('usuariosBody').innerHTML = `
@@ -1146,78 +903,6 @@
                     </tr>
                 `;
             }
-        }
-
-        // Aplicar filtros e ordenação
-        function aplicarFiltros() {
-            const termo = document.getElementById('searchInput').value.toLowerCase();
-            const statusFilter = document.getElementById('statusFilter').value;
-            
-            // Filtrar
-            let filtrados = usuariosData.filter(user => {
-                const matchesSearch = termo === '' || 
-                    user.email.toLowerCase().includes(termo) || 
-                    user.user_id.toLowerCase().includes(termo);
-                
-                if (!matchesSearch) return false;
-                
-                if (statusFilter === 'todos') return true;
-                
-                const dias = user.dias_restantes;
-                const status = user.status;
-                
-                if (statusFilter === 'ativo') {
-                    return status === 'ativo' && dias > 7;
-                } else if (statusFilter === 'inativo') {
-                    return status !== 'ativo' || dias <= 0;
-                } else if (statusFilter === 'pendente') {
-                    return status === 'ativo' && dias > 0 && dias <= 7;
-                } else if (statusFilter === 'expirado') {
-                    return status === 'expirado' || (status === 'ativo' && dias <= 0);
-                } else if (statusFilter === 'sem_assinatura') {
-                    return !status || status === 'sem_assinatura';
-                }
-                
-                return true;
-            });
-            
-            // Ordenar
-            filtrados.sort((a, b) => {
-                let valorA, valorB;
-                
-                if (orderConfig.field === 'email') {
-                    valorA = a.email.toLowerCase();
-                    valorB = b.email.toLowerCase();
-                } else if (orderConfig.field === 'dias') {
-                    valorA = a.dias_restantes || 0;
-                    valorB = b.dias_restantes || 0;
-                } else if (orderConfig.field === 'data_expiracao') {
-                    valorA = a.data_expiracao ? new Date(a.data_expiracao) : new Date(0);
-                    valorB = b.data_expiracao ? new Date(b.data_expiracao) : new Date(0);
-                }
-                
-                if (orderConfig.direction === 'asc') {
-                    return valorA > valorB ? 1 : -1;
-                } else {
-                    return valorA < valorB ? 1 : -1;
-                }
-            });
-            
-            usuariosFiltrados = filtrados;
-            renderizarTabelaUsuarios(filtrados);
-            
-            // Atualizar botões de ordenação
-            document.querySelectorAll('.order-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            const activeBtn = document.getElementById(`order${orderConfig.field.charAt(0).toUpperCase() + orderConfig.field.slice(1)}${orderConfig.direction === 'asc' ? 'Asc' : 'Desc'}`);
-            if (activeBtn) activeBtn.classList.add('active');
-        }
-
-        // Mudar ordenação
-        function mudarOrdenacao(field, direction) {
-            orderConfig = { field, direction };
-            aplicarFiltros();
         }
 
         // Renderizar tabela
@@ -1237,7 +922,7 @@
 
             let html = '';
             usuarios.forEach(user => {
-                const dias = user.dias_restantes;
+                const dias = calcularDiasRestantes(user.data_expiracao);
                 let statusClass = 'status-sem_assinatura';
                 let statusText = user.status || 'sem_assinatura';
 
@@ -1292,20 +977,14 @@
                                 <button class="btn btn-sm btn-success" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')" title="Adicionar dias">
                                     <i class="fas fa-plus"></i>
                                 </button>
-                                <button class="btn btn-sm btn-warning" onclick="abrirModalResetarSenha('${user.user_id}', '${user.email}')" title="Resetar senha">
-                                    <i class="fas fa-key"></i>
-                                </button>
                                 <button class="btn btn-sm btn-primary" onclick="verLogsUsuario('${user.user_id}')" title="Ver logs">
                                     <i class="fas fa-history"></i>
                                 </button>
-                                <button class="btn btn-sm btn-info" onclick="mudarStatus('${user.user_id}', 'ativo')" title="Ativar">
+                                <button class="btn btn-sm btn-warning" onclick="mudarStatus('${user.user_id}', 'ativo')" title="Ativar">
                                     <i class="fas fa-check-circle"></i>
                                 </button>
                                 <button class="btn btn-sm btn-danger" onclick="mudarStatus('${user.user_id}', 'expirado')" title="Desativar">
                                     <i class="fas fa-times-circle"></i>
-                                </button>
-                                <button class="btn btn-sm btn-danger" onclick="abrirModalDelete('${user.user_id}', '${user.email}')" title="Deletar usuário" style="background: #c0392b;">
-                                    <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </td>
@@ -1314,6 +993,23 @@
             });
 
             tbody.innerHTML = html;
+        }
+
+        // Filtrar usuários
+        function filtrarUsuarios() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!termo) {
+                renderizarTabelaUsuarios(usuariosData);
+                return;
+            }
+
+            const filtrados = usuariosData.filter(user => 
+                user.email.toLowerCase().includes(termo) || 
+                user.user_id.toLowerCase().includes(termo)
+            );
+
+            renderizarTabelaUsuarios(filtrados);
         }
 
         // Abrir modal para adicionar dias
@@ -1326,7 +1022,7 @@
             document.getElementById('modalAdicionarDias').style.display = 'flex';
         }
 
-        // Confirmar adição de dias (usando nova função)
+        // Confirmar adição de dias (usa supabaseAdmin)
         async function confirmarAdicionarDias() {
             const dias = parseInt(document.getElementById('diasQuantidade').value);
             const status = document.getElementById('diasStatus').value;
@@ -1340,7 +1036,7 @@
                 showToast('Processando...', 'info');
                 
                 const { data, error } = await supabaseAdmin
-                    .rpc('mylife_admin_atualizar_assinatura', {
+                    .rpc('admin_atualizar_assinatura', {
                         p_user_id: usuarioSelecionado,
                         p_dias: dias,
                         p_status: status
@@ -1348,9 +1044,19 @@
 
                 if (error) throw error;
 
+                // Registrar log manual (usa supabaseAdmin)
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: usuarioSelecionado,
+                        acao: 'admin_manual',
+                        detalhes: `Admin adicionou ${dias} dias e mudou status para ${status}`
+                    });
+
                 showToast(data.mensagem, 'success');
                 fecharModal('modalAdicionarDias');
                 
+                // Recarregar dados
                 await carregarUsuarios();
                 await carregarEstatisticas();
                 
@@ -1360,121 +1066,7 @@
             }
         }
 
-        // Abrir modal resetar senha
-        function abrirModalResetarSenha(userId, email) {
-            usuarioSelecionado = userId;
-            document.getElementById('resetUsuarioInfo').innerHTML = `
-                <strong>Email:</strong> ${email}<br>
-                <strong>ID:</strong> ${userId}
-            `;
-            document.getElementById('resetMotivo').value = '';
-            document.getElementById('modalResetarSenha').style.display = 'flex';
-        }
-
-        // Confirmar reset de senha
-        async function confirmarResetSenha() {
-            const motivo = document.getElementById('resetMotivo').value || 'Usuário esqueceu a senha';
-            
-            try {
-                showToast('Gerando novas senhas...', 'info');
-                
-                // Gerar novas senhas
-                const novaSenhaAcesso = gerarSenhaAleatoria(8);
-                const novaSenhaSaldo = gerarSenhaAleatoria(6);
-                
-                const usuario = usuariosData.find(u => u.user_id === usuarioSelecionado);
-                
-                if (!usuario) {
-                    throw new Error('Usuário não encontrado');
-                }
-
-                // Registrar log usando a nova função
-                const { error } = await supabaseAdmin
-                    .rpc('mylife_admin_resetar_senha', {
-                        p_user_id: usuarioSelecionado,
-                        p_motivo: motivo
-                    });
-
-                if (error) throw error;
-
-                senhasResetadasAtuais = {
-                    acesso: novaSenhaAcesso,
-                    saldo: novaSenhaSaldo,
-                    email: usuario.email
-                };
-                
-                fecharModal('modalResetarSenha');
-                
-                document.getElementById('senhasResetadasEmail').innerHTML = `<strong>${usuario.email}</strong>`;
-                document.getElementById('senhaAcessoDisplay').innerHTML = `
-                    <i class="fas fa-lock"></i> Senha de Acesso: <strong>${novaSenhaAcesso}</strong>
-                `;
-                document.getElementById('senhaSaldoDisplay').innerHTML = `
-                    <i class="fas fa-coins"></i> Senha do Saldo: <strong>${novaSenhaSaldo}</strong>
-                `;
-                
-                document.getElementById('modalSenhasResetadas').style.display = 'flex';
-                
-                showToast('Senhas resetadas com sucesso!', 'success');
-                
-            } catch (error) {
-                console.error('Erro:', error);
-                showToast('Erro ao resetar senhas', 'error');
-            }
-        }
-
-        // Copiar senhas resetadas
-        function copiarSenhasResetadas() {
-            if (!senhasResetadasAtuais) return;
-            
-            const texto = `Senhas para ${senhasResetadasAtuais.email}:\nAcesso: ${senhasResetadasAtuais.acesso}\nSaldo: ${senhasResetadasAtuais.saldo}`;
-            
-            navigator.clipboard.writeText(texto).then(() => {
-                showToast('Senhas copiadas para a área de transferência!', 'success');
-            }).catch(() => {
-                showToast('Erro ao copiar senhas', 'error');
-            });
-        }
-
-        // Abrir modal delete
-        function abrirModalDelete(userId, email) {
-            usuarioSelecionado = userId;
-            document.getElementById('deleteUsuarioInfo').innerHTML = `
-                <strong>Email:</strong> ${email}<br>
-                <strong>ID:</strong> ${userId}
-            `;
-            document.getElementById('deleteMotivo').value = '';
-            document.getElementById('modalConfirmarDelete').style.display = 'flex';
-        }
-
-        // Confirmar delete usuário (usando nova função)
-        async function confirmarDeleteUsuario() {
-            const motivo = document.getElementById('deleteMotivo').value || 'Remoção manual pelo admin';
-            
-            try {
-                showToast('Processando exclusão...', 'warning');
-                
-                const { data, error } = await supabaseAdmin
-                    .rpc('mylife_admin_deletar_usuario', {
-                        p_user_id: usuarioSelecionado,
-                        p_motivo: motivo
-                    });
-
-                if (error) throw error;
-
-                showToast(data.mensagem, 'success');
-                fecharModal('modalConfirmarDelete');
-                
-                await carregarUsuarios();
-                await carregarEstatisticas();
-                
-            } catch (error) {
-                console.error('Erro:', error);
-                showToast('Erro ao deletar usuário: ' + error.message, 'error');
-            }
-        }
-
-        // Mudar status do usuário (usando nova função)
+        // Mudar status do usuário (usa supabaseAdmin)
         async function mudarStatus(userId, novoStatus) {
             if (!confirm(`Tem certeza que deseja mudar o status para ${novoStatus}?`)) {
                 return;
@@ -1482,12 +1074,21 @@
 
             try {
                 const { data, error } = await supabaseAdmin
-                    .rpc('mylife_admin_mudar_status', {
+                    .rpc('admin_mudar_status', {
                         p_user_id: userId,
                         p_status: novoStatus
                     });
 
                 if (error) throw error;
+
+                // Registrar log manual (usa supabaseAdmin)
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: userId,
+                        acao: 'admin_manual',
+                        detalhes: `Admin mudou status para ${novoStatus}`
+                    });
 
                 showToast(data.mensagem, 'success');
                 await carregarUsuarios();
@@ -1499,7 +1100,7 @@
             }
         }
 
-        // Ver logs do usuário
+        // Ver logs do usuário (usa supabaseAdmin)
         async function verLogsUsuario(userId) {
             try {
                 const { data, error } = await supabaseAdmin
@@ -1525,8 +1126,6 @@
                         else if (log.acao === 'proximo_expiracao') actionClass += ' proximo_expiracao';
                         else if (log.acao === 'admin_manual') actionClass += ' admin_manual';
                         else if (log.acao === 'pagamento') actionClass += ' pagamento';
-                        else if (log.acao === 'reset_senha') actionClass += ' reset_senha';
-                        else if (log.acao === 'delete_usuario') actionClass += ' delete_usuario';
 
                         html += `
                             <div class="log-item">
@@ -1548,7 +1147,7 @@
             }
         }
 
-        // Carregar logs gerais
+        // Carregar logs gerais (usa supabaseAdmin)
         async function carregarLogsGerais() {
             try {
                 const { data, error } = await supabaseAdmin
@@ -1575,8 +1174,6 @@
                     else if (log.acao === 'proximo_expiracao') actionClass += ' proximo_expiracao';
                     else if (log.acao === 'admin_manual') actionClass += ' admin_manual';
                     else if (log.acao === 'pagamento') actionClass += ' pagamento';
-                    else if (log.acao === 'reset_senha') actionClass += ' reset_senha';
-                    else if (log.acao === 'delete_usuario') actionClass += ' delete_usuario';
 
                     html += `
                         <div class="log-item">
@@ -1605,15 +1202,17 @@
             await carregarRelatorioFinanceiro();
         }
 
-        // Carregar dados do relatório financeiro
+        // Carregar dados do relatório financeiro (AGORA USA supabaseAdmin)
         async function carregarRelatorioFinanceiro() {
             try {
+                // Buscar todas as assinaturas usando supabaseAdmin (ignora RLS)
                 const { data: assinaturas, error: assError } = await supabaseAdmin
                     .from('assinaturas')
                     .select('*');
 
                 if (assError) throw assError;
 
+                // Buscar logs de pagamento usando supabaseAdmin (ignora RLS)
                 const { data: logs, error: logError } = await supabaseAdmin
                     .from('log_assinaturas')
                     .select('*')
@@ -1622,6 +1221,7 @@
 
                 if (logError) throw logError;
 
+                // Calcular totais
                 let totalMensal = 0;
                 let totalAnual = 0;
                 let pagamentosMensal = 0;
@@ -1653,6 +1253,7 @@
                 const meses = Object.keys(pagamentosPorMes).length;
                 const mediaMensal = meses > 0 ? totalGeral / meses : 0;
 
+                // Calcular assinaturas ativas
                 const hoje = new Date();
                 hoje.setHours(0, 0, 0, 0);
                 
@@ -1670,6 +1271,7 @@
                     return expiracao >= hoje && a.plano === 'anual';
                 }).length;
 
+                // Montar HTML do relatório
                 const content = document.getElementById('relatorioContent');
                 content.innerHTML = `
                     <div class="report-grid">
@@ -1773,7 +1375,7 @@
                 console.error('Erro ao carregar relatório:', error);
                 document.getElementById('relatorioContent').innerHTML = `
                     <p style="text-align: center; color: var(--danger); padding: 20px;">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros: ${error.message}
                     </p>
                 `;
             }
@@ -1787,16 +1389,16 @@
             if (aba === 'usuarios') {
                 document.querySelector('[onclick="mudarAba(\'usuarios\')"]').classList.add('active');
                 document.getElementById('usuariosTab').style.display = 'block';
-                document.getElementById('filtersBar').style.display = 'flex';
+                document.getElementById('searchBar').style.display = 'block';
             } else if (aba === 'logs') {
                 document.querySelector('[onclick="mudarAba(\'logs\')"]').classList.add('active');
                 document.getElementById('logsTab').style.display = 'block';
-                document.getElementById('filtersBar').style.display = 'none';
+                document.getElementById('searchBar').style.display = 'none';
                 carregarLogsGerais();
             } else if (aba === 'ajuda') {
                 document.querySelector('[onclick="mudarAba(\'ajuda\')"]').classList.add('active');
                 document.getElementById('ajudaTab').style.display = 'block';
-                document.getElementById('filtersBar').style.display = 'none';
+                document.getElementById('searchBar').style.display = 'none';
             }
         }
 
@@ -1819,8 +1421,10 @@
 
         // Inicialização
         async function init() {
+            // Verificar autenticação primeiro
             if (!verificarAutenticacao()) return;
 
+            // Mostrar loading
             showToast('Carregando dados...', 'info');
 
             try {
@@ -1834,18 +1438,21 @@
                 showToast('Erro ao carregar dados', 'error');
             }
 
+            // Logout
             document.getElementById('btnLogout').addEventListener('click', async () => {
                 sessionStorage.removeItem('admin_autenticado');
                 window.location.href = 'admin_login.html';
             });
         }
 
+        // Fechar modais ao clicar fora
         window.onclick = function(event) {
             if (event.target.classList.contains('modal-overlay')) {
                 event.target.style.display = 'none';
             }
         };
 
+        // Iniciar quando a página carregar
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
