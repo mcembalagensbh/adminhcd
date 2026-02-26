@@ -28,7 +28,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             width: 100%;
             max-width: 400px;
-            position: relative;
         }
 
         .login-header {
@@ -98,12 +97,6 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-login:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .error-message {
             background: #f8d7da;
             color: #721c24;
@@ -155,10 +148,6 @@
             cursor: pointer;
         }
 
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-
         /* Modal de Recuperação */
         .modal-overlay {
             display: none;
@@ -194,20 +183,6 @@
             font-size: 14px;
         }
 
-        .modal-content input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-
-        .modal-content input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
         .modal-buttons {
             display: flex;
             gap: 10px;
@@ -229,24 +204,9 @@
             color: white;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            background: #5a67d8;
-            transform: translateY(-2px);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         .btn-secondary {
             background: #95a5a6;
             color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #7f8c8d;
-            transform: translateY(-2px);
         }
 
         .modal-message {
@@ -274,33 +234,6 @@
             color: #0c5460;
             display: block;
         }
-
-        .modal-loader {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .back-to-login {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 13px;
-        }
-
-        .back-to-login a {
-            color: #667eea;
-            text-decoration: none;
-            cursor: pointer;
-        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -317,13 +250,8 @@
         <div class="success-message" id="successMessage"></div>
 
         <div class="form-group">
-            <label><i class="fas fa-envelope"></i> E-mail (opcional)</label>
-            <input type="email" id="emailInput" placeholder="Digite seu e-mail">
-        </div>
-
-        <div class="form-group">
             <label><i class="fas fa-lock"></i> Senha</label>
-            <input type="password" id="senhaInput" placeholder="Digite a senha" onkeypress="if(event.key==='Enter') fazerLogin()">
+            <input type="password" id="senhaInput" placeholder="Digite a senha" autofocus>
         </div>
 
         <div class="forgot-password">
@@ -346,28 +274,17 @@
     <!-- Modal de Recuperação de Senha -->
     <div class="modal-overlay" id="modalRecuperacao">
         <div class="modal-content">
-            <h3><i class="fas fa-key"></i> Recuperar senha de ADMIN</h3>
-            <p>A senha de administrador é gerenciada internamente. Para recuperá-la:</p>
+            <h3><i class="fas fa-key"></i> Recuperar senha</h3>
+            <p>Para recuperar a senha de administrador, entre em contato com o suporte.</p>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="margin-bottom: 10px;"><strong>Opções:</strong></p>
-                <ul style="margin-left: 20px;">
-                    <li>📧 Entre em contato com o suporte</li>
-                    <li>🔧 Solicite um reset manual</li>
-                </ul>
+                <p><strong>📧 suporte@mylife.app.br</strong></p>
             </div>
             
             <div class="modal-buttons">
-                <button class="btn-primary" onclick="enviarSolicitacaoSuporte()" id="btnRecuperar">
-                    <i class="fas fa-headset"></i> Solicitar suporte
+                <button class="btn-primary" onclick="fecharModalRecuperacao()">
+                    <i class="fas fa-check"></i> OK
                 </button>
-                <button class="btn-secondary" onclick="fecharModalRecuperacao()">Fechar</button>
-            </div>
-            
-            <div id="modalMessage" class="modal-message"></div>
-            
-            <div class="back-to-login">
-                <a onclick="fecharModalRecuperacao()">← Voltar para o login</a>
             </div>
         </div>
     </div>
@@ -388,16 +305,26 @@
 
             document.getElementById('loading').style.display = 'block';
             document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
 
             try {
+                console.log('Verificando senha...');
+                
                 const { data, error } = await supabase
                     .rpc('verificar_senha_admin', { p_senha: senha });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Erro RPC:', error);
+                    throw error;
+                }
+
+                console.log('Resultado:', data);
 
                 if (data === true) {
                     sessionStorage.setItem('admin_autenticado', 'true');
-                    mostrarSucesso('Login realizado!');
+                    
+                    mostrarSucesso('Login realizado! Redirecionando...');
+                    
                     setTimeout(() => {
                         window.location.href = 'admin.html';
                     }, 1000);
@@ -405,20 +332,28 @@
                     mostrarErro('Senha incorreta');
                 }
             } catch (error) {
-                mostrarErro('Erro ao verificar senha');
+                console.error('Erro detalhado:', error);
+                
+                if (error.message.includes('function "verificar_senha_admin" does not exist')) {
+                    mostrarErro('Erro: Função de verificação não existe no banco. Execute o SQL primeiro.');
+                } else {
+                    mostrarErro('Erro ao verificar senha: ' + error.message);
+                }
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
         }
 
         function mostrarErro(msg) {
-            document.getElementById('errorMessage').textContent = msg;
-            document.getElementById('errorMessage').style.display = 'block';
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
         }
 
         function mostrarSucesso(msg) {
-            document.getElementById('successMessage').textContent = msg;
-            document.getElementById('successMessage').style.display = 'block';
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = msg;
+            successDiv.style.display = 'block';
         }
 
         function mostrarModalRecuperacao() {
@@ -427,30 +362,17 @@
 
         function fecharModalRecuperacao() {
             document.getElementById('modalRecuperacao').style.display = 'none';
-            document.getElementById('modalMessage').style.display = 'none';
         }
 
-        function enviarSolicitacaoSuporte() {
-            const modalMessage = document.getElementById('modalMessage');
-            const btnRecuperar = document.getElementById('btnRecuperar');
-            
-            modalMessage.textContent = '✅ Solicitação enviada! Em breve você receberá instruções no e-mail cadastrado.';
-            modalMessage.className = 'modal-message success';
-            modalMessage.style.display = 'block';
-            
-            btnRecuperar.disabled = true;
-            btnRecuperar.innerHTML = 'Solicitação enviada';
-            
-            // Aqui você pode adicionar uma notificação real (email, banco de dados, etc)
-            console.log('Solicitação de recuperação de senha admin');
-        }
-
+        // Verificar se já está logado
         window.onload = function() {
-            if (sessionStorage.getItem('admin_autenticado') === 'true') {
+            const autenticado = sessionStorage.getItem('admin_autenticado');
+            if (autenticado === 'true') {
                 window.location.href = 'admin.html';
             }
         }
 
+        // Enter no campo de senha
         document.getElementById('senhaInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 fazerLogin();
