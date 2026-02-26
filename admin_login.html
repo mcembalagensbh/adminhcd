@@ -28,6 +28,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             width: 100%;
             max-width: 400px;
+            position: relative;
         }
 
         .login-header {
@@ -97,9 +98,25 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .error-message {
             background: #f8d7da;
             color: #721c24;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
             padding: 10px;
             border-radius: 6px;
             margin-bottom: 20px;
@@ -125,6 +142,159 @@
             color: #95a5a6;
             font-size: 12px;
         }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal de Recuperação */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .modal-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .modal-message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .modal-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .modal-loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .back-to-login {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        .back-to-login a {
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -138,13 +308,23 @@
         </div>
 
         <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
 
         <div class="form-group">
-            <label><i class="fas fa-lock"></i> Senha de Administrador</label>
+            <label><i class="fas fa-envelope"></i> E-mail</label>
+            <input type="email" id="emailInput" placeholder="Digite seu e-mail" value="admin@mylife.app.br">
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-lock"></i> Senha</label>
             <input type="password" id="senhaInput" placeholder="Digite a senha" onkeypress="if(event.key==='Enter') fazerLogin()">
         </div>
 
-        <button class="btn-login" onclick="fazerLogin()">
+        <div class="forgot-password">
+            <a onclick="mostrarModalRecuperacao()"><i class="fas fa-key"></i> Esqueci minha senha</a>
+        </div>
+
+        <button class="btn-login" onclick="fazerLogin()" id="loginBtn">
             <i class="fas fa-sign-in-alt"></i> Acessar Painel
         </button>
 
@@ -157,29 +337,55 @@
         </div>
     </div>
 
+    <!-- Modal de Recuperação de Senha -->
+    <div class="modal-overlay" id="modalRecuperacao">
+        <div class="modal-content">
+            <h3><i class="fas fa-key"></i> Recuperar senha</h3>
+            <p>Digite seu e-mail para receber um link de redefinição de senha.</p>
+            
+            <input type="email" id="emailRecuperacao" placeholder="Seu e-mail" value="admin@mylife.app.br">
+            
+            <div class="modal-buttons">
+                <button class="btn-primary" onclick="enviarRecuperacao()" id="btnRecuperar">
+                    <span id="btnRecuperarText">Enviar link</span>
+                    <span id="btnRecuperarLoader" style="display: none;" class="modal-loader"></span>
+                </button>
+                <button class="btn-secondary" onclick="fecharModalRecuperacao()">Cancelar</button>
+            </div>
+            
+            <div id="modalMessage" class="modal-message"></div>
+            
+            <div class="back-to-login">
+                <a onclick="fecharModalRecuperacao()">← Voltar para o login</a>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Configuração do Supabase
+        // Configuração do Supabase (mesmas credenciais)
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
 
-        // Criar cliente Supabase (com nome único para evitar conflito)
+        // Criar cliente Supabase
         const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Função de login - DEFINIDA ANTES de ser usada
+        // Função de login
         async function fazerLogin() {
+            const email = document.getElementById('emailInput').value;
             const senha = document.getElementById('senhaInput').value;
             
-            if (!senha) {
-                mostrarErro('Digite a senha');
+            if (!email || !senha) {
+                mostrarErro('Preencha e-mail e senha');
                 return;
             }
 
             // Mostrar loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
 
             try {
-                // Verificar a senha no banco
+                // Verificar a senha no banco (sua função existente)
                 const { data, error } = await supabaseAdmin
                     .rpc('verificar_senha_admin', { p_senha: senha });
 
@@ -189,8 +395,12 @@
                     // Senha correta - salvar no sessionStorage
                     sessionStorage.setItem('admin_autenticado', 'true');
                     
+                    mostrarSucesso('Login realizado! Redirecionando...');
+                    
                     // Redirecionar para o painel
-                    window.location.href = 'admin.html';
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1000);
                 } else {
                     mostrarErro('Senha incorreta');
                 }
@@ -208,13 +418,121 @@
             errorDiv.style.display = 'block';
         }
 
-        // Verificar se já está logado (opcional - redirecionar se já estiver)
+        function mostrarSucesso(msg) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = msg;
+            successDiv.style.display = 'block';
+        }
+
+        // Funções do Modal de Recuperação
+        function mostrarModalRecuperacao() {
+            document.getElementById('modalRecuperacao').style.display = 'flex';
+            document.getElementById('emailRecuperacao').focus();
+        }
+
+        function fecharModalRecuperacao() {
+            document.getElementById('modalRecuperacao').style.display = 'none';
+            document.getElementById('modalMessage').style.display = 'none';
+            document.getElementById('modalMessage').className = 'modal-message';
+        }
+
+        async function enviarRecuperacao() {
+            const email = document.getElementById('emailRecuperacao').value;
+            const btnRecuperar = document.getElementById('btnRecuperar');
+            const btnText = document.getElementById('btnRecuperarText');
+            const btnLoader = document.getElementById('btnRecuperarLoader');
+            const modalMessage = document.getElementById('modalMessage');
+            
+            if (!email) {
+                modalMessage.textContent = 'Digite seu e-mail';
+                modalMessage.className = 'modal-message error';
+                modalMessage.style.display = 'block';
+                return;
+            }
+
+            // Validação básica de e-mail
+            if (!email.includes('@') || !email.includes('.')) {
+                modalMessage.textContent = 'Digite um e-mail válido';
+                modalMessage.className = 'modal-message error';
+                modalMessage.style.display = 'block';
+                return;
+            }
+
+            // Desabilitar botão
+            btnRecuperar.disabled = true;
+            btnText.style.opacity = '0.7';
+            btnLoader.style.display = 'inline-block';
+            btnText.textContent = ' Enviando...';
+
+            modalMessage.style.display = 'none';
+
+            try {
+                // Enviar e-mail de recuperação usando o Supabase Auth
+                const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + '/redefinir-senha.html' // Ajuste para o nome do seu arquivo
+                });
+
+                if (error) throw error;
+
+                // Sucesso
+                modalMessage.textContent = '✅ Link de recuperação enviado! Verifique seu e-mail.';
+                modalMessage.className = 'modal-message success';
+                modalMessage.style.display = 'block';
+
+                // Limpar campo
+                document.getElementById('emailRecuperacao').value = '';
+
+                // Fechar modal após 3 segundos
+                setTimeout(() => {
+                    fecharModalRecuperacao();
+                }, 3000);
+
+            } catch (error) {
+                console.error('Erro ao enviar recuperação:', error);
+                
+                let errorMsg = 'Erro ao enviar e-mail. ';
+                if (error.message.includes('rate limit')) {
+                    errorMsg += 'Aguarde alguns minutos e tente novamente.';
+                } else if (error.message.includes('email not found')) {
+                    errorMsg += 'E-mail não cadastrado.';
+                } else {
+                    errorMsg += error.message;
+                }
+
+                modalMessage.textContent = '❌ ' + errorMsg;
+                modalMessage.className = 'modal-message error';
+                modalMessage.style.display = 'block';
+
+                // Reabilitar botão
+                btnRecuperar.disabled = false;
+                btnText.style.opacity = '1';
+                btnLoader.style.display = 'none';
+                btnText.textContent = 'Enviar link';
+            }
+        }
+
+        // Verificar se já está logado
         window.onload = function() {
             const autenticado = sessionStorage.getItem('admin_autenticado');
             if (autenticado === 'true') {
                 window.location.href = 'admin.html';
             }
         }
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalRecuperacao');
+            if (event.target === modal) {
+                fecharModalRecuperacao();
+            }
+        }
+
+        // Adicionar evento de tecla Enter no modal
+        document.getElementById('emailRecuperacao').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                enviarRecuperacao();
+            }
+        });
     </script>
 </body>
 </html>
