@@ -906,6 +906,14 @@
     
     return diffDays;
 }
+        // Adicione esta função NOVA aqui, depois da função determinarStatus
+function formatarDataBR(data) {
+    if (!data) return '-';
+    const d = new Date(data);
+    // Subtrair 3 horas para ajustar para Brasília
+    const dataBrasilia = new Date(d.getTime() - (3 * 60 * 60 * 1000));
+    return dataBrasilia.toLocaleString('pt-BR');
+}
 
         // Determinar status do usuário
         function determinarStatus(user) {
@@ -1302,8 +1310,8 @@
                     content.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
                 } else {
                     let html = '<div class="logs-container" style="max-height: 400px;">';
-                    data.forEach(log => {
-                       const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                   data.forEach(log => {
+    const dataLog = formatarDataBR(log.data_verificacao);
                         let actionClass = 'log-action';
                         if (log.acao === 'trial_auto') actionClass += ' trial_auto';
                         else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
@@ -1351,7 +1359,7 @@
 
                 let html = '';
                 data.forEach(log => {
-    const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    const dataLog = formatarDataBR(log.data_verificacao);
                     let actionClass = 'log-action';
                     if (log.acao === 'trial_auto') actionClass += ' trial_auto';
                     else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
