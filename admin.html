@@ -955,26 +955,45 @@
                 </button>
                 <div class="sql-code" id="sqlCode" contenteditable="true" spellcheck="false">
 -- ============================================
--- CONVERTER USUÁRIO EXISTENTE PARA ASSINATURA MANUAL
+-- EDITAR PLANO DO USUÁRIO (mensal/anual/não definido)
 -- ============================================
--- DESCRIÇÃO: Atualiza um usuário já cadastrado para 
---            ter assinatura manual (válida até 2099)
+-- DESCRIÇÃO: Altera apenas o plano. O status é definido automaticamente:
+--            - Se plano = 'não definido' → status = 'expirado' (grátis)
+--            - Se plano = 'mensal'/'anual' → status = 'ativo' (premium)
 -- ============================================
 
 DO $$
 DECLARE
-    -- 🔴 ALTERE AQUI O EMAIL DO CLIENTE 🔴
-    v_email TEXT := 'cliente@email.com';  -- Email do cliente
-    
-    -- 🔴 ALTERE AQUI O PLANO 🔴
-    v_plano TEXT := 'mensal';  -- 'mensal' ou 'anual'
+    -- 🔴 🔴 🔴 ALTERE AQUI OS DADOS 🔴 🔴 🔴
+    v_email TEXT := 'gostou@oi.com';     -- Email do cliente
+    v_plano TEXT := 'não definido';       -- 'mensal', 'anual' ou 'não definido'
+    -- 🔴 🔴 🔴 FIM DAS ALTERAÇÕES 🔴 🔴 🔴
     
     -- ⚠️ NÃO ALTERE DAQUI PRA BAIXO
     v_user_id UUID;
-    v_data_expiracao TIMESTAMPTZ := '2099-12-31';
+    v_status TEXT;
+    v_data_expiracao TIMESTAMPTZ;
 BEGIN
     -- ============================================
-    -- 1. BUSCAR O UUID DO USUÁRIO PELO EMAIL
+    -- 1. VALIDAR PLANO
+    -- ============================================
+    IF v_plano NOT IN ('mensal', 'anual', 'não definido') THEN
+        RAISE EXCEPTION '❌ Plano inválido. Use "mensal", "anual" ou "não definido"';
+    END IF;
+
+    -- ============================================
+    -- 2. DEFINIR STATUS E DATA BASEADO NO PLANO
+    -- ============================================
+    IF v_plano = 'não definido' THEN
+        v_status := 'expirado';  -- 🔴 CORRIGIDO: 'expirado' em vez de 'inativo'
+        v_data_expiracao := NOW();  -- Expira hoje
+    ELSE
+        v_status := 'ativo';
+        v_data_expiracao := '2026-03-01';
+    END IF;
+
+    -- ============================================
+    -- 3. BUSCAR O UUID DO USUÁRIO PELO EMAIL
     -- ============================================
     SELECT id INTO v_user_id 
     FROM auth.users 
@@ -985,70 +1004,59 @@ BEGIN
     END IF;
 
     -- ============================================
-    -- 2. VERIFICAR SE JÁ TEM ASSINATURA
+    -- 4. VERIFICAR SE JÁ TEM ASSINATURA
     -- ============================================
     IF EXISTS (SELECT 1 FROM public.assinaturas WHERE user_id = v_user_id) THEN
         -- Se já existe, ATUALIZA
         UPDATE public.assinaturas 
         SET 
-            data_expiracao = v_data_expiracao,
-            status = 'ativo',
             plano = v_plano,
-            mp_status = 'manual',
-            mp_subscription_id = NULL,  -- Remove vínculo com MP
+            status = v_status,
+            data_expiracao = v_data_expiracao,
+            mp_status = CASE 
+                WHEN v_plano != 'não definido' THEN 'manual'
+                ELSE NULL
+            END,
             updated_at = NOW()
         WHERE user_id = v_user_id;
         
-        RAISE NOTICE '✅ Assinatura existente ATUALIZADA para manual';
+        RAISE NOTICE '✅ Assinatura ATUALIZADA com sucesso';
     ELSE
         -- Se não existe, CRIA nova
         INSERT INTO public.assinaturas (
             user_id,
-            data_expiracao,
-            status,
             plano,
+            status,
+            data_expiracao,
             mp_status,
             created_at,
             updated_at
         ) VALUES (
             v_user_id,
-            v_data_expiracao,
-            'ativo',
             v_plano,
-            'manual',
+            v_status,
+            v_data_expiracao,
+            CASE WHEN v_plano != 'não definido' THEN 'manual' ELSE NULL END,
             NOW(),
             NOW()
         );
         
-        RAISE NOTICE '✅ Nova assinatura CRIADA para o usuário';
+        RAISE NOTICE '✅ Nova assinatura CRIADA com sucesso';
     END IF;
 
     -- ============================================
-    -- 3. REGISTRAR NO LOG
-    -- ============================================
-    INSERT INTO public.log_assinaturas (
-        user_id,
-        acao,
-        detalhes,
-        created_at
-    ) VALUES (
-        v_user_id,
-        'conversao_manual',
-        format('Usuário convertido para assinatura manual. Plano: %s', v_plano),
-        NOW()
-    );
-
-    -- ============================================
-    -- 4. MOSTRAR RESULTADO
+    -- 5. MOSTRAR RESULTADO
     -- ============================================
     RAISE NOTICE '========================================';
-    RAISE NOTICE '✅ CONVERSÃO REALIZADA COM SUCESSO!';
+    RAISE NOTICE '✅ PLANO ATUALIZADO COM SUCESSO!';
     RAISE NOTICE '========================================';
     RAISE NOTICE '📧 Email: %', v_email;
     RAISE NOTICE '🆔 UUID: %', v_user_id;
     RAISE NOTICE '📅 Plano: %', v_plano;
-    RAISE NOTICE '📆 Expira: 2099-12-31 (NUNCA EXPIRA)';
-    RAISE NOTICE '🔑 Status: manual (fora do MP)';
+    RAISE NOTICE '🔑 Status: %', v_status;
+    RAISE NOTICE '📆 Expira: %', v_data_expiracao;
+    RAISE NOTICE '========================================';
+    RAISE NOTICE 'ℹ️ Se plano = "não definido", status = "expirado" (grátis)';
     RAISE NOTICE '========================================';
 
 EXCEPTION WHEN OTHERS THEN
