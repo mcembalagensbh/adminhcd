@@ -888,20 +888,24 @@
         }
 
         // Calcular dias restantes
-        function calcularDiasRestantes(dataExpiracao) {
-            if (!dataExpiracao) return 0;
-            
-            const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
-            
-            const expiracao = new Date(dataExpiracao);
-            expiracao.setHours(0, 0, 0, 0);
-            
-            const diffTime = expiracao - hoje;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            return diffDays;
-        }
+       function calcularDiasRestantes(dataExpiracao) {
+    if (!dataExpiracao) return 0;
+    
+    const hoje = new Date();
+    
+    // Log para debug (remova em produção)
+    console.log('Data atual do sistema:', hoje.toLocaleDateString('pt-BR'));
+    
+    hoje.setHours(0, 0, 0, 0);
+    
+    const expiracao = new Date(dataExpiracao);
+    expiracao.setHours(0, 0, 0, 0);
+    
+    const diffTime = expiracao - hoje;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
+}
 
         // Determinar status do usuário
         function determinarStatus(user) {
