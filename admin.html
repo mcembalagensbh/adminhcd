@@ -250,7 +250,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 900px;
         }
 
         th {
@@ -287,11 +287,6 @@
         .status-expirado {
             background: #f8d7da;
             color: #721c24;
-        }
-
-        .status-sem_assinatura {
-            background: #e2e3e5;
-            color: #383d41;
         }
 
         .status-pendente {
@@ -408,7 +403,7 @@
             padding: 30px;
             border-radius: 12px;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             max-height: 80vh;
             overflow-y: auto;
         }
@@ -570,7 +565,6 @@
 
         .report-card.total .report-value {
             color: white;
-            font-size: 2.5em;
         }
 
         .report-label {
@@ -594,26 +588,6 @@
             margin-top: 5px;
         }
 
-        .report-table {
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .report-table th {
-            background: var(--light);
-            color: var(--dark);
-            padding: 10px;
-        }
-
-        .report-table td {
-            padding: 8px 10px;
-        }
-
-        .report-highlight {
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
         .plan-badge {
             padding: 3px 8px;
             border-radius: 12px;
@@ -632,19 +606,6 @@
 
         .plan-badge.gratis {
             background: var(--free);
-        }
-
-        .date-filter {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-
-        .date-filter input {
-            padding: 8px;
-            border: 1px solid var(--light);
-            border-radius: 6px;
         }
 
         .filter-indicator {
@@ -705,7 +666,7 @@
         </div>
 
         <div class="search-bar" id="searchBar">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por email ou ID..." onkeyup="filtrarUsuarios()">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por email, ID ou telefone..." onkeyup="filtrarUsuarios()">
         </div>
 
         <div id="usuariosTab" class="tab-content">
@@ -713,10 +674,10 @@
                 <table id="tabelaUsuarios">
                     <thead>
                         <tr>
-                            <th>Email</th>
+                            <th>Email / Telefone</th>
                             <th>Status</th>
                             <th>Expiração</th>
-                            <th>Dias Restantes</th>
+                            <th>Dias</th>
                             <th>Plano</th>
                             <th>Último Login</th>
                             <th>Ações</th>
@@ -751,71 +712,78 @@
                     </h3>
                     <p>Para cada usuário, você tem as seguintes opções:</p>
                     <ul style="margin-left: 30px; margin-top: 10px;">
-                        <li><strong>➕ Adicionar Dias</strong> - Adiciona dias à assinatura atual</li>
+                        <li><strong>✏️ Editar</strong> - Editar status, plano e data de expiração manualmente</li>
                         <li><strong>👁️ Ver Logs</strong> - Mostra histórico de ações do usuário</li>
-                        <li><strong>✅ Ativar/❌ Desativar</strong> - Muda o status manualmente</li>
                         <li><strong>🔍 Filtros</strong> - Clique nos cards de estatísticas para filtrar</li>
+                        <li><strong>📞 Telefone</strong> - Aparece na coluna Email/Telefone quando disponível</li>
                     </ul>
-                </div>
-
-                <div style="margin-bottom: 25px;">
-                    <h3 style="color: var(--primary); margin-bottom: 10px;">
-                        <i class="fas fa-paint-brush"></i> Cores de Status
-                    </h3>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div><span class="status-badge status-ativo">Ativo</span> - Assinatura válida</div>
-                        <div><span class="status-badge status-expirado">Expirado</span> - Assinatura vencida</div>
-                        <div><span class="status-badge status-pendente">Próximo</span> - Expira em até 7 dias</div>
-                        <div><span class="status-badge status-gratis">Grátis</span> - Período grátis ativo</div>
-                        <div><span class="status-badge status-sem_assinatura">Sem assinatura</span> - Nunca assinou</div>
-                    </div>
                 </div>
 
                 <div style="margin-bottom: 25px;">
                     <h3 style="color: var(--primary); margin-bottom: 10px;">
                         <i class="fas fa-chart-line"></i> Relatório Financeiro
                     </h3>
-                    <p>O botão "Relatório Financeiro" no cabeçalho mostra:</p>
+                    <p>Relatório simplificado mostrando:</p>
                     <ul style="margin-left: 30px; margin-top: 10px;">
-                        <li><strong>Total arrecadado</strong> - Valor total de todas as assinaturas</li>
-                        <li><strong>Média mensal</strong> - Valor médio por mês</li>
-                        <li><strong>Receita por período</strong> - Filtro por datas</li>
-                        <li><strong>Detalhamento por plano</strong> - Mensal vs Anual</li>
+                        <li><strong>Saldo Mensal:</strong> Total de assinantes ativos × R$ 17,90</li>
+                        <li><strong>Saldo Anual:</strong> Total de assinantes ativos × R$ 189,90</li>
+                        <li><strong>Total Geral:</strong> Soma dos dois saldos</li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Adicionar Dias -->
-    <div class="modal-overlay" id="modalAdicionarDias">
+    <!-- Modal Editar Usuário -->
+    <div class="modal-overlay" id="modalEditarUsuario">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-calendar-plus"></i> Adicionar Dias</h2>
-                <button class="close-modal" onclick="fecharModal('modalAdicionarDias')">&times;</button>
+                <h2><i class="fas fa-edit"></i> Editar Usuário</h2>
+                <button class="close-modal" onclick="fecharModal('modalEditarUsuario')">&times;</button>
             </div>
-            <div id="modalUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
-                Carregando...
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-sort-numeric-up"></i> Quantidade de Dias</label>
-                <input type="number" id="diasQuantidade" class="form-control" value="30" min="1" max="365">
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-tag"></i> Status</label>
-                <select id="diasStatus" class="form-control">
-                    <option value="ativo">Ativo</option>
-                    <option value="expirado">Expirado</option>
-                    <option value="cancelado">Cancelado</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" style="flex:2" onclick="confirmarAdicionarDias()">
-                    <i class="fas fa-check"></i> Confirmar
-                </button>
-                <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalAdicionarDias')">
-                    Cancelar
-                </button>
+            <div class="modal-body">
+                <div id="editarUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                    Carregando...
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Status</label>
+                    <select id="editarStatus" class="form-control">
+                        <option value="ativo">Ativo</option>
+                        <option value="expirado">Expirado</option>
+                        <option value="sem_assinatura">Sem assinatura (Grátis)</option>
+                    </select>
+                    <small style="color: var(--gray);">"Sem assinatura" aparece como "Grátis" na tabela</small>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Plano</label>
+                    <select id="editarPlano" class="form-control">
+                        <option value="mensal">Mensal (R$ 17,90)</option>
+                        <option value="anual">Anual (R$ 189,90)</option>
+                        <option value="não definido">Não definido (Grátis)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-plus"></i> Data de Expiração</label>
+                    <input type="date" id="editarDataExpiracao" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-sort-numeric-up"></i> Dias para Adicionar/Remover</label>
+                    <input type="number" id="editarDias" class="form-control" value="0" min="-365" max="365">
+                    <small style="color: var(--gray);">Use números positivos para adicionar dias, negativos para remover</small>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" style="flex:2" onclick="confirmarEditarUsuario()">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                    <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalEditarUsuario')">
+                        Cancelar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -838,7 +806,7 @@
 
     <!-- Modal Relatório Financeiro -->
     <div class="modal-overlay" id="modalRelatorioFinanceiro">
-        <div class="modal-content large">
+        <div class="modal-content">
             <div class="modal-header">
                 <h2><i class="fas fa-chart-line"></i> Relatório Financeiro</h2>
                 <button class="close-modal" onclick="fecharModal('modalRelatorioFinanceiro')">&times;</button>
@@ -849,18 +817,47 @@
         </div>
     </div>
 
+    <!-- Modal Deletar Usuário -->
+    <div class="modal-overlay" id="modalDeletarUsuario">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Deletar Usuário</h2>
+                <button class="close-modal" onclick="fecharModal('modalDeletarUsuario')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: #f8d7da; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #721c24;">
+                    <i class="fas fa-skull-crosswalk"></i> 
+                    <strong>Atenção!</strong> Esta ação é irreversível. Todos os dados do usuário serão permanentemente excluídos.
+                </div>
+                
+                <div id="deletarUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                    Carregando...
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Senha de Confirmação (4 dígitos)</label>
+                    <input type="password" id="deletarSenha" class="form-control" placeholder="Digite a senha de 4 dígitos" maxlength="4" inputmode="numeric" style="text-align: center; font-size: 20px; letter-spacing: 8px;">
+                    <small style="color: var(--gray);">Senha padrão: 1234</small>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-danger" style="flex:2" onclick="confirmarDeletarUsuario()">
+                        <i class="fas fa-trash-alt"></i> Deletar Permanentemente
+                    </button>
+                    <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalDeletarUsuario')">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="toast"></div>
 
     <script>
         const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
         const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY0MzYzOCwiZXhwIjoyMDg2MjE5NjM4fQ.o8A42E0Zr3HZw0_qb4s-qA95MatoKCvrpFuAqW31Xqc';
-
-        // Links do Mercado Pago
-        const MERCADO_PAGO_LINKS = {
-            mensal: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=9a30d25477b445028fd6374c1b5d51f9',
-            anual: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=59d5d72cfcee476b99776abcbddc4adf'
-        };
 
         // Valores dos planos
         const PLANOS = {
@@ -873,7 +870,6 @@
         const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
         
         let usuariosData = [];
-        let usuariosFiltrados = [];
         let usuarioSelecionado = null;
         let filtroAtivo = 'todos';
 
@@ -888,39 +884,46 @@
         }
 
         // Calcular dias restantes
-       function calcularDiasRestantes(dataExpiracao) {
-    if (!dataExpiracao) return 0;
-    
-    const hoje = new Date();
-    
-    // Log para debug (remova em produção)
-    console.log('Data atual do sistema:', hoje.toLocaleDateString('pt-BR'));
-    
-    hoje.setHours(0, 0, 0, 0);
-    
-    const expiracao = new Date(dataExpiracao);
-    expiracao.setHours(0, 0, 0, 0);
-    
-    const diffTime = expiracao - hoje;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return diffDays;
-}
-        // Adicione esta função NOVA aqui, depois da função determinarStatus
-function formatarDataBR(data) {
-    if (!data) return '-';
-    const d = new Date(data);
-    // Subtrair 3 horas para ajustar para Brasília
-    const dataBrasilia = new Date(d.getTime() - (3 * 60 * 60 * 1000));
-    return dataBrasilia.toLocaleString('pt-BR');
-}
+        function calcularDiasRestantes(dataExpiracao) {
+            if (!dataExpiracao) return 0;
+            
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            
+            const expiracao = new Date(dataExpiracao);
+            expiracao.setHours(0, 0, 0, 0);
+            
+            const diffTime = expiracao - hoje;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays;
+        }
 
-        // Determinar status do usuário
+        // Formatar data para o Brasil
+        function formatarDataBR(data) {
+            if (!data) return '-';
+            const d = new Date(data);
+            const dataBrasilia = new Date(d.getTime() - (3 * 60 * 60 * 1000));
+            return dataBrasilia.toLocaleString('pt-BR');
+        }
+
+        // Formatar data para input date
+        function formatarDataParaInput(data) {
+            if (!data) return '';
+            const d = new Date(data);
+            const ano = d.getFullYear();
+            const mes = String(d.getMonth() + 1).padStart(2, '0');
+            const dia = String(d.getDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
+        }
+
+        // Determinar status do usuário para exibição
         function determinarStatus(user) {
             const dias = calcularDiasRestantes(user.data_expiracao);
             
+            // Se NÃO tem status ou status é 'sem_assinatura' -> Mostrar "Grátis"
             if (!user.status || user.status === 'sem_assinatura') {
-                return { class: 'status-sem_assinatura', text: 'Sem assinatura' };
+                return { class: 'status-gratis', text: 'Grátis' };
             }
             
             if (user.status === 'ativo') {
@@ -939,7 +942,7 @@ function formatarDataBR(data) {
                 return { class: 'status-expirado', text: 'Expirado' };
             }
             
-            return { class: 'status-sem_assinatura', text: user.status || 'Sem assinatura' };
+            return { class: 'status-gratis', text: 'Grátis' };
         }
 
         // Carregar estatísticas
@@ -960,10 +963,10 @@ function formatarDataBR(data) {
 
                 usuarios?.forEach(user => {
                     const dias = calcularDiasRestantes(user.data_expiracao);
-                    const status = determinarStatus(user);
                     
                     if (user.status === 'ativo') {
                         if (dias > 7) {
+                            // Se não tem plano ou plano é 'não definido' -> Grátis
                             if (!user.plano || user.plano === 'não definido') {
                                 stats.gratis++;
                             } else {
@@ -976,6 +979,8 @@ function formatarDataBR(data) {
                         }
                     } else if (user.status === 'expirado') {
                         stats.expirados++;
+                    } else if (user.status === 'sem_assinatura') {
+                        stats.gratis++;
                     }
                 });
 
@@ -1030,6 +1035,17 @@ function formatarDataBR(data) {
                     .rpc('admin_listar_usuarios');
                 
                 if (error) throw error;
+                
+                // Buscar telefones dos usuários na tabela perfis [citation:2][citation:5]
+                for (let user of data) {
+                    const { data: perfil } = await supabaseAdmin
+                        .from('perfis')
+                        .select('telefone')
+                        .eq('id', user.user_id)
+                        .single();
+                    
+                    user.telefone = perfil?.telefone || 'Não informado';
+                }
                 
                 usuariosData = data || [];
                 
@@ -1120,7 +1136,8 @@ function formatarDataBR(data) {
             if (termo) {
                 filtrados = filtrados.filter(user => 
                     user.email.toLowerCase().includes(termo) || 
-                    user.user_id.toLowerCase().includes(termo)
+                    user.user_id.toLowerCase().includes(termo) ||
+                    (user.telefone && user.telefone.toLowerCase().includes(termo))
                 );
             }
             
@@ -1168,7 +1185,8 @@ function formatarDataBR(data) {
                     <tr>
                         <td class="email-cell" title="${user.email}">
                             <i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>
-                            ${user.email}
+                            ${user.email}<br>
+                            <small><i class="fas fa-phone" style="color: var(--gray);"></i> ${user.telefone}</small>
                         </td>
                         <td>
                             <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
@@ -1183,21 +1201,15 @@ function formatarDataBR(data) {
                         <td><small>${ultimoLogin}</small></td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-sm btn-success" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')" title="Adicionar dias">
-                                    <i class="fas fa-plus"></i>
+                                <button class="btn btn-sm btn-primary" onclick="abrirModalEditarUsuario('${user.user_id}', '${user.email}')" title="Editar usuário">
+                                    <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-primary" onclick="verLogsUsuario('${user.user_id}')" title="Ver logs">
+                                <button class="btn btn-sm btn-info" onclick="verLogsUsuario('${user.user_id}')" title="Ver logs">
                                     <i class="fas fa-history"></i>
                                 </button>
-                                <button class="btn btn-sm btn-warning" onclick="mudarStatus('${user.user_id}', 'ativo')" title="Ativar">
-                                    <i class="fas fa-check-circle"></i>
+                                <button class="btn btn-sm btn-danger" onclick="abrirModalDeletar('${user.user_id}', '${user.email}')" title="Deletar usuário">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
-                                <button class="btn btn-sm btn-danger" onclick="mudarStatus('${user.user_id}', 'expirado')" title="Desativar">
-                                    <i class="fas fa-times-circle"></i>
-                                </button>
-                    <button class="btn btn-sm btn-danger" onclick="abrirModalDeletar('${user.user_id}', '${user.email}')" title="Deletar usuário">
-    <i class="fas fa-trash-alt"></i>
-</button>
                             </div>
                         </td>
                     </tr>
@@ -1207,88 +1219,82 @@ function formatarDataBR(data) {
             tbody.innerHTML = html;
         }
 
-        // Abrir modal para adicionar dias
-        function abrirModalAdicionarDias(userId, email) {
+        // Abrir modal de edição
+        async function abrirModalEditarUsuario(userId, email) {
             usuarioSelecionado = userId;
-            document.getElementById('modalUsuarioInfo').innerHTML = `
+            
+            const user = usuariosData.find(u => u.user_id === userId);
+            
+            document.getElementById('editarUsuarioInfo').innerHTML = `
                 <strong>Email:</strong> ${email}<br>
-                <strong>ID:</strong> ${userId}
+                <strong>ID:</strong> ${userId}<br>
+                <strong>Telefone:</strong> ${user.telefone}
             `;
-            document.getElementById('modalAdicionarDias').style.display = 'flex';
+            
+            document.getElementById('editarStatus').value = user.status || 'sem_assinatura';
+            document.getElementById('editarPlano').value = user.plano || 'não definido';
+            document.getElementById('editarDataExpiracao').value = formatarDataParaInput(user.data_expiracao);
+            document.getElementById('editarDias').value = 0;
+            
+            document.getElementById('modalEditarUsuario').style.display = 'flex';
         }
 
-        // Confirmar adição de dias
-        async function confirmarAdicionarDias() {
-            const dias = parseInt(document.getElementById('diasQuantidade').value);
-            const status = document.getElementById('diasStatus').value;
-
-            if (!dias || dias < 1) {
-                showToast('Digite uma quantidade válida de dias', 'warning');
-                return;
-            }
-
+        // Confirmar edição do usuário
+        async function confirmarEditarUsuario() {
+            const status = document.getElementById('editarStatus').value;
+            const plano = document.getElementById('editarPlano').value;
+            const dataExpiracao = document.getElementById('editarDataExpiracao').value;
+            const diasAjuste = parseInt(document.getElementById('editarDias').value) || 0;
+            
             try {
                 showToast('Processando...', 'info');
                 
-                const { data, error } = await supabaseAdmin
-                    .rpc('admin_atualizar_assinatura', {
-                        p_user_id: usuarioSelecionado,
-                        p_dias: dias,
-                        p_status: status
-                    });
-
+                let novaDataExpiracao = dataExpiracao;
+                
+                // Se tiver ajuste de dias
+                if (diasAjuste !== 0) {
+                    const user = usuariosData.find(u => u.user_id === usuarioSelecionado);
+                    const dataAtual = user.data_expiracao ? new Date(user.data_expiracao) : new Date();
+                    
+                    if (diasAjuste > 0) {
+                        dataAtual.setDate(dataAtual.getDate() + diasAjuste);
+                    } else {
+                        dataAtual.setDate(dataAtual.getDate() + diasAjuste); // diasAjuste é negativo
+                    }
+                    
+                    novaDataExpiracao = dataAtual.toISOString().split('T')[0];
+                }
+                
+                // Atualizar no banco
+                const { error } = await supabaseAdmin
+                    .from('assinaturas')
+                    .update({
+                        status: status,
+                        plano: plano,
+                        data_expiracao: novaDataExpiracao
+                    })
+                    .eq('user_id', usuarioSelecionado);
+                
                 if (error) throw error;
-
+                
+                // Registrar no log
                 await supabaseAdmin
                     .from('log_assinaturas')
                     .insert({
                         user_id: usuarioSelecionado,
                         acao: 'admin_manual',
-                        detalhes: `Admin adicionou ${dias} dias e mudou status para ${status}`
+                        detalhes: `Admin editou: status=${status}, plano=${plano}, data=${novaDataExpiracao}, dias ajustados=${diasAjuste}`
                     });
-
-                showToast(data.mensagem, 'success');
-                fecharModal('modalAdicionarDias');
+                
+                showToast('Usuário atualizado com sucesso!', 'success');
+                fecharModal('modalEditarUsuario');
                 
                 await carregarUsuarios();
                 await carregarEstatisticas();
                 
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao atualizar assinatura', 'error');
-            }
-        }
-
-        // Mudar status do usuário
-        async function mudarStatus(userId, novoStatus) {
-            if (!confirm(`Tem certeza que deseja mudar o status para ${novoStatus}?`)) {
-                return;
-            }
-
-            try {
-                const { data, error } = await supabaseAdmin
-                    .rpc('admin_mudar_status', {
-                        p_user_id: userId,
-                        p_status: novoStatus
-                    });
-
-                if (error) throw error;
-
-                await supabaseAdmin
-                    .from('log_assinaturas')
-                    .insert({
-                        user_id: userId,
-                        acao: 'admin_manual',
-                        detalhes: `Admin mudou status para ${novoStatus}`
-                    });
-
-                showToast(data.mensagem, 'success');
-                await carregarUsuarios();
-                await carregarEstatisticas();
-                
-            } catch (error) {
-                console.error('Erro:', error);
-                showToast('Erro ao mudar status', 'error');
+                showToast('Erro ao atualizar usuário', 'error');
             }
         }
 
@@ -1310,8 +1316,8 @@ function formatarDataBR(data) {
                     content.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
                 } else {
                     let html = '<div class="logs-container" style="max-height: 400px;">';
-                   data.forEach(log => {
-    const dataLog = formatarDataBR(log.data_verificacao);
+                    data.forEach(log => {
+                        const dataLog = formatarDataBR(log.data_verificacao);
                         let actionClass = 'log-action';
                         if (log.acao === 'trial_auto') actionClass += ' trial_auto';
                         else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
@@ -1359,7 +1365,7 @@ function formatarDataBR(data) {
 
                 let html = '';
                 data.forEach(log => {
-    const dataLog = formatarDataBR(log.data_verificacao);
+                    const dataLog = formatarDataBR(log.data_verificacao);
                     let actionClass = 'log-action';
                     if (log.acao === 'trial_auto') actionClass += ' trial_auto';
                     else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
@@ -1388,181 +1394,89 @@ function formatarDataBR(data) {
             }
         }
 
-        // Abrir relatório financeiro
+        // Abrir relatório financeiro simplificado
         async function abrirRelatorioFinanceiro() {
             document.getElementById('modalRelatorioFinanceiro').style.display = 'flex';
-            await carregarRelatorioFinanceiro();
-        }
-
-        // Carregar dados do relatório financeiro
-        async function carregarRelatorioFinanceiro() {
+            
             try {
-                const { data: assinaturas, error: assError } = await supabaseAdmin
+                const { data: assinaturas, error } = await supabaseAdmin
                     .from('assinaturas')
                     .select('*');
-
-                if (assError) throw assError;
-
-                const { data: logs, error: logError } = await supabaseAdmin
-                    .from('log_assinaturas')
-                    .select('*')
-                    .eq('acao', 'pagamento')
-                    .order('data_verificacao', { ascending: false });
-
-                if (logError) throw logError;
-
-                let totalMensal = 0;
-                let totalAnual = 0;
-                let pagamentosMensal = 0;
-                let pagamentosAnual = 0;
-                const pagamentosPorMes = {};
-
-                (logs || []).forEach(log => {
-                    const data = new Date(log.data_verificacao);
-                    const mesAno = `${data.getMonth() + 1}/${data.getFullYear()}`;
-                    
-                    let valor = 0;
-                    if (log.detalhes?.includes('mensal')) {
-                        valor = PLANOS.mensal.valor;
-                        totalMensal += valor;
-                        pagamentosMensal++;
-                    } else if (log.detalhes?.includes('anual')) {
-                        valor = PLANOS.anual.valor;
-                        totalAnual += valor;
-                        pagamentosAnual++;
-                    }
-
-                    if (!pagamentosPorMes[mesAno]) {
-                        pagamentosPorMes[mesAno] = 0;
-                    }
-                    pagamentosPorMes[mesAno] += valor;
-                });
-
-                const totalGeral = totalMensal + totalAnual;
-                const meses = Object.keys(pagamentosPorMes).length;
-                const mediaMensal = meses > 0 ? totalGeral / meses : 0;
-
+                
+                if (error) throw error;
+                
                 const hoje = new Date();
                 hoje.setHours(0, 0, 0, 0);
                 
+                // Contar assinaturas ativas por plano
                 const ativosMensal = (assinaturas || []).filter(a => {
-                    if (!a.data_expiracao) return false;
+                    if (!a.data_expiracao || a.status !== 'ativo') return false;
                     const expiracao = new Date(a.data_expiracao);
                     expiracao.setHours(0, 0, 0, 0);
                     return expiracao >= hoje && a.plano === 'mensal';
                 }).length;
-
+                
                 const ativosAnual = (assinaturas || []).filter(a => {
-                    if (!a.data_expiracao) return false;
+                    if (!a.data_expiracao || a.status !== 'ativo') return false;
                     const expiracao = new Date(a.data_expiracao);
                     expiracao.setHours(0, 0, 0, 0);
                     return expiracao >= hoje && a.plano === 'anual';
                 }).length;
-
+                
+                const saldoMensal = ativosMensal * 17.90;
+                const saldoAnual = ativosAnual * 189.90;
+                const totalGeral = saldoMensal + saldoAnual;
+                
                 const content = document.getElementById('relatorioContent');
                 content.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3 style="color: var(--primary-dark);">Resumo Financeiro</h3>
+                        <p style="color: var(--gray);">Atualizado em ${new Date().toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    
                     <div class="report-grid">
-                        <div class="report-card total">
+                        <div class="report-card" style="border-left: 4px solid var(--primary);">
                             <div class="report-label">
-                                <i class="fas fa-dollar-sign"></i> Total Arrecadado (Geral)
+                                <i class="fas fa-calendar"></i> Assinantes Mensais Ativos
+                            </div>
+                            <div class="report-value">${ativosMensal}</div>
+                            <div class="report-sub">× R$ 17,90 = R$ ${saldoMensal.toFixed(2)}</div>
+                        </div>
+                        
+                        <div class="report-card" style="border-left: 4px solid var(--purple-dark);">
+                            <div class="report-label">
+                                <i class="fas fa-calendar"></i> Assinantes Anuais Ativos
+                            </div>
+                            <div class="report-value">${ativosAnual}</div>
+                            <div class="report-sub">× R$ 189,90 = R$ ${saldoAnual.toFixed(2)}</div>
+                        </div>
+                        
+                        <div class="report-card total" style="grid-column: span 2;">
+                            <div class="report-label">
+                                <i class="fas fa-dollar-sign"></i> Saldo Total (Receita Mensal)
                             </div>
                             <div class="report-value">R$ ${totalGeral.toFixed(2)}</div>
-                            <div class="report-sub">Baseado em ${logs?.length || 0} pagamentos</div>
-                        </div>
-                        
-                        <div class="report-card">
-                            <div class="report-label">
-                                <i class="fas fa-calendar-alt"></i> Média Mensal
-                            </div>
-                            <div class="report-value">R$ ${mediaMensal.toFixed(2)}</div>
-                            <div class="report-sub">${meses} meses com pagamentos</div>
-                        </div>
-                        
-                        <div class="report-card">
-                            <div class="report-label">
-                                <i class="fas fa-users"></i> Assinaturas Ativas
-                            </div>
-                            <div class="report-value">${ativosMensal + ativosAnual}</div>
                             <div class="report-sub">
-                                <span class="plan-badge mensal">Mensal: ${ativosMensal}</span>
-                                <span class="plan-badge anual">Anual: ${ativosAnual}</span>
+                                <span style="opacity: 0.9;">Mensal: R$ ${saldoMensal.toFixed(2)} | Anual: R$ ${saldoAnual.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
-
-                    <div style="margin-top: 20px;">
-                        <h3 style="color: var(--primary-dark); margin-bottom: 15px;">
-                            <i class="fas fa-chart-pie"></i> Detalhamento por Plano
-                        </h3>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                <h4 style="color: var(--primary); margin-bottom: 10px;">
-                                    <i class="fas fa-calendar"></i> Plano Mensal
-                                </h4>
-                                <div style="margin-bottom: 5px;">
-                                    <strong>Total:</strong> R$ ${totalMensal.toFixed(2)}
-                                </div>
-                                <div style="margin-bottom: 5px;">
-                                    <strong>Pagamentos:</strong> ${pagamentosMensal}
-                                </div>
-                                <div>
-                                    <strong>Ticket Médio:</strong> R$ ${pagamentosMensal > 0 ? (totalMensal / pagamentosMensal).toFixed(2) : '0.00'}
-                                </div>
-                            </div>
-                            
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                <h4 style="color: var(--purple-dark); margin-bottom: 10px;">
-                                    <i class="fas fa-calendar"></i> Plano Anual
-                                </h4>
-                                <div style="margin-bottom: 5px;">
-                                    <strong>Total:</strong> R$ ${totalAnual.toFixed(2)}
-                                </div>
-                                <div style="margin-bottom: 5px;">
-                                    <strong>Pagamentos:</strong> ${pagamentosAnual}
-                                </div>
-                                <div>
-                                    <strong>Ticket Médio:</strong> R$ ${pagamentosAnual > 0 ? (totalAnual / pagamentosAnual).toFixed(2) : '0.00'}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px;">
-                        <h3 style="color: var(--primary-dark); margin-bottom: 15px;">
-                            <i class="fas fa-table"></i> Histórico Mensal
-                        </h3>
-                        
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>Mês/Ano</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${Object.entries(pagamentosPorMes)
-                                    .sort((a, b) => {
-                                        const [m1, a1] = a[0].split('/');
-                                        const [m2, a2] = b[0].split('/');
-                                        return new Date(a2, m2-1) - new Date(a1, m1-1);
-                                    })
-                                    .map(([mes, total]) => `
-                                        <tr>
-                                            <td>${mes}</td>
-                                            <td class="report-highlight">R$ ${total.toFixed(2)}</td>
-                                        </tr>
-                                    `).join('')}
-                            </tbody>
-                        </table>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                        <h4 style="color: var(--dark); margin-bottom: 10px;">
+                            <i class="fas fa-info-circle"></i> Detalhamento
+                        </h4>
+                        <p><strong>Total de assinantes ativos:</strong> ${ativosMensal + ativosAnual}</p>
+                        <p><strong>Ticket médio:</strong> R$ ${totalGeral > 0 ? (totalGeral / (ativosMensal + ativosAnual)).toFixed(2) : '0.00'}</p>
+                        <p><small style="color: var(--gray);">*Valores baseados apenas em assinaturas ativas no momento</small></p>
                     </div>
                 `;
-
+                
             } catch (error) {
                 console.error('Erro ao carregar relatório:', error);
                 document.getElementById('relatorioContent').innerHTML = `
                     <p style="text-align: center; color: var(--danger); padding: 20px;">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros: ${error.message}
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros
                     </p>
                 `;
             }
@@ -1609,62 +1523,61 @@ function formatarDataBR(data) {
             }, 3000);
         }
 
-// Abrir modal de deletar usuário
-function abrirModalDeletar(userId, email) {
-    usuarioSelecionado = userId;
-    document.getElementById('deletarUsuarioInfo').innerHTML = `
-        <strong>Email:</strong> ${email}<br>
-        <strong>ID:</strong> ${userId}
-    `;
-    document.getElementById('deletarSenha').value = '';
-    document.getElementById('modalDeletarUsuario').style.display = 'flex';
-}
-
-// Confirmar deletar usuário
-async function confirmarDeletarUsuario() {
-    const senha = document.getElementById('deletarSenha').value;
-    
-    if (!senha || senha.length !== 4) {
-        showToast('Digite a senha de 4 dígitos', 'warning');
-        return;
-    }
-
-    if (!confirm('TEM CERTEZA ABSOLUTA? Esta ação NÃO pode ser desfeita!')) {
-        return;
-    }
-
-    showToast('Processando exclusão...', 'info');
-
-    try {
-        const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/delete-user', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds'
-            },
-            body: JSON.stringify({
-                userId: usuarioSelecionado,
-                senha: senha
-            })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('✅ Usuário deletado com sucesso!', 'success');
-            fecharModal('modalDeletarUsuario');
-            
-            // Recarregar listas
-            await carregarUsuarios();
-            await carregarEstatisticas();
-        } else {
-            showToast('Erro: ' + data.error, 'error');
+        // Abrir modal de deletar usuário
+        function abrirModalDeletar(userId, email) {
+            usuarioSelecionado = userId;
+            document.getElementById('deletarUsuarioInfo').innerHTML = `
+                <strong>Email:</strong> ${email}<br>
+                <strong>ID:</strong> ${userId}
+            `;
+            document.getElementById('deletarSenha').value = '';
+            document.getElementById('modalDeletarUsuario').style.display = 'flex';
         }
-    } catch (error) {
-        console.error('Erro:', error);
-        showToast('Erro ao deletar usuário: ' + error.message, 'error');
-    }
-}
+
+        // Confirmar deletar usuário
+        async function confirmarDeletarUsuario() {
+            const senha = document.getElementById('deletarSenha').value;
+            
+            if (!senha || senha.length !== 4) {
+                showToast('Digite a senha de 4 dígitos', 'warning');
+                return;
+            }
+
+            if (!confirm('TEM CERTEZA ABSOLUTA? Esta ação NÃO pode ser desfeita!')) {
+                return;
+            }
+
+            showToast('Processando exclusão...', 'info');
+
+            try {
+                const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/delete-user', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds'
+                    },
+                    body: JSON.stringify({
+                        userId: usuarioSelecionado,
+                        senha: senha
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('✅ Usuário deletado com sucesso!', 'success');
+                    fecharModal('modalDeletarUsuario');
+                    
+                    await carregarUsuarios();
+                    await carregarEstatisticas();
+                } else {
+                    showToast('Erro: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao deletar usuário: ' + error.message, 'error');
+            }
+        }
 
         // Inicialização
         async function init() {
@@ -1699,40 +1612,5 @@ async function confirmarDeletarUsuario() {
         // Iniciar quando a página carregar
         document.addEventListener('DOMContentLoaded', init);
     </script>
-<!-- Modal Deletar Usuário -->
-    <div class="modal-overlay" id="modalDeletarUsuario">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Deletar Usuário</h2>
-                <button class="close-modal" onclick="fecharModal('modalDeletarUsuario')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div style="background: #f8d7da; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #721c24;">
-                    <i class="fas fa-skull-crosswalk"></i> 
-                    <strong>Atenção!</strong> Esta ação é irreversível. Todos os dados do usuário serão permanentemente excluídos.
-                </div>
-                
-                <div id="deletarUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
-                    Carregando...
-                </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Senha de Confirmação (4 dígitos)</label>
-                    <input type="password" id="deletarSenha" class="form-control" placeholder="Digite a senha de 4 dígitos" maxlength="4" inputmode="numeric" style="text-align: center; font-size: 20px; letter-spacing: 8px;">
-                    <small style="color: var(--gray);">Senha padrão: 1234</small>
-                </div>
-                
-                <div class="modal-footer">
-                    <button class="btn btn-danger" style="flex:2" onclick="confirmarDeletarUsuario()">
-                        <i class="fas fa-trash-alt"></i> Deletar Permanentemente
-                    </button>
-                    <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalDeletarUsuario')">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>
