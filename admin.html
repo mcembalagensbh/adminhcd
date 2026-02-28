@@ -1303,7 +1303,7 @@
                 } else {
                     let html = '<div class="logs-container" style="max-height: 400px;">';
                     data.forEach(log => {
-                        const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR');
+                       const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
                         let actionClass = 'log-action';
                         if (log.acao === 'trial_auto') actionClass += ' trial_auto';
                         else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
@@ -1351,7 +1351,7 @@
 
                 let html = '';
                 data.forEach(log => {
-                    const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR');
+    const dataLog = new Date(log.data_verificacao).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
                     let actionClass = 'log-action';
                     if (log.acao === 'trial_auto') actionClass += ' trial_auto';
                     else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
