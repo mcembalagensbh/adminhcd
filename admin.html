@@ -380,11 +380,6 @@
             color: var(--primary);
         }
 
-        .btn-purple {
-            background: linear-gradient(135deg, var(--purple), var(--purple-dark));
-            color: white;
-        }
-
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -658,6 +653,25 @@
             gap: 5px;
             margin-left: 10px;
         }
+
+        .tab-btn-edicao {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn-edicao:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn-edicao.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -711,33 +725,21 @@
         <div id="usuariosTab" class="tab-content">
             <div class="table-container">
                 <table id="tabelaUsuarios">
-                   <thead>
-    <tr>
-        <th onclick="ordenarTabela('email')">
-            Email <i class="fas fa-sort" id="sort-email"></i>
-        </th>
-        <th onclick="ordenarTabela('status')">
-            Status <i class="fas fa-sort" id="sort-status"></i>
-        </th>
-        <th onclick="ordenarTabela('data_expiracao')">
-            Expiração <i class="fas fa-sort" id="sort-data_expiracao"></i>
-        </th>
-        <th onclick="ordenarTabela('dias_restantes')">
-            Dias Restantes <i class="fas fa-sort" id="sort-dias_restantes"></i>
-        </th>
-        <th onclick="ordenarTabela('plano')">
-            Plano <i class="fas fa-sort" id="sort-plano"></i>
-        </th>
-        <th onclick="ordenarTabela('ultimo_login')">
-            Último Login <i class="fas fa-sort" id="sort-ultimo_login"></i>
-        </th>
-        <th>Telefone</th>  <!-- 🔴 NOVA COLUNA -->
-        <th>Ações</th>
-    </tr>
-</thead>
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Expiração</th>
+                            <th>Dias Restantes</th>
+                            <th>Plano</th>
+                            <th>Último Login</th>
+                            <th>Telefone</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
                     <tbody id="usuariosBody">
                         <tr>
-                            <td colspan="7" class="loading">
+                            <td colspan="8" class="loading">
                                 <i class="fas fa-spinner fa-spin"></i> Carregando usuários...
                             </td>
                         </tr>
@@ -760,28 +762,32 @@
                 
                 <div style="margin-bottom: 25px;">
                     <h3 style="color: var(--primary); margin-bottom: 10px;">
-                        <i class="fas fa-user-cog"></i> Gerenciar Assinaturas
+                        <i class="fas fa-user-cog"></i> Gerenciar Usuários
                     </h3>
-                    <p>Para cada usuário, você tem as seguintes opções:</p>
+                    <p>Para cada usuário, clique no botão <strong>EDITAR</strong> para acessar todas as opções:</p>
                     <ul style="margin-left: 30px; margin-top: 10px;">
-                        <li><strong>➕ Adicionar Dias</strong> - Adiciona dias à assinatura atual</li>
-                        <li><strong>👁️ Ver Logs</strong> - Mostra histórico de ações do usuário</li>
-                        <li><strong>✅ Ativar/❌ Desativar</strong> - Muda o status manualmente</li>
-                        <li><strong>🔍 Filtros</strong> - Clique nos cards de estatísticas para filtrar</li>
+                        <li><strong>📋 Dados Pessoais:</strong> Editar nome e telefone</li>
+                        <li><strong>👑 Assinatura:</strong> Alterar plano e status</li>
+                        <li><strong>📅 Ajustar Dias:</strong> Adicionar ou subtrair dias (valores negativos)</li>
+                        <li><strong>🕒 Logins:</strong> Ver histórico de acesso dos últimos 30 dias</li>
+                        <li><strong>🗑️ Deletar:</strong> Remover permanentemente o usuário</li>
                     </ul>
                 </div>
 
                 <div style="margin-bottom: 25px;">
                     <h3 style="color: var(--primary); margin-bottom: 10px;">
-                        <i class="fas fa-paint-brush"></i> Cores de Status
+                        <i class="fas fa-paint-brush"></i> Regras de Status
                     </h3>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div><span class="status-badge status-ativo">Ativo</span> - Assinatura válida</div>
+                        <div><span class="status-badge status-ativo">Ativo</span> - Assinatura válida (planos pagos)</div>
+                        <div><span class="status-badge status-gratis">Grátis</span> - Período grátis ativo (plano não definido)</div>
                         <div><span class="status-badge status-expirado">Expirado</span> - Assinatura vencida</div>
                         <div><span class="status-badge status-pendente">Próximo</span> - Expira em até 7 dias</div>
-                        <div><span class="status-badge status-gratis">Grátis</span> - Período grátis ativo</div>
                         <div><span class="status-badge status-sem_assinatura">Sem assinatura</span> - Nunca assinou</div>
                     </div>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: var(--gray);">
+                        <i class="fas fa-info-circle"></i> Quando o plano é "Grátis", o status é automático. Para planos pagos, você escolhe entre Ativo/Inativo.
+                    </p>
                 </div>
 
                 <div style="margin-bottom: 25px;">
@@ -792,7 +798,7 @@
                     <ul style="margin-left: 30px; margin-top: 10px;">
                         <li><strong>Total arrecadado</strong> - Valor total de todas as assinaturas</li>
                         <li><strong>Média mensal</strong> - Valor médio por mês</li>
-                        <li><strong>Receita por período</strong> - Filtro por datas</li>
+                        <li><strong>Assinaturas ativas</strong> - Quantidade de planos mensais/anuais</li>
                         <li><strong>Detalhamento por plano</strong> - Mensal vs Anual</li>
                     </ul>
                 </div>
@@ -800,7 +806,7 @@
         </div>
     </div>
 
-    <!-- Modal Adicionar Dias -->
+    <!-- Modal Adicionar Dias (antigo, será substituído pelo novo modal) -->
     <div class="modal-overlay" id="modalAdicionarDias">
         <div class="modal-content">
             <div class="modal-header">
@@ -833,7 +839,7 @@
         </div>
     </div>
 
-    <!-- Modal Logs do Usuário -->
+    <!-- Modal Logs do Usuário (antigo, será substituído pelo novo modal) -->
     <div class="modal-overlay" id="modalLogsUsuario">
         <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
@@ -862,6 +868,197 @@
         </div>
     </div>
 
+    <!-- Modal Deletar Usuário (antigo, será substituído pelo novo modal) -->
+    <div class="modal-overlay" id="modalDeletarUsuario">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Deletar Usuário</h2>
+                <button class="close-modal" onclick="fecharModal('modalDeletarUsuario')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: #f8d7da; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #721c24;">
+                    <i class="fas fa-skull-crosswalk"></i> 
+                    <strong>Atenção!</strong> Esta ação é irreversível. Todos os dados do usuário serão permanentemente excluídos.
+                </div>
+                
+                <div id="deletarUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                    Carregando...
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Senha de Confirmação (4 dígitos)</label>
+                    <input type="password" id="deletarSenha" class="form-control" placeholder="Digite a senha de 4 dígitos" maxlength="4" inputmode="numeric" style="text-align: center; font-size: 20px; letter-spacing: 8px;">
+                    <small style="color: var(--gray);">Senha padrão: 1234</small>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-danger" style="flex:2" onclick="confirmarDeletarUsuario()">
+                        <i class="fas fa-trash-alt"></i> Deletar Permanentemente
+                    </button>
+                    <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalDeletarUsuario')">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL DE EDIÇÃO UNIFICADO -->
+    <div class="modal-overlay" id="modalEdicaoUsuario">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-edit"></i> Editar Usuário</h2>
+                <button class="close-modal" onclick="fecharModal('modalEdicaoUsuario')">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div id="edicaoLoading" class="loading" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando...
+                </div>
+                
+                <div id="edicaoConteudo" style="display: block;">
+                    <!-- Cabeçalho com informações básicas -->
+                    <div style="background: linear-gradient(135deg, #667eea20, #764ba220); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-user" style="font-size: 24px;"></i>
+                            </div>
+                            <div>
+                                <h3 id="edicaoEmail" style="margin: 0; color: var(--dark);"></h3>
+                                <p id="edicaoUserId" style="margin: 5px 0 0 0; font-size: 11px; color: var(--gray);"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Abas -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--light); flex-wrap: wrap;">
+                        <button class="tab-btn-edicao active" onclick="mudarAbaEdicao('dados')" id="tabDados">
+                            <i class="fas fa-user"></i> Dados
+                        </button>
+                        <button class="tab-btn-edicao" onclick="mudarAbaEdicao('assinatura')" id="tabAssinatura">
+                            <i class="fas fa-crown"></i> Assinatura
+                        </button>
+                        <button class="tab-btn-edicao" onclick="mudarAbaEdicao('dias')" id="tabDias">
+                            <i class="fas fa-calendar"></i> Ajustar Dias
+                        </button>
+                        <button class="tab-btn-edicao" onclick="mudarAbaEdicao('logins')" id="tabLogins">
+                            <i class="fas fa-history"></i> Logins (30 dias)
+                        </button>
+                    </div>
+
+                    <!-- ABA 1: DADOS PESSOAIS -->
+                    <div id="abaDados" style="display: block;">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Nome Completo</label>
+                            <input type="text" id="editNome" class="form-control" placeholder="Nome do usuário">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Telefone</label>
+                            <input type="text" id="editTelefone" class="form-control" placeholder="(31) 99999-9999" maxlength="15">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" id="editEmail" class="form-control" disabled style="background: #f5f5f5;">
+                            <small style="color: var(--gray);">Email não pode ser alterado</small>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="salvarDadosPessoais()" style="width: 100%;">
+                                <i class="fas fa-save"></i> Salvar Dados Pessoais
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ABA 2: ASSINATURA -->
+                    <div id="abaAssinatura" style="display: none;">
+                        <div style="background: #e8f4fd; border-left: 4px solid #3498db; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                            <i class="fas fa-info-circle" style="color: #3498db;"></i>
+                            <strong>Regra:</strong> Plano "Grátis" = status automático. Planos pagos você escolhe Ativo/Inativo.
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> Plano</label>
+                            <select id="editPlano" class="form-control" onchange="atualizarStatusPorPlano()">
+                                <option value="não definido">Grátis</option>
+                                <option value="mensal">Mensal</option>
+                                <option value="anual">Anual</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-check-circle"></i> Status</label>
+                            <select id="editStatus" class="form-control">
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                            </select>
+                            <small id="statusHelp" style="color: var(--gray);"></small>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-success" onclick="salvarAssinatura()" style="flex: 2;">
+                                <i class="fas fa-save"></i> Salvar Assinatura
+                            </button>
+                            <button class="btn btn-danger" onclick="cancelarAssinatura()" style="flex: 1;">
+                                <i class="fas fa-ban"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ABA 3: AJUSTAR DIAS -->
+                    <div id="abaDias" style="display: none;">
+                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                            <i class="fas fa-exclamation-triangle" style="color: #856404;"></i>
+                            <strong>Use valores NEGATIVOS para diminuir os dias.</strong>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; flex: 1; text-align: center;">
+                                <span style="color: var(--gray);">Dias atuais</span>
+                                <div style="font-size: 2em; font-weight: 700;" id="diasAtuais">0</div>
+                            </div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray); font-size: 1.5em;"></i>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; flex: 1; text-align: center;">
+                                <span style="color: var(--gray);">Após ajuste</span>
+                                <div style="font-size: 2em; font-weight: 700;" id="diasFuturos">0</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-sort-numeric-up-alt"></i> Ajuste (pode ser negativo)</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="ajusteDias" class="form-control" value="30" min="-365" max="365" step="1" onchange="calcularDiasFuturos()" onkeyup="calcularDiasFuturos()" style="flex: 3;">
+                                <button class="btn btn-primary" onclick="adicionarAjusteDias()" style="flex: 1;">
+                                    <i class="fas fa-check"></i> Aplicar
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap;">
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(-30)">-30</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(-7)">-7</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(-1)">-1</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(1)">+1</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(7)">+7</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(30)">+30</button>
+                        </div>
+                    </div>
+
+                    <!-- ABA 4: LOGINS (30 DIAS) -->
+                    <div id="abaLogins" style="display: none;">
+                        <div id="loginsList" style="max-height: 300px; overflow-y: auto;">
+                            Carregando logins...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content: space-between;">
+                <button class="btn btn-danger" onclick="deletarUsuario()" style="background: var(--danger);">
+                    <i class="fas fa-trash"></i> Deletar Usuário
+                </button>
+                <button class="btn btn-outline" onclick="fecharModal('modalEdicaoUsuario')">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="toast"></div>
 
     <script>
@@ -869,25 +1066,12 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
         const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY0MzYzOCwiZXhwIjoyMDg2MjE5NjM4fQ.o8A42E0Zr3HZw0_qb4s-qA95MatoKCvrpFuAqW31Xqc';
 
-        // Links do Mercado Pago
-        const MERCADO_PAGO_LINKS = {
-            mensal: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=9a30d25477b445028fd6374c1b5d51f9',
-            anual: 'https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=59d5d72cfcee476b99776abcbddc4adf'
-        };
-
-        // Valores dos planos
-        const PLANOS = {
-            mensal: { valor: 17.90, dias: 30 },
-            anual: { valor: 189.90, dias: 365 }
-        };
-
-        // Criar cliente Supabase
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
         
         let usuariosData = [];
-        let usuariosFiltrados = [];
         let usuarioSelecionado = null;
+        let usuarioEditando = null;
         let filtroAtivo = 'todos';
 
         // Verificar autenticação
@@ -901,32 +1085,28 @@
         }
 
         // Calcular dias restantes
-       function calcularDiasRestantes(dataExpiracao) {
-    if (!dataExpiracao) return 0;
-    
-    const hoje = new Date();
-    
-    // Log para debug (remova em produção)
-    console.log('Data atual do sistema:', hoje.toLocaleDateString('pt-BR'));
-    
-    hoje.setHours(0, 0, 0, 0);
-    
-    const expiracao = new Date(dataExpiracao);
-    expiracao.setHours(0, 0, 0, 0);
-    
-    const diffTime = expiracao - hoje;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return diffDays;
-}
-        // Adicione esta função NOVA aqui, depois da função determinarStatus
-function formatarDataBR(data) {
-    if (!data) return '-';
-    const d = new Date(data);
-    // Subtrair 3 horas para ajustar para Brasília
-    const dataBrasilia = new Date(d.getTime() - (3 * 60 * 60 * 1000));
-    return dataBrasilia.toLocaleString('pt-BR');
-}
+        function calcularDiasRestantes(dataExpiracao) {
+            if (!dataExpiracao) return 0;
+            
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            
+            const expiracao = new Date(dataExpiracao);
+            expiracao.setHours(0, 0, 0, 0);
+            
+            const diffTime = expiracao - hoje;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays;
+        }
+
+        // Formatar data
+        function formatarDataBR(data) {
+            if (!data) return '-';
+            const d = new Date(data);
+            const dataBrasilia = new Date(d.getTime() - (3 * 60 * 60 * 1000));
+            return dataBrasilia.toLocaleString('pt-BR');
+        }
 
         // Determinar status do usuário
         function determinarStatus(user) {
@@ -942,7 +1122,6 @@ function formatarDataBR(data) {
                 } else if (dias <= 7) {
                     return { class: 'status-pendente', text: 'Próximo (' + dias + 'd)' };
                 } else {
-                    // Verificar se é período grátis (plano não definido mas ativo)
                     if (!user.plano || user.plano === 'não definido') {
                         return { class: 'status-gratis', text: 'Grátis' };
                     }
@@ -1005,7 +1184,7 @@ function formatarDataBR(data) {
                     <div class="stat-card ${filtroAtivo === 'ativos' ? 'active' : ''}" onclick="aplicarFiltro('ativos')">
                         <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                         <div class="stat-info">
-                            <h3>Ativos</h3>
+                            <h3>Ativos (pagos)</h3>
                             <div class="number">${stats.ativos}</div>
                         </div>
                     </div>
@@ -1046,7 +1225,6 @@ function formatarDataBR(data) {
                 
                 usuariosData = data || [];
                 
-                // Calcular dias para cada usuário
                 usuariosData = usuariosData.map(user => ({
                     ...user,
                     dias_restantes: calcularDiasRestantes(user.data_expiracao),
@@ -1058,7 +1236,7 @@ function formatarDataBR(data) {
                 console.error('Erro ao carregar usuários:', error);
                 document.getElementById('usuariosBody').innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align: center; color: var(--danger); padding: 30px;">
+                        <td colspan="8" style="text-align: center; color: var(--danger); padding: 30px;">
                             <i class="fas fa-exclamation-triangle"></i> Erro ao carregar usuários
                         </td>
                     </tr>
@@ -1070,12 +1248,10 @@ function formatarDataBR(data) {
         function aplicarFiltro(tipo) {
             filtroAtivo = tipo;
             
-            // Atualizar visual dos cards
             document.querySelectorAll('.stat-card').forEach(card => {
                 card.classList.remove('active');
             });
             
-            // Mostrar/esconder botão de limpar filtro
             const clearBtn = document.getElementById('clearFilterBtn');
             const activeFilter = document.getElementById('activeFilter');
             
@@ -1094,7 +1270,6 @@ function formatarDataBR(data) {
                 activeFilter.innerHTML = '';
             }
             
-            // Filtrar usuários
             filtrarUsuarios();
         }
 
@@ -1103,13 +1278,12 @@ function formatarDataBR(data) {
             aplicarFiltro('todos');
         }
 
-        // Filtrar usuários (busca + status)
+        // Filtrar usuários
         function filtrarUsuarios() {
             const termo = document.getElementById('searchInput').value.toLowerCase();
             
             let filtrados = usuariosData;
             
-            // Aplicar filtro de status
             if (filtroAtivo !== 'todos') {
                 filtrados = filtrados.filter(user => {
                     const dias = user.dias_restantes;
@@ -1129,11 +1303,10 @@ function formatarDataBR(data) {
                 });
             }
             
-            // Aplicar filtro de busca
             if (termo) {
                 filtrados = filtrados.filter(user => 
                     user.email.toLowerCase().includes(termo) || 
-                    user.user_id.toLowerCase().includes(termo)
+                    (user.user_id && user.user_id.toLowerCase().includes(termo))
                 );
             }
             
@@ -1141,105 +1314,189 @@ function formatarDataBR(data) {
         }
 
         // Renderizar tabela
-       function renderizarTabelaUsuarios(usuarios) {
-    const tbody = document.getElementById('usuariosBody');
-    
-    if (usuarios.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="8" style="text-align: center; padding: 30px;">
-                    <i class="fas fa-search"></i> Nenhum usuário encontrado
-                </td>
-            </tr>
-        `;
-        return;
-    }
+        function renderizarTabelaUsuarios(usuarios) {
+            const tbody = document.getElementById('usuariosBody');
+            
+            if (usuarios.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 30px;">
+                            <i class="fas fa-search"></i> Nenhum usuário encontrado
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
 
-    let html = '';
-    usuarios.forEach(user => {
-        // Extrair telefone dos metadados (se existir)
-        const telefone = user.raw_user_meta_data?.phone || 'Não informado';
-        
-        const dias = user.dias_restantes;
-        const statusInfo = user.status_info || determinarStatus(user);
-        
-        let diasClass = '';
-        if (dias <= 0) diasClass = 'days-urgent';
-        else if (dias <= 7) diasClass = 'days-warning';
-        else diasClass = 'days-good';
+            let html = '';
+            usuarios.forEach(user => {
+                const telefone = user.raw_user_meta_data?.phone || 'Não informado';
+                
+                const dias = user.dias_restantes;
+                const statusInfo = user.status_info || determinarStatus(user);
+                
+                let diasClass = '';
+                if (dias <= 0) diasClass = 'days-urgent';
+                else if (dias <= 7) diasClass = 'days-warning';
+                else diasClass = 'days-good';
 
-        const dataExpiracao = user.data_expiracao ? 
-            new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
-        
-        const ultimoLogin = user.ultimo_login ? 
-            new Date(user.ultimo_login).toLocaleString('pt-BR') : 'Nunca';
+                const dataExpiracao = user.data_expiracao ? 
+                    new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
+                
+                const ultimoLogin = user.ultimo_login ? 
+                    new Date(user.ultimo_login).toLocaleString('pt-BR') : 'Nunca';
 
-        const plano = user.plano || 'não definido';
-        let planoClass = 'plan-badge';
-        if (plano === 'mensal') planoClass += ' mensal';
-        else if (plano === 'anual') planoClass += ' anual';
-        else planoClass += ' gratis';
+                const plano = user.plano || 'não definido';
+                let planoClass = 'plan-badge';
+                if (plano === 'mensal') planoClass += ' mensal';
+                else if (plano === 'anual') planoClass += ' anual';
+                else planoClass += ' gratis';
 
-        html += `
-            <tr>
-                <td class="email-cell" title="${user.email}">
-                    <i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>
-                    ${user.email}
-                </td>
-                <td>
-                    <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
-                </td>
-                <td>${dataExpiracao}</td>
-                <td>
-                    <span class="days-badge ${diasClass}">${dias} dias</span>
-                </td>
-                <td>
-                    <span class="${planoClass}">${plano}</span>
-                </td>
-                <td><small>${ultimoLogin}</small></td>
-                <td><small>${telefone}</small></td>  <!-- 🔴 NOVA COLUNA DE TELEFONE -->
-                <td>
-                    <div class="action-buttons">
-                        <button class="btn btn-sm btn-success" onclick="abrirModalAdicionarDias('${user.user_id}', '${user.email}')" title="Adicionar dias">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                        <button class="btn btn-sm btn-primary" onclick="verLogsUsuario('${user.user_id}')" title="Ver logs">
-                            <i class="fas fa-history"></i>
-                        </button>
-                        <button class="btn btn-sm btn-warning" onclick="mudarStatus('${user.user_id}', 'ativo')" title="Ativar">
-                            <i class="fas fa-check-circle"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="mudarStatus('${user.user_id}', 'expirado')" title="Desativar">
-                            <i class="fas fa-times-circle"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="abrirModalDeletar('${user.user_id}', '${user.email}')" title="Deletar usuário">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    });
+                html += `
+                    <tr>
+                        <td class="email-cell" title="${user.email}">
+                            <i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>
+                            ${user.email}
+                        </td>
+                        <td>
+                            <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
+                        </td>
+                        <td>${dataExpiracao}</td>
+                        <td>
+                            <span class="days-badge ${diasClass}">${dias} dias</span>
+                        </td>
+                        <td>
+                            <span class="${planoClass}">${plano}</span>
+                        </td>
+                        <td><small>${ultimoLogin}</small></td>
+                        <td><small>${telefone}</small></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-primary" onclick="abrirModalEdicao('${user.user_id}', '${user.email}')" title="Editar usuário">
+                                    <i class="fas fa-edit"></i> EDITAR
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
 
-    tbody.innerHTML = html;
-}
-        // Abrir modal para adicionar dias
-        function abrirModalAdicionarDias(userId, email) {
-            usuarioSelecionado = userId;
-            document.getElementById('modalUsuarioInfo').innerHTML = `
-                <strong>Email:</strong> ${email}<br>
-                <strong>ID:</strong> ${userId}
-            `;
-            document.getElementById('modalAdicionarDias').style.display = 'flex';
+            tbody.innerHTML = html;
         }
 
-        // Confirmar adição de dias
-        async function confirmarAdicionarDias() {
-            const dias = parseInt(document.getElementById('diasQuantidade').value);
-            const status = document.getElementById('diasStatus').value;
+        // ========== FUNÇÕES DO MODAL DE EDIÇÃO ==========
 
-            if (!dias || dias < 1) {
-                showToast('Digite uma quantidade válida de dias', 'warning');
+        // Abrir modal de edição
+        async function abrirModalEdicao(userId, email) {
+            usuarioSelecionado = userId;
+            document.getElementById('edicaoConteudo').style.display = 'none';
+            document.getElementById('edicaoLoading').style.display = 'block';
+            document.getElementById('modalEdicaoUsuario').style.display = 'flex';
+            
+            try {
+                const { data: userAuth, error: authError } = await supabaseAdmin
+                    .from('auth.users')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                    
+                const { data: assinatura, error: assError } = await supabaseAdmin
+                    .from('assinaturas')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .maybeSingle();
+
+                if (authError) throw authError;
+
+                usuarioEditando = {
+                    id: userId,
+                    email: userAuth.email,
+                    nome: userAuth.raw_user_meta_data?.nome || '',
+                    phone: userAuth.raw_user_meta_data?.phone || '',
+                    assinatura: assinatura || null
+                };
+
+                document.getElementById('edicaoEmail').textContent = userAuth.email;
+                document.getElementById('edicaoUserId').textContent = userId;
+                document.getElementById('editNome').value = usuarioEditando.nome;
+                document.getElementById('editTelefone').value = usuarioEditando.phone;
+                document.getElementById('editEmail').value = userAuth.email;
+
+                if (assinatura) {
+                    document.getElementById('editPlano').value = assinatura.plano || 'não definido';
+                    document.getElementById('editStatus').value = assinatura.status === 'ativo' ? 'ativo' : 'inativo';
+                    
+                    const dias = calcularDiasRestantes(assinatura.data_expiracao);
+                    document.getElementById('diasAtuais').textContent = dias;
+                    document.getElementById('diasFuturos').textContent = dias;
+                } else {
+                    document.getElementById('editPlano').value = 'não definido';
+                    document.getElementById('editStatus').value = 'ativo';
+                    document.getElementById('diasAtuais').textContent = '0';
+                    document.getElementById('diasFuturos').textContent = '0';
+                }
+
+                atualizarStatusPorPlano();
+                await carregarLoginsUsuario(userId);
+
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showToast('Erro ao carregar dados do usuário', 'error');
+            } finally {
+                document.getElementById('edicaoLoading').style.display = 'none';
+                document.getElementById('edicaoConteudo').style.display = 'block';
+            }
+        }
+
+        // Mudar abas
+        function mudarAbaEdicao(aba) {
+            document.querySelectorAll('.tab-btn-edicao').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(`tab${aba.charAt(0).toUpperCase() + aba.slice(1)}`).classList.add('active');
+            
+            document.getElementById('abaDados').style.display = 'none';
+            document.getElementById('abaAssinatura').style.display = 'none';
+            document.getElementById('abaDias').style.display = 'none';
+            document.getElementById('abaLogins').style.display = 'none';
+            
+            document.getElementById(`aba${aba.charAt(0).toUpperCase() + aba.slice(1)}`).style.display = 'block';
+        }
+
+        // Atualizar status baseado no plano
+        function atualizarStatusPorPlano() {
+            const plano = document.getElementById('editPlano').value;
+            const statusSelect = document.getElementById('editStatus');
+            const statusHelp = document.getElementById('statusHelp');
+            
+            if (plano === 'não definido') {
+                statusSelect.disabled = true;
+                statusHelp.innerHTML = 'Status automático: Grátis (plano gratuito)';
+            } else {
+                statusSelect.disabled = false;
+                statusHelp.innerHTML = 'Escolha o status para planos pagos';
+            }
+        }
+
+        // Calcular dias futuros
+        function calcularDiasFuturos() {
+            const diasAtuais = parseInt(document.getElementById('diasAtuais').textContent) || 0;
+            const ajuste = parseInt(document.getElementById('ajusteDias').value) || 0;
+            document.getElementById('diasFuturos').textContent = diasAtuais + ajuste;
+        }
+
+        // Ajuste rápido
+        function ajusteRapido(valor) {
+            document.getElementById('ajusteDias').value = valor;
+            calcularDiasFuturos();
+        }
+
+        // Aplicar ajuste de dias
+        async function adicionarAjusteDias() {
+            const ajuste = parseInt(document.getElementById('ajusteDias').value);
+            if (ajuste === 0) {
+                showToast('Digite um valor diferente de zero', 'warning');
                 return;
             }
 
@@ -1249,8 +1506,8 @@ function formatarDataBR(data) {
                 const { data, error } = await supabaseAdmin
                     .rpc('admin_atualizar_assinatura', {
                         p_user_id: usuarioSelecionado,
-                        p_dias: dias,
-                        p_status: status
+                        p_dias: ajuste,
+                        p_status: document.getElementById('editStatus').value
                     });
 
                 if (error) throw error;
@@ -1260,98 +1517,315 @@ function formatarDataBR(data) {
                     .insert({
                         user_id: usuarioSelecionado,
                         acao: 'admin_manual',
-                        detalhes: `Admin adicionou ${dias} dias e mudou status para ${status}`
+                        detalhes: `Admin ajustou ${ajuste} dias`
                     });
 
-                showToast(data.mensagem, 'success');
-                fecharModal('modalAdicionarDias');
+                showToast(`✅ Dias ajustados!`, 'success');
+                
+                const { data: assinatura } = await supabaseAdmin
+                    .from('assinaturas')
+                    .select('data_expiracao')
+                    .eq('user_id', usuarioSelecionado)
+                    .single();
+                    
+                const novosDias = calcularDiasRestantes(assinatura?.data_expiracao);
+                document.getElementById('diasAtuais').textContent = novosDias;
+                document.getElementById('diasFuturos').textContent = novosDias;
+                document.getElementById('ajusteDias').value = 30;
                 
                 await carregarUsuarios();
                 await carregarEstatisticas();
                 
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao atualizar assinatura', 'error');
+                showToast('Erro ao ajustar dias', 'error');
             }
         }
 
-        // Mudar status do usuário
-        async function mudarStatus(userId, novoStatus) {
-            if (!confirm(`Tem certeza que deseja mudar o status para ${novoStatus}?`)) {
+        // Salvar dados pessoais
+        async function salvarDadosPessoais() {
+            const nome = document.getElementById('editNome').value.trim();
+            const phone = document.getElementById('editTelefone').value.trim();
+
+            if (!nome) {
+                showToast('Nome é obrigatório', 'warning');
                 return;
             }
 
             try {
-                const { data, error } = await supabaseAdmin
-                    .rpc('admin_mudar_status', {
-                        p_user_id: userId,
-                        p_status: novoStatus
-                    });
+                showToast('Salvando...', 'info');
+
+                const { error } = await supabaseAdmin.auth.admin.updateUserById(
+                    usuarioSelecionado,
+                    {
+                        user_metadata: {
+                            nome: nome,
+                            phone: phone
+                        }
+                    }
+                );
 
                 if (error) throw error;
 
                 await supabaseAdmin
                     .from('log_assinaturas')
                     .insert({
-                        user_id: userId,
+                        user_id: usuarioSelecionado,
                         acao: 'admin_manual',
-                        detalhes: `Admin mudou status para ${novoStatus}`
+                        detalhes: `Admin atualizou dados: Nome: ${nome}, Tel: ${phone}`
                     });
 
-                showToast(data.mensagem, 'success');
+                showToast('✅ Dados atualizados!', 'success');
+                await carregarUsuarios();
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao salvar dados', 'error');
+            }
+        }
+
+        // Salvar assinatura
+        async function salvarAssinatura() {
+            const plano = document.getElementById('editPlano').value;
+            const status = document.getElementById('editStatus').value;
+
+            try {
+                showToast('Salvando...', 'info');
+
+                const novoStatus = plano === 'não definido' ? 'ativo' : status;
+
+                const { error } = await supabaseAdmin
+                    .from('assinaturas')
+                    .upsert({
+                        user_id: usuarioSelecionado,
+                        plano: plano,
+                        status: novoStatus,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'user_id' });
+
+                if (error) throw error;
+
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: usuarioSelecionado,
+                        acao: 'admin_manual',
+                        detalhes: `Admin alterou plano para ${plano}, status: ${novoStatus}`
+                    });
+
+                showToast('✅ Assinatura atualizada!', 'success');
+                
+                const { data: assinatura } = await supabaseAdmin
+                    .from('assinaturas')
+                    .select('*')
+                    .eq('user_id', usuarioSelecionado)
+                    .single();
+                    
+                if (assinatura) {
+                    const dias = calcularDiasRestantes(assinatura.data_expiracao);
+                    document.getElementById('diasAtuais').textContent = dias;
+                    document.getElementById('diasFuturos').textContent = dias;
+                }
+                
                 await carregarUsuarios();
                 await carregarEstatisticas();
                 
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao mudar status', 'error');
+                showToast('Erro ao salvar assinatura', 'error');
             }
         }
 
-        // Ver logs do usuário
-        async function verLogsUsuario(userId) {
+        // Cancelar assinatura
+        async function cancelarAssinatura() {
+            if (!confirm('Tem certeza que deseja CANCELAR esta assinatura?')) return;
+
             try {
-                const { data, error } = await supabaseAdmin
-                    .from('log_assinaturas')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('data_verificacao', { ascending: false })
-                    .limit(50);
+                showToast('Processando...', 'info');
+
+                const { error } = await supabaseAdmin
+                    .from('assinaturas')
+                    .update({
+                        status: 'inativo',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('user_id', usuarioSelecionado);
 
                 if (error) throw error;
 
-                const content = document.getElementById('logsUsuarioContent');
-                
-                if (!data || data.length === 0) {
-                    content.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
-                } else {
-                    let html = '<div class="logs-container" style="max-height: 400px;">';
-                   data.forEach(log => {
-    const dataLog = formatarDataBR(log.data_verificacao);
-                        let actionClass = 'log-action';
-                        if (log.acao === 'trial_auto') actionClass += ' trial_auto';
-                        else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
-                        else if (log.acao === 'proximo_expiracao') actionClass += ' proximo_expiracao';
-                        else if (log.acao === 'admin_manual') actionClass += ' admin_manual';
-                        else if (log.acao === 'pagamento') actionClass += ' pagamento';
-
-                        html += `
-                            <div class="log-item">
-                                <div class="log-date">${dataLog}</div>
-                                <div class="${actionClass}">${log.acao}</div>
-                                <div class="log-details">${log.detalhes || ''}</div>
-                            </div>
-                        `;
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: usuarioSelecionado,
+                        acao: 'admin_manual',
+                        detalhes: `Admin cancelou assinatura`
                     });
-                    html += '</div>';
-                    content.innerHTML = html;
-                }
 
-                document.getElementById('modalLogsUsuario').style.display = 'flex';
+                showToast('✅ Assinatura cancelada!', 'success');
+                
+                document.getElementById('editStatus').value = 'inativo';
+                await carregarUsuarios();
+                await carregarEstatisticas();
                 
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao carregar logs', 'error');
+                showToast('Erro ao cancelar', 'error');
+            }
+        }
+
+        // Carregar logins
+        async function carregarLoginsUsuario(userId) {
+            try {
+                const trintaDiasAtras = new Date();
+                trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
+
+                const { data: sessions, error } = await supabaseAdmin
+                    .rpc('auth.get_user_sessions', { user_id: userId });
+
+                if (error) {
+                    console.warn('Erro ao buscar sessões:', error);
+                    document.getElementById('loginsList').innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Histórico de login não disponível</p>';
+                    return;
+                }
+
+                const loginsList = document.getElementById('loginsList');
+                
+                if (!sessions || sessions.length === 0) {
+                    loginsList.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum login nos últimos 30 dias</p>';
+                    return;
+                }
+
+                let html = '';
+                sessions.forEach(session => {
+                    const dataLogin = new Date(session.created_at).toLocaleString('pt-BR');
+                    html += `
+                        <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-sign-in-alt" style="color: var(--success);"></i>
+                            <span>${dataLogin}</span>
+                        </div>
+                    `;
+                });
+
+                loginsList.innerHTML = html;
+
+            } catch (error) {
+                console.error('Erro ao carregar logins:', error);
+                document.getElementById('loginsList').innerHTML = '<p style="text-align: center; color: var(--danger);">Erro ao carregar logins</p>';
+            }
+        }
+
+        // Deletar usuário
+        async function deletarUsuario() {
+            if (!confirm('TEM CERTEZA ABSOLUTA? Esta ação NÃO pode ser desfeita!')) return;
+
+            const senha = prompt('Digite a senha de 4 dígitos para confirmar:');
+            if (!senha || senha.length !== 4) {
+                showToast('Senha inválida', 'warning');
+                return;
+            }
+
+            try {
+                showToast('Deletando usuário...', 'info');
+
+                const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/delete-user', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({
+                        userId: usuarioSelecionado,
+                        senha: senha
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('✅ Usuário deletado com sucesso!', 'success');
+                    fecharModal('modalEdicaoUsuario');
+                    await carregarUsuarios();
+                    await carregarEstatisticas();
+                } else {
+                    showToast('Erro: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao deletar usuário: ' + error.message, 'error');
+            }
+        }
+
+        // Abrir relatório financeiro
+        async function abrirRelatorioFinanceiro() {
+            document.getElementById('modalRelatorioFinanceiro').style.display = 'flex';
+            await carregarRelatorioFinanceiro();
+        }
+
+        // Carregar relatório financeiro
+        async function carregarRelatorioFinanceiro() {
+            try {
+                const { data: assinaturas, error: assError } = await supabaseAdmin
+                    .from('assinaturas')
+                    .select('*');
+
+                if (assError) throw assError;
+
+                const hoje = new Date();
+                hoje.setHours(0, 0, 0, 0);
+                
+                const ativosMensal = (assinaturas || []).filter(a => {
+                    if (!a.data_expiracao || a.status !== 'ativo') return false;
+                    const expiracao = new Date(a.data_expiracao);
+                    expiracao.setHours(0, 0, 0, 0);
+                    return expiracao >= hoje && a.plano === 'mensal';
+                }).length;
+
+                const ativosAnual = (assinaturas || []).filter(a => {
+                    if (!a.data_expiracao || a.status !== 'ativo') return false;
+                    const expiracao = new Date(a.data_expiracao);
+                    expiracao.setHours(0, 0, 0, 0);
+                    return expiracao >= hoje && a.plano === 'anual';
+                }).length;
+
+                const content = document.getElementById('relatorioContent');
+                content.innerHTML = `
+                    <div class="report-grid">
+                        <div class="report-card total">
+                            <div class="report-label">
+                                <i class="fas fa-users"></i> Assinaturas Ativas
+                            </div>
+                            <div class="report-value">${ativosMensal + ativosAnual}</div>
+                            <div class="report-sub">
+                                <span class="plan-badge mensal">Mensal: ${ativosMensal}</span>
+                                <span class="plan-badge anual">Anual: ${ativosAnual}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-label">
+                                <i class="fas fa-calendar-alt"></i> Total Usuários
+                            </div>
+                            <div class="report-value">${usuariosData.length}</div>
+                            <div class="report-sub">Todos os cadastros</div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-label">
+                                <i class="fas fa-chart-line"></i> Receita Mensal
+                            </div>
+                            <div class="report-value">R$ ${(ativosMensal * 17.90).toFixed(2)}</div>
+                            <div class="report-sub">Apenas planos ativos</div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Erro ao carregar relatório:', error);
+                document.getElementById('relatorioContent').innerHTML = `
+                    <p style="text-align: center; color: var(--danger); padding: 20px;">
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros
+                    </p>
+                `;
             }
         }
 
@@ -1375,7 +1849,7 @@ function formatarDataBR(data) {
 
                 let html = '';
                 data.forEach(log => {
-    const dataLog = formatarDataBR(log.data_verificacao);
+                    const dataLog = formatarDataBR(log.data_verificacao);
                     let actionClass = 'log-action';
                     if (log.acao === 'trial_auto') actionClass += ' trial_auto';
                     else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
@@ -1404,187 +1878,7 @@ function formatarDataBR(data) {
             }
         }
 
-        // Abrir relatório financeiro
-        async function abrirRelatorioFinanceiro() {
-            document.getElementById('modalRelatorioFinanceiro').style.display = 'flex';
-            await carregarRelatorioFinanceiro();
-        }
-
-        // Carregar dados do relatório financeiro
-        async function carregarRelatorioFinanceiro() {
-            try {
-                const { data: assinaturas, error: assError } = await supabaseAdmin
-                    .from('assinaturas')
-                    .select('*');
-
-                if (assError) throw assError;
-
-                const { data: logs, error: logError } = await supabaseAdmin
-                    .from('log_assinaturas')
-                    .select('*')
-                    .eq('acao', 'pagamento')
-                    .order('data_verificacao', { ascending: false });
-
-                if (logError) throw logError;
-
-                let totalMensal = 0;
-                let totalAnual = 0;
-                let pagamentosMensal = 0;
-                let pagamentosAnual = 0;
-                const pagamentosPorMes = {};
-
-                (logs || []).forEach(log => {
-                    const data = new Date(log.data_verificacao);
-                    const mesAno = `${data.getMonth() + 1}/${data.getFullYear()}`;
-                    
-                    let valor = 0;
-                    if (log.detalhes?.includes('mensal')) {
-                        valor = PLANOS.mensal.valor;
-                        totalMensal += valor;
-                        pagamentosMensal++;
-                    } else if (log.detalhes?.includes('anual')) {
-                        valor = PLANOS.anual.valor;
-                        totalAnual += valor;
-                        pagamentosAnual++;
-                    }
-
-                    if (!pagamentosPorMes[mesAno]) {
-                        pagamentosPorMes[mesAno] = 0;
-                    }
-                    pagamentosPorMes[mesAno] += valor;
-                });
-
-                const totalGeral = totalMensal + totalAnual;
-                const meses = Object.keys(pagamentosPorMes).length;
-                const mediaMensal = meses > 0 ? totalGeral / meses : 0;
-
-                const hoje = new Date();
-                hoje.setHours(0, 0, 0, 0);
-                
-                const ativosMensal = (assinaturas || []).filter(a => {
-                    if (!a.data_expiracao) return false;
-                    const expiracao = new Date(a.data_expiracao);
-                    expiracao.setHours(0, 0, 0, 0);
-                    return expiracao >= hoje && a.plano === 'mensal';
-                }).length;
-
-                const ativosAnual = (assinaturas || []).filter(a => {
-                    if (!a.data_expiracao) return false;
-                    const expiracao = new Date(a.data_expiracao);
-                    expiracao.setHours(0, 0, 0, 0);
-                    return expiracao >= hoje && a.plano === 'anual';
-                }).length;
-
-                const content = document.getElementById('relatorioContent');
-                content.innerHTML = `
-                    <div class="report-grid">
-                        <div class="report-card total">
-                            <div class="report-label">
-                                <i class="fas fa-dollar-sign"></i> Total Arrecadado (Geral)
-                            </div>
-                            <div class="report-value">R$ ${totalGeral.toFixed(2)}</div>
-                            <div class="report-sub">Baseado em ${logs?.length || 0} pagamentos</div>
-                        </div>
-                        
-                        <div class="report-card">
-                            <div class="report-label">
-                                <i class="fas fa-calendar-alt"></i> Média Mensal
-                            </div>
-                            <div class="report-value">R$ ${mediaMensal.toFixed(2)}</div>
-                            <div class="report-sub">${meses} meses com pagamentos</div>
-                        </div>
-                        
-                        <div class="report-card">
-                            <div class="report-label">
-                                <i class="fas fa-users"></i> Assinaturas Ativas
-                            </div>
-                            <div class="report-value">${ativosMensal + ativosAnual}</div>
-                            <div class="report-sub">
-                                <span class="plan-badge mensal">Mensal: ${ativosMensal}</span>
-                                <span class="plan-badge anual">Anual: ${ativosAnual}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px;">
-                        <h3 style="color: var(--primary-dark); margin-bottom: 15px;">
-                            <i class="fas fa-chart-pie"></i> Detalhamento por Plano
-                        </h3>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                <h4 style="color: var(--primary); margin-bottom: 10px;">
-                                    <i class="fas fa-calendar"></i> Plano Mensal
-                                </h4>
-                                <div style="margin-bottom: 5px;">
-                                    <strong>Total:</strong> R$ ${totalMensal.toFixed(2)}
-                                </div>
-                                <div style="margin-bottom: 5px;">
-                                    <strong>Pagamentos:</strong> ${pagamentosMensal}
-                                </div>
-                                <div>
-                                    <strong>Ticket Médio:</strong> R$ ${pagamentosMensal > 0 ? (totalMensal / pagamentosMensal).toFixed(2) : '0.00'}
-                                </div>
-                            </div>
-                            
-                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                                <h4 style="color: var(--purple-dark); margin-bottom: 10px;">
-                                    <i class="fas fa-calendar"></i> Plano Anual
-                                </h4>
-                                <div style="margin-bottom: 5px;">
-                                    <strong>Total:</strong> R$ ${totalAnual.toFixed(2)}
-                                </div>
-                                <div style="margin-bottom: 5px;">
-                                    <strong>Pagamentos:</strong> ${pagamentosAnual}
-                                </div>
-                                <div>
-                                    <strong>Ticket Médio:</strong> R$ ${pagamentosAnual > 0 ? (totalAnual / pagamentosAnual).toFixed(2) : '0.00'}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px;">
-                        <h3 style="color: var(--primary-dark); margin-bottom: 15px;">
-                            <i class="fas fa-table"></i> Histórico Mensal
-                        </h3>
-                        
-                        <table class="report-table">
-                            <thead>
-                                <tr>
-                                    <th>Mês/Ano</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${Object.entries(pagamentosPorMes)
-                                    .sort((a, b) => {
-                                        const [m1, a1] = a[0].split('/');
-                                        const [m2, a2] = b[0].split('/');
-                                        return new Date(a2, m2-1) - new Date(a1, m1-1);
-                                    })
-                                    .map(([mes, total]) => `
-                                        <tr>
-                                            <td>${mes}</td>
-                                            <td class="report-highlight">R$ ${total.toFixed(2)}</td>
-                                        </tr>
-                                    `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-
-            } catch (error) {
-                console.error('Erro ao carregar relatório:', error);
-                document.getElementById('relatorioContent').innerHTML = `
-                    <p style="text-align: center; color: var(--danger); padding: 20px;">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros: ${error.message}
-                    </p>
-                `;
-            }
-        }
-
-        // Mudar aba
+        // Mudar aba principal
         function mudarAba(aba) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
@@ -1625,63 +1919,6 @@ function formatarDataBR(data) {
             }, 3000);
         }
 
-// Abrir modal de deletar usuário
-function abrirModalDeletar(userId, email) {
-    usuarioSelecionado = userId;
-    document.getElementById('deletarUsuarioInfo').innerHTML = `
-        <strong>Email:</strong> ${email}<br>
-        <strong>ID:</strong> ${userId}
-    `;
-    document.getElementById('deletarSenha').value = '';
-    document.getElementById('modalDeletarUsuario').style.display = 'flex';
-}
-
-// Confirmar deletar usuário
-async function confirmarDeletarUsuario() {
-    const senha = document.getElementById('deletarSenha').value;
-    
-    if (!senha || senha.length !== 4) {
-        showToast('Digite a senha de 4 dígitos', 'warning');
-        return;
-    }
-
-    if (!confirm('TEM CERTEZA ABSOLUTA? Esta ação NÃO pode ser desfeita!')) {
-        return;
-    }
-
-    showToast('Processando exclusão...', 'info');
-
-    try {
-        const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/delete-user', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds'
-            },
-            body: JSON.stringify({
-                userId: usuarioSelecionado,
-                senha: senha
-            })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-            showToast('✅ Usuário deletado com sucesso!', 'success');
-            fecharModal('modalDeletarUsuario');
-            
-            // Recarregar listas
-            await carregarUsuarios();
-            await carregarEstatisticas();
-        } else {
-            showToast('Erro: ' + data.error, 'error');
-        }
-    } catch (error) {
-        console.error('Erro:', error);
-        showToast('Erro ao deletar usuário: ' + error.message, 'error');
-    }
-}
-
         // Inicialização
         async function init() {
             if (!verificarAutenticacao()) return;
@@ -1712,43 +1949,8 @@ async function confirmarDeletarUsuario() {
             }
         };
 
-        // Iniciar quando a página carregar
+        // Iniciar
         document.addEventListener('DOMContentLoaded', init);
     </script>
-<!-- Modal Deletar Usuário -->
-    <div class="modal-overlay" id="modalDeletarUsuario">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Deletar Usuário</h2>
-                <button class="close-modal" onclick="fecharModal('modalDeletarUsuario')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div style="background: #f8d7da; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #721c24;">
-                    <i class="fas fa-skull-crosswalk"></i> 
-                    <strong>Atenção!</strong> Esta ação é irreversível. Todos os dados do usuário serão permanentemente excluídos.
-                </div>
-                
-                <div id="deletarUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
-                    Carregando...
-                </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Senha de Confirmação (4 dígitos)</label>
-                    <input type="password" id="deletarSenha" class="form-control" placeholder="Digite a senha de 4 dígitos" maxlength="4" inputmode="numeric" style="text-align: center; font-size: 20px; letter-spacing: 8px;">
-                    <small style="color: var(--gray);">Senha padrão: 1234</small>
-                </div>
-                
-                <div class="modal-footer">
-                    <button class="btn btn-danger" style="flex:2" onclick="confirmarDeletarUsuario()">
-                        <i class="fas fa-trash-alt"></i> Deletar Permanentemente
-                    </button>
-                    <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalDeletarUsuario')">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>
