@@ -1671,12 +1671,15 @@ async function abrirModalEdicao(userId, email) {
 
         // Carregar logins
        // Carregar contagem de logins (últimos 30 dias)
+// Carregar contagem de logins (últimos 30 dias)
+// Carregar informações de login (usando dados já carregados)
 async function carregarLoginsUsuario(userId) {
     const loginsList = document.getElementById('loginsList');
-    loginsList.innerHTML = '<p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Verificando acessos...</p>';
+    loginsList.innerHTML = '<p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Verificando...</p>';
     
     try {
-        const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/get-user-sessions', {
+        // Buscar usuário diretamente da tabela auth.users via Edge Function (já temos get-user-data)
+        const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/get-user-data', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1688,51 +1691,58 @@ async function carregarLoginsUsuario(userId) {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Erro ao buscar logins');
+            throw new Error(data.error || 'Erro ao buscar dados');
         }
 
-        const totalLogins = data.sessions?.length || 0;
-        
+        const ultimoLogin = data.user.last_sign_in_at 
+            ? new Date(data.user.last_sign_in_at).toLocaleString('pt-BR') 
+            : 'Nunca acessou';
+
+        const dataCriacao = new Date(data.user.created_at).toLocaleString('pt-BR');
+
         let html = `
-            <div style="padding: 20px; text-align: center;">
-                <div style="background: linear-gradient(135deg, #667eea, #764ba2); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                    <i class="fas fa-sign-in-alt" style="color: white; font-size: 32px;"></i>
+            <div style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-clock" style="color: white; font-size: 24px;"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0;">Histórico de Acesso</h3>
+                        <p style="color: var(--gray); margin: 5px 0 0 0;">Informações de login</p>
+                    </div>
                 </div>
-                
-                <h3 style="margin-bottom: 10px;">Total de Acessos</h3>
-                
-                <div style="font-size: 3.5em; font-weight: 700; color: var(--primary); margin-bottom: 10px;">
-                    ${totalLogins}
+
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: 600; color: var(--dark);">
+                            <i class="fas fa-calendar-check" style="color: var(--success); margin-right: 10px;"></i>
+                            Data de cadastro
+                        </div>
+                        <div>${dataCriacao}</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+                        <div style="font-weight: 600; color: var(--dark);">
+                            <i class="fas fa-sign-in-alt" style="color: var(--primary); margin-right: 10px;"></i>
+                            Último acesso
+                        </div>
+                        <div style="font-weight: 600; color: ${ultimoLogin === 'Nunca acessou' ? 'var(--danger)' : 'var(--dark)'};">
+                            ${ultimoLogin}
+                        </div>
+                    </div>
                 </div>
-                
-                <p style="color: var(--gray); font-size: 14px;">
-                    <i class="fas fa-calendar-alt"></i> 
-                    Últimos 30 dias
-                </p>
+
+                <div style="margin-top: 20px; background: #e8f4fd; border-left: 4px solid #3498db; padding: 15px; border-radius: 6px;">
+                    <i class="fas fa-info-circle" style="color: #3498db; margin-right: 8px;"></i>
+                    <span>O histórico detalhado de múltiplos logins não está disponível, mas você pode ver o último acesso acima.</span>
+                </div>
+            </div>
         `;
 
-        // Se houver logins, mostrar a data do último (opcional)
-        if (totalLogins > 0 && data.sessions[0]) {
-            const ultimoLogin = new Date(data.sessions[0].created_at).toLocaleString('pt-BR');
-            html += `
-                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                    <div style="font-weight: 600; margin-bottom: 5px;">Último acesso registrado:</div>
-                    <div style="color: var(--dark);">${ultimoLogin}</div>
-                </div>
-            `;
-        } else {
-            html += `
-                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; color: var(--gray);">
-                    <i class="fas fa-info-circle"></i> Nenhum acesso nos últimos 30 dias
-                </div>
-            `;
-        }
-
-        html += '</div>';
         loginsList.innerHTML = html;
 
     } catch (error) {
-        console.error('Erro ao carregar logins:', error);
+        console.error('Erro ao carregar informações de login:', error);
         loginsList.innerHTML = `
             <div style="padding: 20px; text-align: center; color: var(--danger);">
                 <i class="fas fa-exclamation-triangle" style="font-size: 2em; margin-bottom: 10px;"></i>
