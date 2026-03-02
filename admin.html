@@ -403,7 +403,7 @@
             padding: 30px;
             border-radius: 12px;
             width: 90%;
-            max-width: 500px;
+            max-width: 700px;
             max-height: 80vh;
             overflow-y: auto;
         }
@@ -662,6 +662,7 @@
             font-weight: 600;
             color: var(--gray);
             border-bottom: 3px solid transparent;
+            transition: all 0.3s;
         }
 
         .tab-btn-edicao:hover {
@@ -770,7 +771,7 @@
                         <li><strong>👑 Assinatura:</strong> Alterar plano e status</li>
                         <li><strong>📅 Ajustar Dias:</strong> Adicionar ou subtrair dias (valores negativos)</li>
                         <li><strong>🕒 Logins:</strong> Ver histórico de acesso dos últimos 30 dias</li>
-                        <li><strong>🗑️ Deletar:</strong> Remover permanentemente o usuário</li>
+                        <li><strong>🔒 Segurança:</strong> Excluir permanentemente o usuário</li>
                     </ul>
                 </div>
 
@@ -806,55 +807,6 @@
         </div>
     </div>
 
-    <!-- Modal Adicionar Dias (antigo, será substituído pelo novo modal) -->
-    <div class="modal-overlay" id="modalAdicionarDias">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-calendar-plus"></i> Adicionar Dias</h2>
-                <button class="close-modal" onclick="fecharModal('modalAdicionarDias')">&times;</button>
-            </div>
-            <div id="modalUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
-                Carregando...
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-sort-numeric-up"></i> Quantidade de Dias</label>
-                <input type="number" id="diasQuantidade" class="form-control" value="30" min="1" max="365">
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-tag"></i> Status</label>
-                <select id="diasStatus" class="form-control">
-                    <option value="ativo">Ativo</option>
-                    <option value="expirado">Expirado</option>
-                    <option value="cancelado">Cancelado</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" style="flex:2" onclick="confirmarAdicionarDias()">
-                    <i class="fas fa-check"></i> Confirmar
-                </button>
-                <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalAdicionarDias')">
-                    Cancelar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Logs do Usuário (antigo, será substituído pelo novo modal) -->
-    <div class="modal-overlay" id="modalLogsUsuario">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h2><i class="fas fa-history"></i> Histórico do Usuário</h2>
-                <button class="close-modal" onclick="fecharModal('modalLogsUsuario')">&times;</button>
-            </div>
-            <div id="logsUsuarioContent" style="max-height: 400px; overflow-y: auto;">
-                Carregando...
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="fecharModal('modalLogsUsuario')">Fechar</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Relatório Financeiro -->
     <div class="modal-overlay" id="modalRelatorioFinanceiro">
         <div class="modal-content large">
@@ -864,41 +816,6 @@
             </div>
             <div class="modal-body" id="relatorioContent">
                 <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando dados financeiros...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Deletar Usuário (antigo, será substituído pelo novo modal) -->
-    <div class="modal-overlay" id="modalDeletarUsuario">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Deletar Usuário</h2>
-                <button class="close-modal" onclick="fecharModal('modalDeletarUsuario')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div style="background: #f8d7da; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #721c24;">
-                    <i class="fas fa-skull-crosswalk"></i> 
-                    <strong>Atenção!</strong> Esta ação é irreversível. Todos os dados do usuário serão permanentemente excluídos.
-                </div>
-                
-                <div id="deletarUsuarioInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
-                    Carregando...
-                </div>
-                
-                <div class="form-group">
-                    <label><i class="fas fa-lock"></i> Senha de Confirmação (4 dígitos)</label>
-                    <input type="password" id="deletarSenha" class="form-control" placeholder="Digite a senha de 4 dígitos" maxlength="4" inputmode="numeric" style="text-align: center; font-size: 20px; letter-spacing: 8px;">
-                    <small style="color: var(--gray);">Senha padrão: 1234</small>
-                </div>
-                
-                <div class="modal-footer">
-                    <button class="btn btn-danger" style="flex:2" onclick="confirmarDeletarUsuario()">
-                        <i class="fas fa-trash-alt"></i> Deletar Permanentemente
-                    </button>
-                    <button class="btn btn-outline" style="flex:1" onclick="fecharModal('modalDeletarUsuario')">
-                        Cancelar
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -941,7 +858,10 @@
                             <i class="fas fa-calendar"></i> Ajustar Dias
                         </button>
                         <button class="tab-btn-edicao" onclick="mudarAbaEdicao('logins')" id="tabLogins">
-                            <i class="fas fa-history"></i> Logins (30 dias)
+                            <i class="fas fa-history"></i> Logins
+                        </button>
+                        <button class="tab-btn-edicao" onclick="mudarAbaEdicao('seguranca')" id="tabSeguranca">
+                            <i class="fas fa-shield-alt"></i> Segurança
                         </button>
                     </div>
 
@@ -1043,15 +963,60 @@
                     <!-- ABA 4: LOGINS (30 DIAS) -->
                     <div id="abaLogins" style="display: none;">
                         <div id="loginsList" style="max-height: 300px; overflow-y: auto;">
-                            Carregando logins...
+                            <p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Carregando logins...</p>
+                        </div>
+                    </div>
+
+                    <!-- ABA 5: SEGURANÇA (DELETAR) -->
+                    <div id="abaSeguranca" style="display: none;">
+                        <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="background: #dc3545; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-exclamation-triangle" style="color: white; font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="color: #721c24; margin: 0 0 5px 0;">Zona de Perigo</h4>
+                                    <p style="color: #721c24; margin: 0; font-size: 13px;">Ações irreversíveis. Cuidado!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border: 1px solid #ffc107; border-radius: 8px; padding: 20px;">
+                            <h4 style="color: var(--dark); margin-bottom: 15px;">Excluir usuário permanentemente</h4>
+                            
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                <p style="margin-bottom: 10px;"><strong>⚠️ Esta ação:</strong></p>
+                                <ul style="margin-left: 20px; color: var(--gray);">
+                                    <li>Remove o usuário do sistema de autenticação</li>
+                                    <li>Apaga todas as assinaturas e histórico</li>
+                                    <li><strong>NÃO pode ser desfeita</strong></li>
+                                </ul>
+                            </div>
+
+                            <div id="deletarInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                                <strong>Email:</strong> <span id="deletarEmail"></span><br>
+                                <strong>ID:</strong> <span id="deletarId"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-lock"></i> Senha de Confirmação (4 dígitos)</label>
+                                <input type="password" id="deletarSenha" class="form-control" placeholder="Digite a senha de 4 dígitos" maxlength="4" inputmode="numeric" style="text-align: center; font-size: 20px; letter-spacing: 8px;">
+                                <small style="color: var(--gray);">Senha padrão: 1234</small>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-danger" onclick="deletarUsuario()" style="flex: 1;">
+                                    <i class="fas fa-trash-alt"></i> Sim, deletar permanentemente
+                                </button>
+                                <button class="btn btn-outline" onclick="fecharModal('modalEdicaoUsuario')" style="flex: 1;">
+                                    Cancelar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer" style="justify-content: space-between;">
-                <button class="btn btn-danger" onclick="deletarUsuario()" style="background: var(--danger);">
-                    <i class="fas fa-trash"></i> Deletar Usuário
-                </button>
+            <div class="modal-footer" style="justify-content: flex-end;">
                 <button class="btn btn-outline" onclick="fecharModal('modalEdicaoUsuario')">
                     Fechar
                 </button>
@@ -1437,7 +1402,9 @@
                 }
 
                 atualizarStatusPorPlano();
-                await carregarLoginsUsuario(userId);
+                
+                // Carregar logins quando abrir
+                carregarLoginsUsuario(userId).catch(console.error);
 
             } catch (error) {
                 console.error('Erro ao carregar dados:', error);
@@ -1460,8 +1427,16 @@
             document.getElementById('abaAssinatura').style.display = 'none';
             document.getElementById('abaDias').style.display = 'none';
             document.getElementById('abaLogins').style.display = 'none';
+            document.getElementById('abaSeguranca').style.display = 'none';
             
             document.getElementById(`aba${aba.charAt(0).toUpperCase() + aba.slice(1)}`).style.display = 'block';
+            
+            // Se for a aba de segurança, preencher os dados
+            if (aba === 'seguranca') {
+                document.getElementById('deletarEmail').textContent = document.getElementById('edicaoEmail').textContent;
+                document.getElementById('deletarId').textContent = usuarioSelecionado;
+                document.getElementById('deletarSenha').value = '';
+            }
         }
 
         // Atualizar status baseado no plano
@@ -1592,16 +1567,34 @@
             try {
                 showToast('Salvando...', 'info');
 
+                const { data: assinaturaAtual } = await supabaseAdmin
+                    .from('assinaturas')
+                    .select('data_expiracao')
+                    .eq('user_id', usuarioSelecionado)
+                    .maybeSingle();
+
                 const novoStatus = plano === 'não definido' ? 'ativo' : status;
+
+                const dadosAssinatura = {
+                    user_id: usuarioSelecionado,
+                    plano: plano,
+                    status: novoStatus,
+                    updated_at: new Date().toISOString()
+                };
+
+                if (!assinaturaAtual) {
+                    const dataExpiracao = new Date();
+                    dataExpiracao.setDate(dataExpiracao.getDate() + 30);
+                    dadosAssinatura.data_expiracao = dataExpiracao.toISOString();
+                    dadosAssinatura.created_at = new Date().toISOString();
+                    dadosAssinatura.mp_status = 'manual';
+                } else {
+                    dadosAssinatura.data_expiracao = assinaturaAtual.data_expiracao;
+                }
 
                 const { error } = await supabaseAdmin
                     .from('assinaturas')
-                    .upsert({
-                        user_id: usuarioSelecionado,
-                        plano: plano,
-                        status: novoStatus,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id' });
+                    .upsert(dadosAssinatura, { onConflict: 'user_id' });
 
                 if (error) throw error;
 
@@ -1621,7 +1614,7 @@
                     .eq('user_id', usuarioSelecionado)
                     .single();
                     
-                if (assinatura) {
+                if (assinatura && assinatura.data_expiracao) {
                     const dias = calcularDiasRestantes(assinatura.data_expiracao);
                     document.getElementById('diasAtuais').textContent = dias;
                     document.getElementById('diasFuturos').textContent = dias;
@@ -1632,7 +1625,7 @@
                 
             } catch (error) {
                 console.error('Erro:', error);
-                showToast('Erro ao salvar assinatura', 'error');
+                showToast('Erro ao salvar assinatura: ' + error.message, 'error');
             }
         }
 
@@ -1675,42 +1668,77 @@
 
         // Carregar logins
         async function carregarLoginsUsuario(userId) {
+            const loginsList = document.getElementById('loginsList');
+            loginsList.innerHTML = '<p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Carregando logins...</p>';
+            
             try {
                 const trintaDiasAtras = new Date();
                 trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
+                const trintaDiasStr = trintaDiasAtras.toISOString();
 
                 const { data: sessions, error } = await supabaseAdmin
-                    .rpc('auth.get_user_sessions', { user_id: userId });
+                    .from('auth.sessions')
+                    .select('created_at')
+                    .eq('user_id', userId)
+                    .gte('created_at', trintaDiasStr)
+                    .order('created_at', { ascending: false });
 
                 if (error) {
                     console.warn('Erro ao buscar sessões:', error);
-                    document.getElementById('loginsList').innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Histórico de login não disponível</p>';
+                    loginsList.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: var(--gray);">
+                            <i class="fas fa-info-circle"></i> 
+                            Histórico de login não disponível. Permissões insuficientes.
+                        </div>
+                    `;
                     return;
                 }
 
-                const loginsList = document.getElementById('loginsList');
-                
                 if (!sessions || sessions.length === 0) {
-                    loginsList.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum login nos últimos 30 dias</p>';
+                    loginsList.innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: var(--gray);">
+                            <i class="fas fa-clock"></i> 
+                            Nenhum login nos últimos 30 dias
+                        </div>
+                    `;
                     return;
                 }
 
-                let html = '';
+                let html = '<div style="padding: 10px;">';
+                html += '<h4 style="margin-bottom: 15px;">Últimos acessos (30 dias)</h4>';
+                
                 sessions.forEach(session => {
-                    const dataLogin = new Date(session.created_at).toLocaleString('pt-BR');
+                    const dataLogin = new Date(session.created_at).toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
                     html += `
-                        <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-sign-in-alt" style="color: var(--success);"></i>
-                            <span>${dataLogin}</span>
+                        <div style="padding: 12px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 32px; height: 32px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-sign-in-alt" style="color: white; font-size: 14px;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">Acesso realizado</div>
+                                <div style="font-size: 12px; color: var(--gray);">${dataLogin}</div>
+                            </div>
                         </div>
                     `;
                 });
-
+                
+                html += '</div>';
                 loginsList.innerHTML = html;
 
             } catch (error) {
                 console.error('Erro ao carregar logins:', error);
-                document.getElementById('loginsList').innerHTML = '<p style="text-align: center; color: var(--danger);">Erro ao carregar logins</p>';
+                loginsList.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Erro ao carregar logins: ${error.message}
+                    </div>
+                `;
             }
         }
 
@@ -1718,9 +1746,9 @@
         async function deletarUsuario() {
             if (!confirm('TEM CERTEZA ABSOLUTA? Esta ação NÃO pode ser desfeita!')) return;
 
-            const senha = prompt('Digite a senha de 4 dígitos para confirmar:');
+            const senha = document.getElementById('deletarSenha').value;
             if (!senha || senha.length !== 4) {
-                showToast('Senha inválida', 'warning');
+                showToast('Digite a senha de 4 dígitos', 'warning');
                 return;
             }
 
