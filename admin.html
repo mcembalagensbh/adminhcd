@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Life - Painel Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+            --light: #ecf0f1;
+            --purple: #9b59b6;
+            --purple-dark: #8e44ad;
+            --free: #3498db;
+        }
+
+        body {
+            background: #f5f7fa;
+            color: var(--dark);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 i {
+            font-size: 1.5em;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-header {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-header:hover {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .stat-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .stat-icon.free {
+            background: var(--free);
+        }
+
+        .stat-info h3 {
+            font-size: 0.9em;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .stat-info .number {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .clear-filter {
+            background: var(--light);
+            color: var(--dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        .clear-filter:hover {
+            background: var(--gray);
+            color: white;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .search-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-ativo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-expirado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-sem_assinatura {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .status-pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-gratis {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .days-badge {
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .days-urgent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .days-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .days-good {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--free);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content.large {
+            max-width: 800px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--light);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .logs-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .log-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--light);
+            display: flex;
+            gap: 15px;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-date {
+            min-width: 160px;
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .log-action {
+            min-width: 120px;
+            font-weight: 600;
+        }
+
+        .log-action.trial_auto { color: var(--primary); }
+        .log-action.expirado_auto { color: var(--danger); }
+        .log-action.proximo_expiracao { color: var(--warning); }
+        .log-action.admin_manual { color: var(--success); }
+        .log-action.pagamento { color: var(--purple); }
+
+        .log-details {
+            color: var(--dark);
+            flex: 1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: var(--gray);
+        }
+
+        .loading i {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 2000;
+            display: none;
+            animation: slideIn 0.3s;
+        }
+
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .email-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .report-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--light);
+        }
+
+        .report-card.total {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .report-card.total .report-value {
+            color: white;
+            font-size: 2.5em;
+        }
+
+        .report-label {
+            font-size: 0.9em;
+            color: var(--gray);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .report-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .report-sub {
+            font-size: 0.8em;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        .report-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .report-table th {
+            background: var(--light);
+            color: var(--dark);
+            padding: 10px;
+        }
+
+        .report-table td {
+            padding: 8px 10px;
+        }
+
+        .report-highlight {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .plan-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            background: var(--purple);
+            color: white;
+        }
+
+        .plan-badge.mensal {
+            background: var(--primary);
+        }
+
+        .plan-badge.anual {
+            background: var(--purple-dark);
+        }
+
+        .plan-badge.gratis {
+            background: var(--free);
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .date-filter input {
+            padding: 8px;
+            border: 1px solid var(--light);
+            border-radius: 6px;
+        }
+
+        .filter-indicator {
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .tab-btn-edicao {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn-edicao:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn-edicao.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-crown"></i>
+                My Life - Painel Administrativo
+            </h1>
+            <div class="header-right">
+                <button class="btn-header" onclick="abrirRelatorioFinanceiro()">
+                    <i class="fas fa-chart-line"></i>
+                    Relatório Financeiro
+                </button>
+                <button class="logout-btn" id="btnLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsContainer">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando estatísticas...</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="mudarAba('usuarios')">
+                <i class="fas fa-users"></i> Usuários
+            </button>
+            <button class="tab-btn" onclick="mudarAba('logs')">
+                <i class="fas fa-history"></i> Logs
+            </button>
+            <button class="tab-btn" onclick="mudarAba('ajuda')">
+                <i class="fas fa-question-circle"></i> Ajuda
+            </button>
+        </div>
+
+        <div id="filtersBar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div id="activeFilter"></div>
+            <button class="clear-filter" onclick="limparFiltro()" id="clearFilterBtn" style="display: none;">
+                <i class="fas fa-times"></i> Limpar filtro
+            </button>
+        </div>
+
+        <div class="search-bar" id="searchBar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar por email ou ID..." onkeyup="filtrarUsuarios()">
+        </div>
+
+        <div id="usuariosTab" class="tab-content">
+            <div class="table-container">
+                <table id="tabelaUsuarios">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Expiração</th>
+                            <th>Dias Restantes</th>
+                            <th>Plano</th>
+                            <th>Último Login</th>
+                            <th>Telefone</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usuariosBody">
+                        <tr>
+                            <td colspan="8" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i> Carregando usuários...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="logsTab" class="tab-content" style="display: none;">
+            <div class="logs-container" id="logsContainer">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando logs...</div>
+            </div>
+        </div>
+
+        <div id="ajudaTab" class="tab-content" style="display: none;">
+            <div style="background: white; padding: 30px; border-radius: 12px;">
+                <h2 style="color: var(--primary-dark); margin-bottom: 20px;">
+                    <i class="fas fa-question-circle"></i> Manual do Administrador
+                </h2>
+                
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: var(--primary); margin-bottom: 10px;">
+                        <i class="fas fa-user-cog"></i> Gerenciar Usuários
+                    </h3>
+                    <p>Para cada usuário, clique no botão <strong>EDITAR</strong> para acessar todas as opções:</p>
+                    <ul style="margin-left: 30px; margin-top: 10px;">
+                        <li><strong>📋 Dados Pessoais:</strong> Editar nome e telefone</li>
+                        <li><strong>👑 Assinatura:</strong> Alterar plano e status</li>
+                        <li><strong>📅 Ajustar Dias:</strong> Adicionar ou subtrair dias (valores negativos)</li>
+                        <li><strong>🕒 Logins:</strong> Ver histórico de acesso dos últimos 30 dias</li>
+                        <li><strong>🔒 Segurança:</strong> Excluir permanentemente o usuário</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: var(--primary); margin-bottom: 10px;">
+                        <i class="fas fa-paint-brush"></i> Regras de Status
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div><span class="status-badge status-ativo">Ativo</span> - Assinatura válida (planos pagos)</div>
+                        <div><span class="status-badge status-gratis">Grátis</span> - Período grátis ativo (plano não definido)</div>
+                        <div><span class="status-badge status-expirado">Expirado</span> - Assinatura vencida</div>
+                        <div><span class="status-badge status-pendente">Próximo</span> - Expira em até 7 dias</div>
+                        <div><span class="status-badge status-sem_assinatura">Sem assinatura</span> - Nunca assinou</div>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: var(--gray);">
+                        <i class="fas fa-info-circle"></i> Quando o plano é "Grátis", o status é automático. Para planos pagos, você escolhe entre Ativo/Inativo.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: var(--primary); margin-bottom: 10px;">
+                        <i class="fas fa-chart-line"></i> Relatório Financeiro
+                    </h3>
+                    <p>O botão "Relatório Financeiro" no cabeçalho mostra:</p>
+                    <ul style="margin-left: 30px; margin-top: 10px;">
+                        <li><strong>Total arrecadado</strong> - Valor total de todas as assinaturas</li>
+                        <li><strong>Média mensal</strong> - Valor médio por mês</li>
+                        <li><strong>Assinaturas ativas</strong> - Quantidade de planos mensais/anuais</li>
+                        <li><strong>Detalhamento por plano</strong> - Mensal vs Anual</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Relatório Financeiro -->
+    <div class="modal-overlay" id="modalRelatorioFinanceiro">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-line"></i> Relatório Financeiro</h2>
+                <button class="close-modal" onclick="fecharModal('modalRelatorioFinanceiro')">&times;</button>
+            </div>
+            <div class="modal-body" id="relatorioContent">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando dados financeiros...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO MODAL DE EDIÇÃO UNIFICADO -->
+    <div class="modal-overlay" id="modalEdicaoUsuario">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-user-edit"></i> Editar Usuário</h2>
+                <button class="close-modal" onclick="fecharModal('modalEdicaoUsuario')">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div id="edicaoLoading" class="loading" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando...
+                </div>
+                
+                <div id="edicaoConteudo" style="display: block;">
+                    <!-- Cabeçalho com informações básicas -->
+                    <div style="background: linear-gradient(135deg, #667eea20, #764ba220); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-user" style="font-size: 24px;"></i>
+                            </div>
+                            <div>
+                                <h3 id="edicaoEmail" style="margin: 0; color: var(--dark);"></h3>
+                                <p id="edicaoUserId" style="margin: 5px 0 0 0; font-size: 11px; color: var(--gray);"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Abas -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--light); flex-wrap: wrap;">
+                        <button class="tab-btn-edicao active" onclick="mudarAbaEdicao('dados')" id="tabDados">
+                            <i class="fas fa-user"></i> Dados
+                        </button>
+                        <button class="tab-btn-edicao" onclick="mudarAbaEdicao('assinatura')" id="tabAssinatura">
+                            <i class="fas fa-crown"></i> Assinatura
+                        </button>
+                        <button class="tab-btn-edicao" onclick="mudarAbaEdicao('dias')" id="tabDias">
+                            <i class="fas fa-calendar"></i> Ajustar Dias
+                        </button>
+                        <button class="tab-btn-edicao" onclick="mudarAbaEdicao('logins')" id="tabLogins">
+                            <i class="fas fa-history"></i> Logins
+                        </button>
+                        <button class="tab-btn-edicao" onclick="mudarAbaEdicao('seguranca')" id="tabSeguranca">
+                            <i class="fas fa-shield-alt"></i> Segurança
+                        </button>
+                    </div>
+
+                    <!-- ABA 1: DADOS PESSOAIS -->
+                    <div id="abaDados" style="display: block;">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Nome Completo</label>
+                            <input type="text" id="editNome" class="form-control" placeholder="Nome do usuário">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Telefone</label>
+                            <input type="text" id="editTelefone" class="form-control" placeholder="(31) 99999-9999" maxlength="15">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" id="editEmail" class="form-control" disabled style="background: #f5f5f5;">
+                            <small style="color: var(--gray);">Email não pode ser alterado</small>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="salvarDadosPessoais()" style="width: 100%;">
+                                <i class="fas fa-save"></i> Salvar Dados Pessoais
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ABA 2: ASSINATURA -->
+                    <div id="abaAssinatura" style="display: none;">
+                        <div style="background: #e8f4fd; border-left: 4px solid #3498db; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                            <i class="fas fa-info-circle" style="color: #3498db;"></i>
+                            <strong>Regra:</strong> Plano "Grátis" = status automático. Planos pagos você escolhe Ativo/Inativo.
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> Plano</label>
+                            <select id="editPlano" class="form-control" onchange="atualizarStatusPorPlano()">
+                                <option value="não definido">Grátis</option>
+                                <option value="mensal">Mensal</option>
+                                <option value="anual">Anual</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-check-circle"></i> Status</label>
+                            <select id="editStatus" class="form-control">
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                            </select>
+                            <small id="statusHelp" style="color: var(--gray);"></small>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-success" onclick="salvarAssinatura()" style="flex: 2;">
+                                <i class="fas fa-save"></i> Salvar Assinatura
+                            </button>
+                            <button class="btn btn-danger" onclick="cancelarAssinatura()" style="flex: 1;">
+                                <i class="fas fa-ban"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ABA 3: AJUSTAR DIAS -->
+                    <div id="abaDias" style="display: none;">
+                        <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                            <i class="fas fa-exclamation-triangle" style="color: #856404;"></i>
+                            <strong>Use valores NEGATIVOS para diminuir os dias.</strong>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; flex: 1; text-align: center;">
+                                <span style="color: var(--gray);">Dias atuais</span>
+                                <div style="font-size: 2em; font-weight: 700;" id="diasAtuais">0</div>
+                            </div>
+                            <i class="fas fa-arrow-right" style="color: var(--gray); font-size: 1.5em;"></i>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; flex: 1; text-align: center;">
+                                <span style="color: var(--gray);">Após ajuste</span>
+                                <div style="font-size: 2em; font-weight: 700;" id="diasFuturos">0</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-sort-numeric-up-alt"></i> Ajuste (pode ser negativo)</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="ajusteDias" class="form-control" value="30" min="-365" max="365" step="1" onchange="calcularDiasFuturos()" onkeyup="calcularDiasFuturos()" style="flex: 3;">
+                                <button class="btn btn-primary" onclick="adicionarAjusteDias()" style="flex: 1;">
+                                    <i class="fas fa-check"></i> Aplicar
+                                </button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 5px; flex-wrap: wrap;">
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(-30)">-30</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(-7)">-7</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(-1)">-1</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(1)">+1</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(7)">+7</button>
+                            <button class="btn btn-sm btn-outline" onclick="ajusteRapido(30)">+30</button>
+                        </div>
+                    </div>
+
+                    <!-- ABA 4: LOGINS (30 DIAS) -->
+                    <div id="abaLogins" style="display: none;">
+                        <div id="loginsList" style="max-height: 300px; overflow-y: auto;">
+                            <p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Carregando logins...</p>
+                        </div>
+                    </div>
+
+                    <!-- ABA 5: SEGURANÇA (DELETAR) -->
+                    <div id="abaSeguranca" style="display: none;">
+                        <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="background: #dc3545; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-exclamation-triangle" style="color: white; font-size: 24px;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="color: #721c24; margin: 0 0 5px 0;">Zona de Perigo</h4>
+                                    <p style="color: #721c24; margin: 0; font-size: 13px;">Ações irreversíveis. Cuidado!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background: white; border: 1px solid #ffc107; border-radius: 8px; padding: 20px;">
+                            <h4 style="color: var(--dark); margin-bottom: 15px;">Excluir usuário permanentemente</h4>
+                            
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                <p style="margin-bottom: 10px;"><strong>⚠️ Esta ação:</strong></p>
+                                <ul style="margin-left: 20px; color: var(--gray);">
+                                    <li>Remove o usuário do sistema de autenticação</li>
+                                    <li>Apaga todas as assinaturas e histórico</li>
+                                    <li><strong>NÃO pode ser desfeita</strong></li>
+                                </ul>
+                            </div>
+
+                            <div id="deletarInfo" style="background: var(--light); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                                <strong>Email:</strong> <span id="deletarEmail"></span><br>
+                                <strong>ID:</strong> <span id="deletarId"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fas fa-lock"></i> Senha de Confirmação (4 dígitos)</label>
+                                <input type="password" id="deletarSenha" class="form-control" placeholder="Digite a senha de 4 dígitos" maxlength="4" inputmode="numeric" style="text-align: center; font-size: 20px; letter-spacing: 8px;">
+                                <small style="color: var(--gray);">Senha padrão: 1234</small>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-danger" onclick="deletarUsuario()" style="flex: 1;">
+                                    <i class="fas fa-trash-alt"></i> Sim, deletar permanentemente
+                                </button>
+                                <button class="btn btn-outline" onclick="fecharModal('modalEdicaoUsuario')" style="flex: 1;">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="fecharModal('modalEdicaoUsuario')">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const SUPABASE_URL = 'https://rirvrrlgjetsgwhqqfvq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NDM2MzgsImV4cCI6MjA4NjIxOTYzOH0.1T5eQnQXMCRqOSxtYFIHMedAF_D0Jo4Mg36LZHLJ2ds';
+        const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcnZycmxnamV0c2d3aHFxZnZxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDY0MzYzOCwiZXhwIjoyMDg2MjE5NjM4fQ.o8A42E0Zr3HZw0_qb4s-qA95MatoKCvrpFuAqW31Xqc';
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseAdmin = window.supabase.createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+        
+        let usuariosData = [];
+        let usuarioSelecionado = null;
+        let usuarioEditando = null;
+        let filtroAtivo = 'todos';
+
+        // Verificar autenticação
+        function verificarAutenticacao() {
+            const autenticado = sessionStorage.getItem('admin_autenticado');
+            if (!autenticado) {
+                window.location.href = 'admin_login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Calcular dias restantes
+        function calcularDiasRestantes(dataExpiracao) {
+            if (!dataExpiracao) return 0;
+            
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            
+            const expiracao = new Date(dataExpiracao);
+            expiracao.setHours(0, 0, 0, 0);
+            
+            const diffTime = expiracao - hoje;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays;
+        }
+
+        // Formatar data
+        function formatarDataBR(data) {
+            if (!data) return '-';
+            const d = new Date(data);
+            const dataBrasilia = new Date(d.getTime() - (3 * 60 * 60 * 1000));
+            return dataBrasilia.toLocaleString('pt-BR');
+        }
+
+        // Determinar status do usuário
+        function determinarStatus(user) {
+    const dias = calcularDiasRestantes(user.data_expiracao);
+    const plano = user.plano || 'não definido';
+    
+    // Se tem data de expiração e ainda está válida
+    if (user.data_expiracao && dias > 0) {
+        if (plano === 'não definido') {
+            return { class: 'status-gratis', text: 'Teste (' + dias + 'd)' };
+        } else if (plano === 'mensal') {
+            return { class: 'status-ativo', text: 'Mensal' };
+        } else if (plano === 'anual') {
+            return { class: 'status-ativo', text: 'Anual' };
+        }
+    }
+    
+    // Se expirou
+    if (user.data_expiracao && dias <= 0) {
+        return { class: 'status-expirado', text: 'Expirado' };
+    }
+    
+    // Sem assinatura
+    return { class: 'status-sem_assinatura', text: 'Sem assinatura' };
+}
+
+        // Carregar estatísticas
+       async function carregarEstatisticas() {
+    try {
+        const { data: usuarios, error } = await supabaseAdmin
+            .rpc('admin_listar_usuarios');
+        
+        if (error) throw error;
+        
+        const stats = {
+            total: usuarios?.length || 0,
+            ativos: 0,
+            teste: 0,
+            expiram7dias: 0,
+            expirados: 0
+        };
+
+        usuarios?.forEach(user => {
+            const dias = calcularDiasRestantes(user.data_expiracao);
+            const plano = user.plano || 'não definido';
+            
+            if (user.data_expiracao && dias > 0) {
+                if (plano === 'mensal' || plano === 'anual') {
+                    stats.ativos++;
+                } else if (plano === 'não definido') {
+                    stats.teste++;
+                }
+            } else if (user.data_expiracao && dias > 0 && dias <= 7) {
+                stats.expiram7dias++;
+            } else if (user.data_expiracao && dias <= 0) {
+                stats.expirados++;
+            }
+        });
+
+        const container = document.getElementById('statsContainer');
+        
+        container.innerHTML = `
+            <div class="stat-card ${filtroAtivo === 'todos' ? 'active' : ''}" onclick="aplicarFiltro('todos')">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-info">
+                    <h3>Total Usuários</h3>
+                    <div class="number">${stats.total}</div>
+                </div>
+            </div>
+            <div class="stat-card ${filtroAtivo === 'ativos' ? 'active' : ''}" onclick="aplicarFiltro('ativos')">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info">
+                    <h3>Premium (Mensal/Anual)</h3>
+                    <div class="number">${stats.ativos}</div>
+                </div>
+            </div>
+            <div class="stat-card ${filtroAtivo === 'teste' ? 'active' : ''}" onclick="aplicarFiltro('teste')">
+                <div class="stat-icon free"><i class="fas fa-gift"></i></div>
+                <div class="stat-info">
+                    <h3>Período de Teste</h3>
+                    <div class="number">${stats.teste}</div>
+                </div>
+            </div>
+            <div class="stat-card ${filtroAtivo === 'expiram7dias' ? 'active' : ''}" onclick="aplicarFiltro('expiram7dias')">
+                <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="stat-info">
+                    <h3>Expirando em 7 dias</h3>
+                    <div class="number">${stats.expiram7dias}</div>
+                </div>
+            </div>
+            <div class="stat-card ${filtroAtivo === 'expirados' ? 'active' : ''}" onclick="aplicarFiltro('expirados')">
+                <div class="stat-icon"><i class="fas fa-calendar-times"></i></div>
+                <div class="stat-info">
+                    <h3>Expirados</h3>
+                    <div class="number">${stats.expirados}</div>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Erro ao carregar estatísticas:', error);
+    }
+}
+
+        // Carregar usuários
+        async function carregarUsuarios() {
+            try {
+                const { data, error } = await supabaseAdmin
+                    .rpc('admin_listar_usuarios');
+                
+                if (error) throw error;
+                
+                usuariosData = data || [];
+                
+                usuariosData = usuariosData.map(user => ({
+                    ...user,
+                    dias_restantes: calcularDiasRestantes(user.data_expiracao),
+                    status_info: determinarStatus(user)
+                }));
+                
+                aplicarFiltro(filtroAtivo);
+            } catch (error) {
+                console.error('Erro ao carregar usuários:', error);
+                document.getElementById('usuariosBody').innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--danger); padding: 30px;">
+                            <i class="fas fa-exclamation-triangle"></i> Erro ao carregar usuários
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Aplicar filtro
+        function aplicarFiltro(tipo) {
+            filtroAtivo = tipo;
+            
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            const clearBtn = document.getElementById('clearFilterBtn');
+            const activeFilter = document.getElementById('activeFilter');
+            
+            if (tipo !== 'todos') {
+                clearBtn.style.display = 'inline-flex';
+                let nomeFiltro = '';
+                switch(tipo) {
+                    case 'ativos': nomeFiltro = 'Ativos'; break;
+                    case 'gratis': nomeFiltro = 'Grátis'; break;
+                    case 'expiram7dias': nomeFiltro = 'Expirando em 7 dias'; break;
+                    case 'expirados': nomeFiltro = 'Expirados'; break;
+                }
+                activeFilter.innerHTML = `<span class="filter-indicator"><i class="fas fa-filter"></i> Filtrando: ${nomeFiltro}</span>`;
+            } else {
+                clearBtn.style.display = 'none';
+                activeFilter.innerHTML = '';
+            }
+            
+            filtrarUsuarios();
+        }
+
+        // Limpar filtro
+        function limparFiltro() {
+            aplicarFiltro('todos');
+        }
+
+        // Filtrar usuários
+        function filtrarUsuarios() {
+    const termo = document.getElementById('searchInput').value.toLowerCase();
+    
+    let filtrados = usuariosData;
+    
+    if (filtroAtivo !== 'todos') {
+        filtrados = filtrados.filter(user => {
+            const dias = calcularDiasRestantes(user.data_expiracao);
+            const plano = user.plano || 'não definido';
+            
+            switch(filtroAtivo) {
+                case 'ativos':
+                    return user.data_expiracao && dias > 0 && (plano === 'mensal' || plano === 'anual');
+                case 'teste':
+                    return user.data_expiracao && dias > 0 && plano === 'não definido';
+                case 'expiram7dias':
+                    return user.data_expiracao && dias > 0 && dias <= 7;
+                case 'expirados':
+                    return !user.data_expiracao || dias <= 0;
+                default:
+                    return true;
+            }
+        });
+    }
+    
+    if (termo) {
+        filtrados = filtrados.filter(user => 
+            user.email.toLowerCase().includes(termo) || 
+            (user.user_id && user.user_id.toLowerCase().includes(termo))
+        );
+    }
+    
+    renderizarTabelaUsuarios(filtrados);
+}
+
+        // Renderizar tabela
+        function renderizarTabelaUsuarios(usuarios) {
+            const tbody = document.getElementById('usuariosBody');
+            
+            if (usuarios.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 30px;">
+                            <i class="fas fa-search"></i> Nenhum usuário encontrado
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            usuarios.forEach(user => {
+                const telefone = user.raw_user_meta_data?.phone || 'Não informado';
+                
+                const dias = user.dias_restantes;
+                const statusInfo = user.status_info || determinarStatus(user);
+                
+                let diasClass = '';
+                if (dias <= 0) diasClass = 'days-urgent';
+                else if (dias <= 7) diasClass = 'days-warning';
+                else diasClass = 'days-good';
+
+                const dataExpiracao = user.data_expiracao ? 
+                    new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
+                
+                const ultimoLogin = user.ultimo_login ? 
+                    new Date(user.ultimo_login).toLocaleString('pt-BR') : 'Nunca';
+
+                const plano = user.plano || 'não definido';
+                let planoClass = 'plan-badge';
+                if (plano === 'mensal') planoClass += ' mensal';
+                else if (plano === 'anual') planoClass += ' anual';
+                else planoClass += ' gratis';
+
+                html += `
+                    <tr>
+                        <td class="email-cell" title="${user.email}">
+                            <i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>
+                            ${user.email}
+                        </td>
+                        <td>
+                            <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
+                        </td>
+                        <td>${dataExpiracao}</td>
+                        <td>
+                            <span class="days-badge ${diasClass}">${dias} dias</span>
+                        </td>
+                        <td>
+                            <span class="${planoClass}">${plano}</span>
+                        </td>
+                        <td><small>${ultimoLogin}</small></td>
+                        <td><small>${telefone}</small></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-primary" onclick="abrirModalEdicao('${user.user_id}', '${user.email}')" title="Editar usuário">
+                                    <i class="fas fa-edit"></i> EDITAR
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // ========== FUNÇÕES DO MODAL DE EDIÇÃO ==========
+
+        // Abrir modal de edição
+      // Abrir modal de edição (CORRIGIDO)
+async function abrirModalEdicao(userId, email) {
+    usuarioSelecionado = userId;
+    document.getElementById('edicaoConteudo').style.display = 'none';
+    document.getElementById('edicaoLoading').style.display = 'block';
+    document.getElementById('modalEdicaoUsuario').style.display = 'flex';
+    
+    try {
+        // Buscar dados do usuário via Edge Function
+        const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/get-user-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({ userId: userId })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Erro ao carregar dados');
+        }
+
+        usuarioEditando = {
+            id: userId,
+            email: data.user.email,
+            nome: data.user.nome || '',
+            phone: data.user.phone || '',
+            assinatura: data.assinatura || null
+        };
+
+        document.getElementById('edicaoEmail').textContent = data.user.email;
+        document.getElementById('edicaoUserId').textContent = userId;
+        document.getElementById('editNome').value = usuarioEditando.nome;
+        document.getElementById('editTelefone').value = usuarioEditando.phone;
+        document.getElementById('editEmail').value = data.user.email;
+
+        if (data.assinatura) {
+            document.getElementById('editPlano').value = data.assinatura.plano || 'não definido';
+            document.getElementById('editStatus').value = data.assinatura.status === 'ativo' ? 'ativo' : 'inativo';
+            
+            const dias = calcularDiasRestantes(data.assinatura.data_expiracao);
+            document.getElementById('diasAtuais').textContent = dias;
+            document.getElementById('diasFuturos').textContent = dias;
+        } else {
+            document.getElementById('editPlano').value = 'não definido';
+            document.getElementById('editStatus').value = 'ativo';
+            document.getElementById('diasAtuais').textContent = '0';
+            document.getElementById('diasFuturos').textContent = '0';
+        }
+
+        atualizarStatusPorPlano();
+        
+        // Carregar logins
+        carregarLoginsUsuario(userId);
+
+    } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        showToast('Erro ao carregar dados do usuário: ' + error.message, 'error');
+    } finally {
+        document.getElementById('edicaoLoading').style.display = 'none';
+        document.getElementById('edicaoConteudo').style.display = 'block';
+    }
+}
+
+        // Mudar abas
+        function mudarAbaEdicao(aba) {
+            document.querySelectorAll('.tab-btn-edicao').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(`tab${aba.charAt(0).toUpperCase() + aba.slice(1)}`).classList.add('active');
+            
+            document.getElementById('abaDados').style.display = 'none';
+            document.getElementById('abaAssinatura').style.display = 'none';
+            document.getElementById('abaDias').style.display = 'none';
+            document.getElementById('abaLogins').style.display = 'none';
+            document.getElementById('abaSeguranca').style.display = 'none';
+            
+            document.getElementById(`aba${aba.charAt(0).toUpperCase() + aba.slice(1)}`).style.display = 'block';
+            
+            // Se for a aba de segurança, preencher os dados
+            if (aba === 'seguranca') {
+                document.getElementById('deletarEmail').textContent = document.getElementById('edicaoEmail').textContent;
+                document.getElementById('deletarId').textContent = usuarioSelecionado;
+                document.getElementById('deletarSenha').value = '';
+            }
+        }
+
+        // Atualizar status baseado no plano
+        function atualizarStatusPorPlano() {
+    const plano = document.getElementById('editPlano').value;
+    const statusSelect = document.getElementById('editStatus');
+    const statusHelp = document.getElementById('statusHelp');
+    
+    if (plano === 'não definido') {
+        statusSelect.disabled = true;
+        statusHelp.innerHTML = 'Plano Grátis/Teste - status automático: Ativo';
+    } else {
+        statusSelect.disabled = false;
+        statusHelp.innerHTML = 'Escolha o status para planos pagos (Ativo/Inativo)';
+    }
+}
+
+        // Calcular dias futuros
+        function calcularDiasFuturos() {
+            const diasAtuais = parseInt(document.getElementById('diasAtuais').textContent) || 0;
+            const ajuste = parseInt(document.getElementById('ajusteDias').value) || 0;
+            document.getElementById('diasFuturos').textContent = diasAtuais + ajuste;
+        }
+
+        // Ajuste rápido
+        function ajusteRapido(valor) {
+            document.getElementById('ajusteDias').value = valor;
+            calcularDiasFuturos();
+        }
+
+        // Aplicar ajuste de dias
+        async function adicionarAjusteDias() {
+            const ajuste = parseInt(document.getElementById('ajusteDias').value);
+            if (ajuste === 0) {
+                showToast('Digite um valor diferente de zero', 'warning');
+                return;
+            }
+
+            try {
+                showToast('Processando...', 'info');
+                
+                const { data, error } = await supabaseAdmin
+                    .rpc('admin_atualizar_assinatura', {
+                        p_user_id: usuarioSelecionado,
+                        p_dias: ajuste,
+                        p_status: document.getElementById('editStatus').value
+                    });
+
+                if (error) throw error;
+
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: usuarioSelecionado,
+                        acao: 'admin_manual',
+                        detalhes: `Admin ajustou ${ajuste} dias`
+                    });
+
+                showToast(`✅ Dias ajustados!`, 'success');
+                
+                const { data: assinatura } = await supabaseAdmin
+                    .from('assinaturas')
+                    .select('data_expiracao')
+                    .eq('user_id', usuarioSelecionado)
+                    .single();
+                    
+                const novosDias = calcularDiasRestantes(assinatura?.data_expiracao);
+                document.getElementById('diasAtuais').textContent = novosDias;
+                document.getElementById('diasFuturos').textContent = novosDias;
+                document.getElementById('ajusteDias').value = 30;
+                
+                await carregarUsuarios();
+                await carregarEstatisticas();
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao ajustar dias', 'error');
+            }
+        }
+
+        // Salvar dados pessoais
+        async function salvarDadosPessoais() {
+            const nome = document.getElementById('editNome').value.trim();
+            const phone = document.getElementById('editTelefone').value.trim();
+
+            if (!nome) {
+                showToast('Nome é obrigatório', 'warning');
+                return;
+            }
+
+            try {
+                showToast('Salvando...', 'info');
+
+                const { error } = await supabaseAdmin.auth.admin.updateUserById(
+                    usuarioSelecionado,
+                    {
+                        user_metadata: {
+                            nome: nome,
+                            phone: phone
+                        }
+                    }
+                );
+
+                if (error) throw error;
+
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: usuarioSelecionado,
+                        acao: 'admin_manual',
+                        detalhes: `Admin atualizou dados: Nome: ${nome}, Tel: ${phone}`
+                    });
+
+                showToast('✅ Dados atualizados!', 'success');
+                await carregarUsuarios();
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao salvar dados', 'error');
+            }
+        }
+
+        // Salvar assinatura
+        async function salvarAssinatura() {
+    const plano = document.getElementById('editPlano').value;
+    const status = document.getElementById('editStatus').value;
+
+    try {
+        showToast('Salvando...', 'info');
+
+        const { data: assinaturaAtual } = await supabaseAdmin
+            .from('assinaturas')
+            .select('data_expiracao')
+            .eq('user_id', usuarioSelecionado)
+            .maybeSingle();
+
+        // Mapear plano para o formato correto
+        let planoSalvar = plano;
+        if (plano === 'não definido') planoSalvar = 'gratis';
+        
+        // Status sempre será 'ativo' para planos gratuitos/teste
+        const novoStatus = (plano === 'não definido') ? 'ativo' : status;
+
+        const dadosAssinatura = {
+            user_id: usuarioSelecionado,
+            plano: planoSalvar,
+            status: novoStatus,
+            updated_at: new Date().toISOString()
+        };
+
+        if (!assinaturaAtual) {
+            const dataExpiracao = new Date();
+            if (plano === 'mensal') dataExpiracao.setMonth(dataExpiracao.getMonth() + 1);
+            else if (plano === 'anual') dataExpiracao.setFullYear(dataExpiracao.getFullYear() + 1);
+            else if (plano === 'não definido') dataExpiracao.setDate(dataExpiracao.getDate() + 30);
+            else dataExpiracao.setDate(dataExpiracao.getDate() + 30);
+            
+            dadosAssinatura.data_expiracao = dataExpiracao.toISOString();
+            dadosAssinatura.created_at = new Date().toISOString();
+            dadosAssinatura.mp_status = 'manual';
+        } else {
+            dadosAssinatura.data_expiracao = assinaturaAtual.data_expiracao;
+        }
+
+        const { error } = await supabaseAdmin
+            .from('assinaturas')
+            .upsert(dadosAssinatura, { onConflict: 'user_id' });
+
+        if (error) throw error;
+
+        await supabaseAdmin
+            .from('log_assinaturas')
+            .insert({
+                user_id: usuarioSelecionado,
+                acao: 'admin_manual',
+                detalhes: `Admin alterou plano para ${planoSalvar}, status: ${novoStatus}`
+            });
+
+        showToast('✅ Assinatura atualizada!', 'success');
+        
+        const { data: assinatura } = await supabaseAdmin
+            .from('assinaturas')
+            .select('*')
+            .eq('user_id', usuarioSelecionado)
+            .single();
+            
+        if (assinatura && assinatura.data_expiracao) {
+            const dias = calcularDiasRestantes(assinatura.data_expiracao);
+            document.getElementById('diasAtuais').textContent = dias;
+            document.getElementById('diasFuturos').textContent = dias;
+        }
+        
+        await carregarUsuarios();
+        await carregarEstatisticas();
+        
+    } catch (error) {
+        console.error('Erro:', error);
+        showToast('Erro ao salvar assinatura: ' + error.message, 'error');
+    }
+}
+
+        // Cancelar assinatura
+        async function cancelarAssinatura() {
+            if (!confirm('Tem certeza que deseja CANCELAR esta assinatura?')) return;
+
+            try {
+                showToast('Processando...', 'info');
+
+                const { error } = await supabaseAdmin
+                    .from('assinaturas')
+                    .update({
+                        status: 'inativo',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('user_id', usuarioSelecionado);
+
+                if (error) throw error;
+
+                await supabaseAdmin
+                    .from('log_assinaturas')
+                    .insert({
+                        user_id: usuarioSelecionado,
+                        acao: 'admin_manual',
+                        detalhes: `Admin cancelou assinatura`
+                    });
+
+                showToast('✅ Assinatura cancelada!', 'success');
+                
+                document.getElementById('editStatus').value = 'inativo';
+                await carregarUsuarios();
+                await carregarEstatisticas();
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao cancelar', 'error');
+            }
+        }
+
+        // Carregar logins
+       // Carregar contagem de logins (últimos 30 dias)
+// Carregar contagem de logins (últimos 30 dias)
+// Carregar informações de login (usando dados já carregados)
+async function carregarLoginsUsuario(userId) {
+    const loginsList = document.getElementById('loginsList');
+    loginsList.innerHTML = '<p style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Verificando...</p>';
+    
+    try {
+        // Buscar usuário diretamente da tabela auth.users via Edge Function (já temos get-user-data)
+        const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/get-user-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({ userId: userId })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Erro ao buscar dados');
+        }
+
+        const ultimoLogin = data.user.last_sign_in_at 
+            ? new Date(data.user.last_sign_in_at).toLocaleString('pt-BR') 
+            : 'Nunca acessou';
+
+        const dataCriacao = new Date(data.user.created_at).toLocaleString('pt-BR');
+
+        let html = `
+            <div style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-clock" style="color: white; font-size: 24px;"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0;">Histórico de Acesso</h3>
+                        <p style="color: var(--gray); margin: 5px 0 0 0;">Informações de login</p>
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: 600; color: var(--dark);">
+                            <i class="fas fa-calendar-check" style="color: var(--success); margin-right: 10px;"></i>
+                            Data de cadastro
+                        </div>
+                        <div>${dataCriacao}</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+                        <div style="font-weight: 600; color: var(--dark);">
+                            <i class="fas fa-sign-in-alt" style="color: var(--primary); margin-right: 10px;"></i>
+                            Último acesso
+                        </div>
+                        <div style="font-weight: 600; color: ${ultimoLogin === 'Nunca acessou' ? 'var(--danger)' : 'var(--dark)'};">
+                            ${ultimoLogin}
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; background: #e8f4fd; border-left: 4px solid #3498db; padding: 15px; border-radius: 6px;">
+                    <i class="fas fa-info-circle" style="color: #3498db; margin-right: 8px;"></i>
+                    <span>O histórico detalhado de múltiplos logins não está disponível, mas você pode ver o último acesso acima.</span>
+                </div>
+            </div>
+        `;
+
+        loginsList.innerHTML = html;
+
+    } catch (error) {
+        console.error('Erro ao carregar informações de login:', error);
+        loginsList.innerHTML = `
+            <div style="padding: 20px; text-align: center; color: var(--danger);">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2em; margin-bottom: 10px;"></i>
+                <p>Erro ao carregar dados de acesso</p>
+                <p style="font-size: 12px;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+        // Deletar usuário
+        async function deletarUsuario() {
+            if (!confirm('TEM CERTEZA ABSOLUTA? Esta ação NÃO pode ser desfeita!')) return;
+
+            const senha = document.getElementById('deletarSenha').value;
+            if (!senha || senha.length !== 4) {
+                showToast('Digite a senha de 4 dígitos', 'warning');
+                return;
+            }
+
+            try {
+                showToast('Deletando usuário...', 'info');
+
+                const response = await fetch('https://rirvrrlgjetsgwhqqfvq.supabase.co/functions/v1/delete-user', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({
+                        userId: usuarioSelecionado,
+                        senha: senha
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('✅ Usuário deletado com sucesso!', 'success');
+                    fecharModal('modalEdicaoUsuario');
+                    await carregarUsuarios();
+                    await carregarEstatisticas();
+                } else {
+                    showToast('Erro: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('Erro ao deletar usuário: ' + error.message, 'error');
+            }
+        }
+
+        // Abrir relatório financeiro
+        async function abrirRelatorioFinanceiro() {
+            document.getElementById('modalRelatorioFinanceiro').style.display = 'flex';
+            await carregarRelatorioFinanceiro();
+        }
+
+        // Carregar relatório financeiro
+        async function carregarRelatorioFinanceiro() {
+            try {
+                const { data: assinaturas, error: assError } = await supabaseAdmin
+                    .from('assinaturas')
+                    .select('*');
+
+                if (assError) throw assError;
+
+                const hoje = new Date();
+                hoje.setHours(0, 0, 0, 0);
+                
+                const ativosMensal = (assinaturas || []).filter(a => {
+                    if (!a.data_expiracao || a.status !== 'ativo') return false;
+                    const expiracao = new Date(a.data_expiracao);
+                    expiracao.setHours(0, 0, 0, 0);
+                    return expiracao >= hoje && a.plano === 'mensal';
+                }).length;
+
+                const ativosAnual = (assinaturas || []).filter(a => {
+                    if (!a.data_expiracao || a.status !== 'ativo') return false;
+                    const expiracao = new Date(a.data_expiracao);
+                    expiracao.setHours(0, 0, 0, 0);
+                    return expiracao >= hoje && a.plano === 'anual';
+                }).length;
+
+                const content = document.getElementById('relatorioContent');
+                content.innerHTML = `
+                    <div class="report-grid">
+                        <div class="report-card total">
+                            <div class="report-label">
+                                <i class="fas fa-users"></i> Assinaturas Ativas
+                            </div>
+                            <div class="report-value">${ativosMensal + ativosAnual}</div>
+                            <div class="report-sub">
+                                <span class="plan-badge mensal">Mensal: ${ativosMensal}</span>
+                                <span class="plan-badge anual">Anual: ${ativosAnual}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-label">
+                                <i class="fas fa-calendar-alt"></i> Total Usuários
+                            </div>
+                            <div class="report-value">${usuariosData.length}</div>
+                            <div class="report-sub">Todos os cadastros</div>
+                        </div>
+                        
+                        <div class="report-card">
+                            <div class="report-label">
+                                <i class="fas fa-chart-line"></i> Receita Mensal
+                            </div>
+                            <div class="report-value">R$ ${(ativosMensal * 17.90).toFixed(2)}</div>
+                            <div class="report-sub">Apenas planos ativos</div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Erro ao carregar relatório:', error);
+                document.getElementById('relatorioContent').innerHTML = `
+                    <p style="text-align: center; color: var(--danger); padding: 20px;">
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados financeiros
+                    </p>
+                `;
+            }
+        }
+
+        // Carregar logs gerais
+        async function carregarLogsGerais() {
+            try {
+                const { data, error } = await supabaseAdmin
+                    .from('log_assinaturas')
+                    .select('*')
+                    .order('data_verificacao', { ascending: false })
+                    .limit(100);
+
+                if (error) throw error;
+
+                const container = document.getElementById('logsContainer');
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--gray); padding: 20px;">Nenhum log encontrado</p>';
+                    return;
+                }
+
+                let html = '';
+                data.forEach(log => {
+                    const dataLog = formatarDataBR(log.data_verificacao);
+                    let actionClass = 'log-action';
+                    if (log.acao === 'trial_auto') actionClass += ' trial_auto';
+                    else if (log.acao === 'expirado_auto') actionClass += ' expirado_auto';
+                    else if (log.acao === 'proximo_expiracao') actionClass += ' proximo_expiracao';
+                    else if (log.acao === 'admin_manual') actionClass += ' admin_manual';
+                    else if (log.acao === 'pagamento') actionClass += ' pagamento';
+
+                    html += `
+                        <div class="log-item">
+                            <div class="log-date">${dataLog}</div>
+                            <div class="${actionClass}">${log.acao}</div>
+                            <div class="log-details">${log.detalhes || ''}</div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('logsContainer').innerHTML = `
+                    <p style="text-align: center; color: var(--danger); padding: 20px;">
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar logs
+                    </p>
+                `;
+            }
+        }
+
+        // Mudar aba principal
+        function mudarAba(aba) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+            
+            if (aba === 'usuarios') {
+                document.querySelector('[onclick="mudarAba(\'usuarios\')"]').classList.add('active');
+                document.getElementById('usuariosTab').style.display = 'block';
+                document.getElementById('searchBar').style.display = 'block';
+                document.getElementById('filtersBar').style.display = 'flex';
+            } else if (aba === 'logs') {
+                document.querySelector('[onclick="mudarAba(\'logs\')"]').classList.add('active');
+                document.getElementById('logsTab').style.display = 'block';
+                document.getElementById('searchBar').style.display = 'none';
+                document.getElementById('filtersBar').style.display = 'none';
+                carregarLogsGerais();
+            } else if (aba === 'ajuda') {
+                document.querySelector('[onclick="mudarAba(\'ajuda\')"]').classList.add('active');
+                document.getElementById('ajudaTab').style.display = 'block';
+                document.getElementById('searchBar').style.display = 'none';
+                document.getElementById('filtersBar').style.display = 'none';
+            }
+        }
+
+        // Fechar modal
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Show toast
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Inicialização
+        async function init() {
+            if (!verificarAutenticacao()) return;
+
+            showToast('Carregando dados...', 'info');
+
+            try {
+                await Promise.all([
+                    carregarEstatisticas(),
+                    carregarUsuarios()
+                ]);
+                showToast('Dados carregados!', 'success');
+            } catch (error) {
+                console.error('Erro na inicialização:', error);
+                showToast('Erro ao carregar dados', 'error');
+            }
+
+            document.getElementById('btnLogout').addEventListener('click', async () => {
+                sessionStorage.removeItem('admin_autenticado');
+                window.location.href = 'admin_login.html';
+            });
+        }
+
+        // Fechar modais ao clicar fora
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.style.display = 'none';
+            }
+        };
+
+        // Iniciar
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
