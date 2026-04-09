@@ -673,6 +673,14 @@
             color: var(--primary);
             border-bottom: 3px solid var(--primary);
         }
+
+
+        .plan-badge.teste {
+    background: #2ecc71;
+    color: white;
+}
+
+
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1075,28 +1083,41 @@
 
         // Determinar status do usuário
         function determinarStatus(user) {
+    // Status é baseado apenas no campo status da tabela assinaturas
+    if (user.status === 'ativo') {
+        return { class: 'status-ativo', text: 'Ativo' };
+    } else if (user.status === 'inativo') {
+        return { class: 'status-expirado', text: 'Inativo' };
+    } else {
+        return { class: 'status-sem_assinatura', text: 'Sem status' };
+    }
+}
+
+
+function determinarPlano(user) {
     const dias = calcularDiasRestantes(user.data_expiracao);
     const plano = user.plano || 'não definido';
     
     // Se tem data de expiração e ainda está válida
     if (user.data_expiracao && dias > 0) {
-        if (plano === 'não definido') {
-            return { class: 'status-gratis', text: 'Teste (' + dias + 'd)' };
-        } else if (plano === 'mensal') {
-            return { class: 'status-ativo', text: 'Mensal' };
+        if (plano === 'mensal') {
+            return { class: 'plan-badge mensal', text: 'Mensal' };
         } else if (plano === 'anual') {
-            return { class: 'status-ativo', text: 'Anual' };
+            return { class: 'plan-badge anual', text: 'Anual' };
+        } else {
+            return { class: 'plan-badge teste', text: `Teste (${dias}d)` };
         }
     }
     
-    // Se expirou
+    // Se expirou ou não tem assinatura
     if (user.data_expiracao && dias <= 0) {
-        return { class: 'status-expirado', text: 'Expirado' };
+        return { class: 'plan-badge gratis', text: 'Grátis' };
     }
     
     // Sem assinatura
-    return { class: 'status-sem_assinatura', text: 'Sem assinatura' };
+    return { class: 'plan-badge gratis', text: 'Grátis' };
 }
+
 
         // Carregar estatísticas
        async function carregarEstatisticas() {
@@ -1276,74 +1297,69 @@
 
         // Renderizar tabela
         function renderizarTabelaUsuarios(usuarios) {
-            const tbody = document.getElementById('usuariosBody');
-            
-            if (usuarios.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" style="text-align: center; padding: 30px;">
-                            <i class="fas fa-search"></i> Nenhum usuário encontrado
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+    const tbody = document.getElementById('usuariosBody');
+    
+    if (usuarios.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 30px;">
+                    <i class="fas fa-search"></i> Nenhum usuário encontrado
+                 </td>
+             </tr>
+        `;
+        return;
+    }
 
-            let html = '';
-            usuarios.forEach(user => {
-                const telefone = user.raw_user_meta_data?.phone || 'Não informado';
-                
-                const dias = user.dias_restantes;
-                const statusInfo = user.status_info || determinarStatus(user);
-                
-                let diasClass = '';
-                if (dias <= 0) diasClass = 'days-urgent';
-                else if (dias <= 7) diasClass = 'days-warning';
-                else diasClass = 'days-good';
+    let html = '';
+    usuarios.forEach(user => {
+        const telefone = user.raw_user_meta_data?.phone || 'Não informado';
+        
+        const dias = calcularDiasRestantes(user.data_expiracao);
+        const statusInfo = determinarStatus(user);
+        const planInfo = determinarPlano(user);
+        
+        let diasClass = '';
+        if (dias <= 0) diasClass = 'days-urgent';
+        else if (dias <= 7) diasClass = 'days-warning';
+        else diasClass = 'days-good';
 
-                const dataExpiracao = user.data_expiracao ? 
-                    new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
-                
-                const ultimoLogin = user.ultimo_login ? 
-                    new Date(user.ultimo_login).toLocaleString('pt-BR') : 'Nunca';
+        const dataExpiracao = user.data_expiracao ? 
+            new Date(user.data_expiracao).toLocaleDateString('pt-BR') : '-';
+        
+        const ultimoLogin = user.ultimo_login ? 
+            new Date(user.ultimo_login).toLocaleString('pt-BR') : 'Nunca';
 
-                const plano = user.plano || 'não definido';
-                let planoClass = 'plan-badge';
-                if (plano === 'mensal') planoClass += ' mensal';
-                else if (plano === 'anual') planoClass += ' anual';
-                else planoClass += ' gratis';
+        html += `
+            <tr>
+                <td class="email-cell" title="${user.email}">
+                    <i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>
+                    ${user.email}
+                </td>
+                <td>
+                    <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
+                </td>
+                <td>${dataExpiracao}</td>
+                <td>
+                    <span class="days-badge ${diasClass}">${dias} dias</span>
+                </td>
+                <td>
+                    <span class="${planInfo.class}">${planInfo.text}</span>
+                </td>
+                <td><small>${ultimoLogin}</small></td>
+                <td><small>${telefone}</small></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-sm btn-primary" onclick="abrirModalEdicao('${user.user_id}', '${user.email}')" title="Editar usuário">
+                            <i class="fas fa-edit"></i> EDITAR
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
 
-                html += `
-                    <tr>
-                        <td class="email-cell" title="${user.email}">
-                            <i class="fas fa-envelope" style="color: var(--gray); margin-right: 5px;"></i>
-                            ${user.email}
-                        </td>
-                        <td>
-                            <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
-                        </td>
-                        <td>${dataExpiracao}</td>
-                        <td>
-                            <span class="days-badge ${diasClass}">${dias} dias</span>
-                        </td>
-                        <td>
-                            <span class="${planoClass}">${plano}</span>
-                        </td>
-                        <td><small>${ultimoLogin}</small></td>
-                        <td><small>${telefone}</small></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-primary" onclick="abrirModalEdicao('${user.user_id}', '${user.email}')" title="Editar usuário">
-                                    <i class="fas fa-edit"></i> EDITAR
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tbody.innerHTML = html;
-        }
+    tbody.innerHTML = html;
+}
 
         // ========== FUNÇÕES DO MODAL DE EDIÇÃO ==========
 
@@ -1387,7 +1403,14 @@ async function abrirModalEdicao(userId, email) {
         document.getElementById('editEmail').value = data.user.email;
 
         if (data.assinatura) {
-            document.getElementById('editPlano').value = data.assinatura.plano || 'não definido';
+            // Mapear plano para o select
+            let planoSelect = 'não definido';
+            if (data.assinatura.plano === 'mensal') planoSelect = 'mensal';
+            else if (data.assinatura.plano === 'anual') planoSelect = 'anual';
+            else if (data.assinatura.plano === 'gratis') planoSelect = 'não definido';
+            else if (data.assinatura.plano === 'teste') planoSelect = 'não definido';
+            
+            document.getElementById('editPlano').value = planoSelect;
             document.getElementById('editStatus').value = data.assinatura.status === 'ativo' ? 'ativo' : 'inativo';
             
             const dias = calcularDiasRestantes(data.assinatura.data_expiracao);
@@ -1573,10 +1596,12 @@ async function abrirModalEdicao(userId, email) {
             .maybeSingle();
 
         // Mapear plano para o formato correto
-        let planoSalvar = plano;
-        if (plano === 'não definido') planoSalvar = 'gratis';
+        let planoSalvar = 'gratis';
+        if (plano === 'mensal') planoSalvar = 'mensal';
+        else if (plano === 'anual') planoSalvar = 'anual';
+        else if (plano === 'não definido') planoSalvar = 'gratis';
         
-        // Status sempre será 'ativo' para planos gratuitos/teste
+        // Status sempre será 'ativo' para planos gratuitos
         const novoStatus = (plano === 'não definido') ? 'ativo' : status;
 
         const dadosAssinatura = {
@@ -1590,7 +1615,6 @@ async function abrirModalEdicao(userId, email) {
             const dataExpiracao = new Date();
             if (plano === 'mensal') dataExpiracao.setMonth(dataExpiracao.getMonth() + 1);
             else if (plano === 'anual') dataExpiracao.setFullYear(dataExpiracao.getFullYear() + 1);
-            else if (plano === 'não definido') dataExpiracao.setDate(dataExpiracao.getDate() + 30);
             else dataExpiracao.setDate(dataExpiracao.getDate() + 30);
             
             dadosAssinatura.data_expiracao = dataExpiracao.toISOString();
