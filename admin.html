@@ -1082,21 +1082,25 @@
         }
 
         // Determinar status do usuário
-        function determinarStatus(user) {
-    // Status é baseado apenas no campo status da tabela assinaturas
+       function determinarStatus(user) {
+    // Se não tem assinatura ou status é null/undefined
+    if (!user.status) {
+        return { class: 'status-ativo', text: 'Ativo' };
+    }
+    
+    // Status baseado no campo status da tabela assinaturas
     if (user.status === 'ativo') {
         return { class: 'status-ativo', text: 'Ativo' };
     } else if (user.status === 'inativo') {
         return { class: 'status-expirado', text: 'Inativo' };
     } else {
-        return { class: 'status-sem_assinatura', text: 'Sem status' };
+        return { class: 'status-ativo', text: 'Ativo' };
     }
 }
 
-
 function determinarPlano(user) {
     const dias = calcularDiasRestantes(user.data_expiracao);
-    const plano = user.plano || 'não definido';
+    const plano = user.plano || 'gratis';
     
     // Se tem data de expiração e ainda está válida
     if (user.data_expiracao && dias > 0) {
@@ -1104,17 +1108,15 @@ function determinarPlano(user) {
             return { class: 'plan-badge mensal', text: 'Mensal' };
         } else if (plano === 'anual') {
             return { class: 'plan-badge anual', text: 'Anual' };
+        } else if (plano === 'teste') {
+            return { class: 'plan-badge teste', text: `Teste (${dias}d)` };
         } else {
+            // Se não tem plano definido mas tem data de expiração, é teste
             return { class: 'plan-badge teste', text: `Teste (${dias}d)` };
         }
     }
     
     // Se expirou ou não tem assinatura
-    if (user.data_expiracao && dias <= 0) {
-        return { class: 'plan-badge gratis', text: 'Grátis' };
-    }
-    
-    // Sem assinatura
     return { class: 'plan-badge gratis', text: 'Grátis' };
 }
 
